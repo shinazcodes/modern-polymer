@@ -146,8 +146,10 @@ app.use(function (req, res, next) {
 
 // [SH] Catch unauthorised errors
 app.use(function (err, req, res, next) {
-  console.log('Listening on ' + req.toString());
-
+  if(req)
+  // console.log('request on ' + JSON.stringify(req));
+  res.status(401);
+  res.json({ "message": ""+req +"" + ": " + err.message });
   if (err.name === 'UnauthorizedError') {
     res.status(401);
     res.json({ "message": err.name + ": " + err.message });

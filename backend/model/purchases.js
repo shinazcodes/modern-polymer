@@ -35,9 +35,6 @@ purchaseSchema.methods.setPurchase = function (id, data) {
   console.log("here3   zz ");
   this.itemPrice = data.itemPrice;
   console.log("here3   aaaa ");
-
-
-
 };
 
 

@@ -9,6 +9,7 @@ var auth = jwt({
 
 var ctrlProfile = require('../controllers/profile');
 var ctrlPurchase = require('../controllers/purchase');
+var ctrlJobDetails = require('../controllers/job-details');
 var ctrlAuth = require('../controllers/authentication');
 var ctrlOtp = require('../controllers/verify-otp');
 var ctrlEmailVerify = require('../controllers/emailverify');
@@ -16,6 +17,7 @@ var ctrlPurchaseHistory = require('../controllers/purchase-history');
 
 // profile
 router.get('/profile', auth, ctrlProfile.profileRead);
+router.get('/jobDetails', auth, ctrlJobDetails.jobDetails);
 router.post('/purchase', auth, ctrlPurchase.purchase);
 router.post('/verifyEmail', ctrlEmailVerify.verifyEmail);
 router.post('/purchaseHistory', auth, ctrlPurchaseHistory.purchaseHistory);

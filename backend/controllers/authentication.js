@@ -9,7 +9,7 @@ var sendJSONresponse = function(res, status, content) {
 
 module.exports.register = function(req, res) {
 
-  if(!req.body || !req.body.token || !req.body.password) {
+  if(!req.body || !req.body.emailToken || !req.body.password) {
     sendJSONresponse(res, 400, {
       "response": null,
       "message": "All fields required"
@@ -17,7 +17,7 @@ module.exports.register = function(req, res) {
     return;
   }
   console.log("request:" +req.body);
-  User.findOne({emailToken: req.body.token}, (err, user)=>{
+  User.findOne({emailToken: req.body.emailToken}, (err, user)=>{
     if(err) {
       res.status(401).json({
       "repsonse": null,
@@ -32,16 +32,17 @@ module.exports.register = function(req, res) {
       } else {
       user.setPassword(req.body.password);
       user.isVerified = true;
-      user.emailToken = '';
+      // user.emailToken = '';
       user.email = user.email;
-      user.name = user.name;
-      token = user.generateJwt();
+      // user.name = user.name;
+      emailToken = user.generateJwt();
       console.log("user2" + user);
 
-      User.findOneAndUpdate({emailToken: req.body.token}, {...user}, {new: true}, (err, user) =>{
+      User.findOneAndUpdate({emailToken: req.body.emailToken}, {...user}, {new: true}, (err, user) =>{
         console.log("err" + err);
         console.log("user" + user);
         if(err) {
+          console.log("err register:", err)
           res.status(401).json({
             "response": null,
             "message": "something went wrong!"

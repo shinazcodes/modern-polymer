@@ -7,13 +7,28 @@ var User = mongoose.model('User');
 // todo host in create transport
 
 module.exports.verifyEmail = function(req, res) {
-    console.log("user")
-    
+    console.log("req verify emsil",req)
+    if(
+        !req.body.email ||
+        !req.body.firstName ||
+        !req.body.lastName ||
+        !req.body.streetAddress ||
+        !req.body.city ||
+        !req.body.state ||
+         !req.body.zipCode ||
+       !req.body.id 
+
+    ) {
+        res.status(401).json({
+            "response": null,
+            "message": "please enter all details"
+        }); 
+    } else {
 var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'yahoo',
     auth: {
-      user: 'authpepperlogic@gmail.com',
-      pass: 'AuthPepperLogic$1'
+      user: 'shivarajshiva1990@yahoo.com',
+      pass: 'cegzxfqmmnbvzkae'
     },
     tls: {
         rejectUnauthorized: false
@@ -22,9 +37,15 @@ var transporter = nodemailer.createTransport({
   
     var user = new User();
 
-    user.name = req.body.userName;
     user.email = req.body.email;
-
+    user.firstName = req.body.firstName;
+    user.lastName = req.body.lastName;
+    user.streetAddress = req.body.streetAddress;
+    user.city = req.body.city;
+    user.state = req.body.state;
+    user.zipCode = req.body.zipCode;
+    user.id = req.body.id;
+  console.log("req.body",req.body)
     User.findOne({email: req.body.email}, function (err, doc){
         console.log(""+err);
         console.log(""+doc);
@@ -33,11 +54,12 @@ var transporter = nodemailer.createTransport({
             user.otp = Math.floor(100000 + Math.random() * 900000);
             console.log(user.otp); 
             var mailOptions = {
-                from: 'authpepperlogic@gmail.com',
+                from: 'shivarajshiva1990@yahoo.com',
                 to: 'shinazazeez@gmail.com',
                 subject: 'Verification Link Pepper Logic' ,
                 text: 'here is the verification code: ' + user.otp ,
-                html: `<a href="http://192.168.1.9:4200/password/${user.emailToken}">click here to verify your email and set your password</a>`
+                // html: `<a href="http://192.168.1.9:4200/password/${user.emailToken}">click here to verify your email and set your password</a>`
+                html: `<p>use this otp for hometech sign up: ${user.otp}</p>`
                 
             };
             
@@ -55,7 +77,7 @@ var transporter = nodemailer.createTransport({
                 }
             });
             
-            console.log("helloo")
+            console.log("transporter new usr")
             user.save(function(err) {
                 res.status(200);
                 res.json({
@@ -116,6 +138,6 @@ var transporter = nodemailer.createTransport({
             }
         }
     });
-    console.log("helloo")
+}
 
 }
