@@ -32,11 +32,6 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  id: {
-    type: String,
-    required: false
-  },
-  
   isVerified: {
     type: Boolean,
     required: true,
@@ -50,7 +45,46 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
- 
+  adhar: {
+    type: String,
+    required: false
+  },
+  biodata: {
+    type: String,
+    required: false
+  },
+  certificate: {
+    type: String,
+    required: false
+  },
+  license: {
+    type: String,
+    required: false
+  },
+  passbook: {
+    type: String,
+    required: false
+  },
+  pancard: {
+    type: String,
+    required: false
+  },
+  photo: {
+    type: String,
+    required: false
+  },
+  adharNumber: {
+    type: String,
+    required: false
+  },
+  assignedTasks: {
+    type: Array,
+    required: false
+  },
+  userType: {
+    type: String,
+    required: false
+  },
   hash: String,
   salt: String
 });
@@ -73,6 +107,7 @@ userSchema.methods.generateJwt = function () {
     _id: this._id,
     email: this.email,
     name: this.firstName + " " +this.lastName,
+    userType: this.userType ?? "technician",
     exp: parseInt(expiry.getTime() / 1000),
   }, "MY_SECRET"); // DO NOT KEEP YOUR SECRET IN THE CODE!
 };

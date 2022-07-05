@@ -18,14 +18,18 @@ import { LockClosedIcon } from "@heroicons/react/solid";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { login } from "../../api/Auth/authSlice";
-import { store } from "../../api/store";
+import { useSelector } from "react-redux";
+import { ApiState, login } from "../../api/Auth/authSlice";
+import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "./signup";
 import verifyEmail from "./verify-email";
 declare var navigator: any = "";
 export default function Example() {
   const router = useRouter();
   const [showPrompt, setShowPrompt] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const state = useSelector<RootState, RootState>((state) => state);
+
   useEffect(() => {
     if (typeof window !== undefined) {
       if ("serviceWorker" in navigator) {
@@ -75,6 +79,18 @@ export default function Example() {
       deferredPrompt = null;
     });
   };
+
+  useEffect(() => {
+    if (hasSubmitted && state.auth.status === ApiState.SUCCESS) {
+      console.log(localStorage.getItem("userType"));
+      if (localStorage.getItem("userType") === "admin") {
+        router.push("/admin/create-job");
+      } else {
+        router.replace("/home");
+      }
+    }
+  }, [hasSubmitted]);
+
   return (
     <>
       {/*
@@ -94,8 +110,8 @@ export default function Example() {
         <div className="max-w-md w-full space-y-8">
           <div>
             <img
-              className="mx-auto h-12 w-auto"
-              src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
+              className="mx-auto h-32 w-auto"
+              src="/newlogo.png"
               alt="Workflow"
             />
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -130,9 +146,11 @@ export default function Example() {
                 const res = await store.dispatch(login(values));
                 console.log(res);
                 if (res) {
-                  router.replace("/home");
+                  setHasSubmitted(true);
                 }
               } catch (err) {
+                setHasSubmitted(false);
+
                 console.log(err);
                 resetForm();
               }
@@ -152,13 +170,7 @@ export default function Example() {
               isSubmitting,
               /* and other goodies */
             }) => (
-              <form
-                onSubmit={handleSubmit}
-                className="mt-8 space-y-6"
-                action="#"
-                method="POST"
-              >
-                <input type="hidden" name="remember" defaultValue="true" />
+              <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                 <div className="rounded-md shadow-sm -space-y-px">
                   <div>
                     <label htmlFor="email-address" className="sr-only">
@@ -167,7 +179,7 @@ export default function Example() {
                     <input
                       id="email"
                       name="email"
-                      type="email"
+                      type="text"
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.email}
@@ -197,21 +209,6 @@ export default function Example() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      id="remember-me"
-                      name="remember-me"
-                      type="checkbox"
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                    <label
-                      htmlFor="remember-me"
-                      className="ml-2 block text-sm text-gray-900"
-                    >
-                      Remember me
-                    </label>
-                  </div>
-
                   <div className="text-sm">
                     <a
                       href="#"
@@ -226,9 +223,6 @@ export default function Example() {
                   <button
                     type="submit"
                     className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    onClick={() => {
-                      router.push("/home");
-                    }}
                   >
                     <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                       <LockClosedIcon

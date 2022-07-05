@@ -33,13 +33,14 @@ export interface EmailVerifyItems {
   state: string;
   zipCode: string;
   email: string;
-  id?: string | number | string[] | undefined;
+  photo?: string | number | string[] | undefined;
   adhar?: string | number | string[] | undefined;
   biodata?: string | number | string[] | undefined;
   certificate?: string | number | string[] | undefined;
   license?: string | number | string[] | undefined;
   passbook?: string | number | string[] | undefined;
   pancard?: string | number | string[] | undefined;
+  userType?: string;
 }
 export default function SignUpPage() {
   //   const { state } = useSelector<RootState, string>((state) =>
@@ -59,12 +60,6 @@ export default function SignUpPage() {
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const onNext = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // router.replace("/auth/verify-email");
-    // dispatch(verifyEmail({}));
-  };
-
   function getBase64(file: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -80,7 +75,7 @@ export default function SignUpPage() {
   }, [state, hasSubmitted]);
   return (
     <>
-      <div className="mt-10 sm:mt-0">
+      <div className="mt-16">
         {/* <div className="md:col-span-1">
             <div className="px-4 sm:px-0">
               <h3 className="text-lg font-medium leading-6 text-gray-900">Personal Information</h3>
@@ -98,7 +93,7 @@ export default function SignUpPage() {
                 state: "",
                 zipCode: "",
                 email: "",
-                id: "",
+                photo: "",
                 certificate: "",
                 adhar: "",
                 biodata: "",
@@ -129,7 +124,17 @@ export default function SignUpPage() {
               console.log(JSON.stringify({ ...values, id: file }));
               try {
                 const res = await store.dispatch(
-                  verifyEmail({ ...values, id: file })
+                  verifyEmail({
+                    ...values,
+                    photo: photoFile,
+                    pancard: pancardfile,
+                    passbook: passbookfile,
+                    license: licensefile,
+                    biodata: biodatafile,
+                    adhar: adharFile,
+                    certificate: certificatefile,
+                    userType: "admin",
+                  })
                 );
                 setFile(undefined);
                 setFieldValue("id", "");
@@ -214,20 +219,20 @@ export default function SignUpPage() {
                           onChange={(e: any) => {
                             if (e.target.files[0].size > 2097152) {
                               alert("File is too big!");
-                              values.id = undefined;
+                              values.photo = undefined;
                             } else {
                               handleChange(e);
 
                               var file = e.target.files[0];
                               if (file)
                                 getBase64(file).then((data) => {
-                                  setFile(data);
+                                  setPhotoFile(data);
                                   console.log(data);
                                 });
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
+                          value={values.photo}
                           autoComplete="postal-code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
@@ -350,38 +355,6 @@ export default function SignUpPage() {
                           htmlFor="id"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          upload id
-                        </label>
-                        <input
-                          type="file"
-                          name="id"
-                          id="id"
-                          onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
-                              alert("File is too big!");
-                              values.id = undefined;
-                            } else {
-                              handleChange(e);
-
-                              var file = e.target.files[0];
-                              if (file)
-                                getBase64(file).then((data) => {
-                                  setFile(data);
-                                  console.log(data);
-                                });
-                            }
-                          }}
-                          onBlur={handleBlur}
-                          value={values.id}
-                          autoComplete="postal-code"
-                          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        />
-                      </div>
-                      <div className="col-span-6 sm:col-span-3 lg:col-span-2">
-                        <label
-                          htmlFor="id"
-                          className="block text-sm font-medium text-gray-700"
-                        >
                           upload pancard
                         </label>
                         <input
@@ -404,7 +377,7 @@ export default function SignUpPage() {
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
+                          value={values.pancard}
                           autoComplete="postal-code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
@@ -436,7 +409,7 @@ export default function SignUpPage() {
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
+                          value={values.passbook}
                           autoComplete="postal-code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
@@ -468,7 +441,7 @@ export default function SignUpPage() {
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
+                          value={values.certificate}
                           autoComplete="postal-code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
@@ -500,14 +473,14 @@ export default function SignUpPage() {
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
+                          value={values.license}
                           autoComplete="postal-code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
                       <div className="col-span-6 sm:col-span-3 lg:col-span-2">
                         <label
-                          htmlFor="id"
+                          htmlFor="biodata"
                           className="block text-sm font-medium text-gray-700"
                         >
                           upload biodata
@@ -519,21 +492,20 @@ export default function SignUpPage() {
                           onChange={(e: any) => {
                             if (e.target.files[0].size > 2097152) {
                               alert("File is too big!");
-                              values.id = undefined;
+                              values.biodata = undefined;
                             } else {
                               handleChange(e);
 
                               var file = e.target.files[0];
                               if (file)
                                 getBase64(file).then((data) => {
-                                  setFile(data);
+                                  setbiodataFile(data);
                                   console.log(data);
                                 });
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
-                          autoComplete="postal-code"
+                          value={values.biodata}
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
@@ -549,22 +521,27 @@ export default function SignUpPage() {
                           name="adhar"
                           id="adhar"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
-                              alert("File is too big!");
-                              values.adhar = undefined;
-                            } else {
-                              handleChange(e);
+                            if (e.target.files[0]) {
+                              if (e.target.files[0].size > 2097152) {
+                                alert("File is too big!");
+                                values.adhar = undefined;
+                              } else {
+                                handleChange(e);
 
-                              var file = e.target.files[0];
-                              if (file)
-                                getBase64(file).then((data) => {
-                                  setAdharFile(data);
-                                  console.log(data);
-                                });
+                                var file = e.target.files[0];
+                                if (file)
+                                  getBase64(file).then((data) => {
+                                    setAdharFile(data);
+                                    console.log(data);
+                                  });
+                              }
+                            } else {
+                              values.adhar = undefined;
+                              handleChange(e);
                             }
                           }}
                           onBlur={handleBlur}
-                          value={values.id}
+                          value={values.adhar}
                           autoComplete="postal-code"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />

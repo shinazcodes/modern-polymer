@@ -11,9 +11,13 @@ import {
 } from "redux-persist";
 import authReducer from "./Auth/authSlice";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
+import customerReducer from "./Auth/customerSlice";
+import technicianReducer from "./Auth/techniciansSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  customer: customerReducer,
+  technician: technicianReducer,
 });
 const persistConfig = {
   key: "root",

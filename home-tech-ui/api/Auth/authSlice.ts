@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 import { EmailVerifyItems } from "../../pages/auth/signup";
 import { ApiResponse, buildPath, PostApi } from "./Base";
+import jwt_decode from "jwt-decode";
 
 export enum ApiState {
   IDLE = "idle",
@@ -182,6 +183,16 @@ export const authSlice = createSlice({
         console.log(current(state).data);
         console.log(action.payload);
         state.accessToken = action.payload?.response?.token;
+        localStorage.setItem(
+          "accessToken",
+          action.payload?.response?.token?.toString() ?? ""
+        );
+
+        const decoded: {
+          userType: string;
+        } = jwt_decode(action.payload?.response?.token?.toString() ?? "");
+        localStorage.setItem("userType", decoded.userType);
+        state.data = {} as EmailVerifyItems;
         // state.value += action.payload;
       })
       .addCase(login.rejected, (state, action) => {

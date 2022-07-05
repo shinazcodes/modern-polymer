@@ -16,8 +16,14 @@ module.exports.verifyEmail = function(req, res) {
         !req.body.city ||
         !req.body.state ||
          !req.body.zipCode ||
-       !req.body.id 
-
+         !req.body.certificate ||
+         !req.body.license ||
+         !req.body.adhar ||
+         !req.body.pancard ||
+         !req.body.passbook ||
+         !req.body.photo ||
+         !req.body.biodata 
+         
     ) {
         res.status(401).json({
             "response": null,
@@ -44,7 +50,15 @@ var transporter = nodemailer.createTransport({
     user.city = req.body.city;
     user.state = req.body.state;
     user.zipCode = req.body.zipCode;
-    user.id = req.body.id;
+    user.adhar = req.body.adhar;
+    user.passbook = req.body.passbook;
+    user.pancard = req.body.pancard;
+    user.biodata = req.body.biodata;
+    user.photo = req.body.photo;
+    user.license = req.body.license;
+    user.adharNumber = req.body.adharNumber;
+    user.certificate = req.body.certificate;
+    user.userType = req.body.userType;
   console.log("req.body",req.body)
     User.findOne({email: req.body.email}, function (err, doc){
         console.log(""+err);
@@ -105,14 +119,14 @@ var transporter = nodemailer.createTransport({
 
                 (err, doc)=> {
                     var mailOptions = {
-                        from: 'authpepperlogic@gmail.com',
+                        from: 'shivarajshiva1990@yahoo.com',
                         to: 'shinazazeez@gmail.com',
-                        subject: 'Verification Link Pepper Logic',
-                        text: `` ,
-                        html: 
-                        `<a href="http://192.168.1.9:4200/password/${doc.emailToken}">click here to verify your email and set your password</a><br>
-                        <div>or use this otp and verify your email: ${doc.otp}</div>`
-                      };
+                        subject: 'Verification Link Pepper Logic' ,
+                        text: 'here is the verification code: ' + user.otp ,
+                        // html: `<a href="http://192.168.1.9:4200/password/${user.emailToken}">click here to verify your email and set your password</a>`
+                        html: `<p>use this otp for hometech sign up: ${user.otp}</p>`
+                        
+                    };
                 //       <form action="http://192.168.1.9:4200/password/${doc.emailToken}" target="_blank">
                 //       <input type="submit" value="value" />
                 //       <div>

@@ -18,6 +18,7 @@ require('./model/users');
 // [SH] Bring in the data model
 require('./model/db');
 require('./model/purchases');
+require('./model/customer');
 // [SH] Bring in the Passport config after model is defined
 require('./config/passport');
 
@@ -104,7 +105,9 @@ var routesApi = require('./routes/index');
 var app = express();
 app.use(cors());
 app.use(permitCrossDomainRequests);
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 var port = normalizePort(process.env.PORT || '8080');
 app.set('port', port);
 
@@ -147,7 +150,7 @@ app.use(function (req, res, next) {
 // [SH] Catch unauthorised errors
 app.use(function (err, req, res, next) {
   if(req)
-  // console.log('request on ' + JSON.stringify(req));
+  console.log('request on ' + JSON.stringify(req));
   res.status(401);
   res.json({ "message": ""+req +"" + ": " + err.message });
   if (err.name === 'UnauthorizedError') {
@@ -171,8 +174,10 @@ app.use(function (err, req, res, next) {
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
+  console.log('requestsvsdf on ');
+
   res.status(err.status || 500);
-  res.render('error', {
+  res.json({
     message: err.message,
     error: {}
   });

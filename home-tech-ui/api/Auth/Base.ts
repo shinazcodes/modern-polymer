@@ -15,15 +15,17 @@ export const HomeTechApi = axios.create({
   responseType: "json",
   timeout: 60 * 1000,
   timeoutErrorMessage: "timed out",
-  // transformRequest:[
-  //     (data: any, headers?: AxiosRequestHeaders): any =>{
-  //         if(headers) {
-  //             headers["Rqst-Id"] =  "1212323"
-  //         }
-  //         return data
-  //     },
-  //     ...(axios.defaults.transformRequest as AxiosRequestTransformer[])
-  // ],
+  transformRequest: [
+    (data: any, headers?: AxiosRequestHeaders): any => {
+      if (headers) {
+        headers["Authorization"] = `Bearer ${localStorage
+          .getItem("accessToken")
+          ?.toString()}`;
+      }
+      return data;
+    },
+    ...(axios.defaults.transformRequest as AxiosRequestTransformer[]),
+  ],
 });
 
 export enum HomeTechBase {

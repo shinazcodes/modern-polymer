@@ -5,6 +5,11 @@ import {
   LightningBoltIcon,
   ScaleIcon,
 } from "@heroicons/react/outline";
+import { useSelector } from "react-redux";
+import { RootState } from "../api/store";
+import jwt_decode from "jwt-decode";
+import { useEffect, useState } from "react";
+import { decode } from "punycode";
 
 const features = [
   {
@@ -25,6 +30,23 @@ const features = [
 ];
 
 export default function Example() {
+  const token = useSelector<RootState, string | undefined>(
+    (state) => state.auth.accessToken
+  );
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    if (token) {
+      var decoded: {
+        name: string;
+        email: string;
+      } = jwt_decode(token);
+      console.log(decoded);
+      setName(decoded.name);
+      setEmail(decoded.email);
+    }
+  }, [token]);
+
   return (
     <div className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,10 +55,10 @@ export default function Example() {
             <ScaleIcon className="h-6 w-6" aria-hidden="true" />
           </div>
           <p className="mt-10 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Hello shinaz azeez
+            Hello {name}
           </p>
           <p className="mt-20 max-w-2xl text-xl text-gray-500 lg:mx-auto text-center">
-            Registered email : shinaz5@hometech.com
+            Registered email : {email}
           </p>
         </div>
 
