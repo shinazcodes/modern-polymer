@@ -4,6 +4,7 @@ import NavBar from "./components/navbar";
 import { Provider } from "react-redux";
 import { persistor, store } from "../api/store";
 import { PersistGate } from "redux-persist/integration/react";
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

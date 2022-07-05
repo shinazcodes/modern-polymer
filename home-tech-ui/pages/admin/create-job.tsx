@@ -28,7 +28,7 @@ import { getTechnicianList } from "../../api/Auth/techniciansSlice";
 import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "../auth/signup";
 import ListBoxComponent from "../components/ListBox";
-
+import { confirmAlert } from "react-confirm-alert";
 export interface CreateJobItems {
   name: string;
   fullAddress: string;
@@ -37,6 +37,11 @@ export interface CreateJobItems {
   machine: string;
   email: string;
   brand: string;
+}
+export enum JobStatus {
+  UNASSIGNED = "unassigned",
+  PENDING = "pending",
+  COMPLETED = "completed",
 }
 export const Machines = ["Washing Machine", "Fridge", "AC"];
 export default function CreateJobPage() {
@@ -73,10 +78,19 @@ export default function CreateJobPage() {
     if (state.technician.status === ApiState.SUCCESS && gotTechnicians) {
       console.log(state.technician.data);
     }
-    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+    if (state.customer.status === ApiState.SUCCESS && hasSubmitted) {
       //   router.replace("/auth/verify-email");
+
+      confirmAlert({
+        title: "Job Created Successfully",
+      });
+    } else if (state.customer.status === ApiState.ERROR && hasSubmitted) {
+      confirmAlert({
+        title: "something went wrong",
+      });
     }
   }, [state, hasSubmitted]);
+
   return (
     <>
       <div className="mt-16">
@@ -151,7 +165,9 @@ export default function CreateJobPage() {
               <form onSubmit={handleSubmit}>
                 <div className="shadow  sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6">
-                    <div className="mb-4">please enter the job details</div>
+                    <div className="mb-4">
+                      please enter the customer/job details
+                    </div>
                     <div className="grid grid-cols-6 gap-6">
                       <div className="col-span-6 sm:col-span-3">
                         <label
@@ -298,7 +314,7 @@ export default function CreateJobPage() {
                               technician: EmailVerifyItems
                             ) => {
                               console.log(technician);
-                              setSelectedTechnician(technician.email);
+                              setSelectedTechnician(technician._id ?? "");
                             }}
                           />
                         )}

@@ -2,6 +2,7 @@ import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/solid";
 import { Customer } from "../../api/Auth/customerSlice";
 import { EmailVerifyItems } from "../auth/signup";
+import AssignedTechnician from "./AssignedTechnician";
 import ListBoxComponent from "./ListBox";
 
 export default function CarouselComponent({
@@ -12,7 +13,7 @@ export default function CarouselComponent({
   technicians: EmailVerifyItems[];
 }) {
   return (
-    <div className="w-full px-4">
+    <div className="w-full">
       <div className="mx-0 w-full rounded-2xl bg-white p-2">
         <div>
           {customers.map((customer: Customer) => {
@@ -20,7 +21,7 @@ export default function CarouselComponent({
               <Disclosure>
                 {({ open }) => (
                   <>
-                    <Disclosure.Button className="flex mt-2 w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+                    <Disclosure.Button className="flex mt-2 w-full justify-between rounded-lg bg-yellow-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-yellow-200 focus:outline-none focus-visible:ring focus-visible:ring-yellow-500 focus-visible:ring-opacity-75">
                       <span>
                         {customer.name} - {customer.machine} - {customer.brand}
                       </span>
@@ -32,11 +33,20 @@ export default function CarouselComponent({
                     </Disclosure.Button>
                     <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
                       <p>name: {customer.name}</p>
-                      <p>phone number: {customer.brand}</p>
+                      <p>phone number: {customer.mobileNumber}</p>
                       <p>address: {customer.fullAddress}</p>
                       <p>machine: {customer.machine}</p>
+                      <p>status: {customer.status}</p>
                       <p>brand: {customer.brand}</p>
-                      <p>assigned to: {customer.assignedTo ?? "none"}</p>
+                      <p>
+                        <>
+                          assigned to:{" "}
+                          <AssignedTechnician
+                            customer={customer}
+                            technicians={technicians}
+                          />
+                        </>
+                      </p>
                       <div className="flex">
                         <div className="min-w-fit m-auto"> assign to:</div>
                         <ListBoxComponent technicians={technicians} />

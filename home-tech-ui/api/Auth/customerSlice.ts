@@ -37,29 +37,22 @@ export const createCustomer = createAsyncThunk(
   "customer/createCustomer",
   async (data: Customer) => {
     console.log(data);
-    try {
-      const response = await PostApi(buildPath("createCustomer"), data);
-      console.log(response);
 
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<any>;
-    } catch (err) {
-      console.log(err);
-    }
+    const response = await PostApi(buildPath("createCustomer"), data);
+    console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
   }
 );
 export const getCustomers = createAsyncThunk(
   "customer/getCustomers",
   async () => {
-    try {
-      const response = await GetApi(buildPath("get-customers"));
-      console.log(response);
+    const response = await GetApi(buildPath("get-customers"));
+    console.log(response);
 
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<Customer[]>;
-    } catch (err) {
-      console.log(err);
-    }
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<Customer[]>;
   }
 );
 

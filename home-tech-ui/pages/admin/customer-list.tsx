@@ -30,6 +30,7 @@ import { RootState, store } from "../../api/store";
 import CarouselComponent from "../components/CarouselComponent";
 import ListBoxComponent from "../components/ListBox";
 import TabComponent from "../components/TabComponent";
+import { JobStatus } from "./create-job";
 
 export interface CreateJobItems {
   name: string;
@@ -155,7 +156,7 @@ export default function CustomerList() {
             }) => (
               <form onSubmit={handleSubmit}>
                 <div className="shadow overflow-hidden sm:rounded-md">
-                  <div className="px-4 py-5 bg-white h-screen sm:p-6">
+                  <div className="px-4 py-5 bg-white overflow-scroll h-screen sm:p-6">
                     <div className="max-w-full bg-white shadow mx-auto py-6 px-4 h-full sm:px-6 lg:px-8">
                       <h1 className="text-3xl font-bold text-gray-900">
                         Jobs List
@@ -164,9 +165,21 @@ export default function CustomerList() {
                         state.customer.customerList && (
                           <TabComponent
                             customers={{
-                              pending: state.customer.customerList,
-                              onGoing: [state.customer.customerList[0]],
-                              completed: state.customer.customerList,
+                              all: state.customer.customerList,
+
+                              unAssigned: state.customer.customerList.filter(
+                                (customer) =>
+                                  !customer.status ||
+                                  customer.status === JobStatus.UNASSIGNED
+                              ),
+                              pending: state.customer.customerList.filter(
+                                (customer) =>
+                                  customer.status === JobStatus.PENDING
+                              ),
+                              completed: state.customer.customerList.filter(
+                                (customer) =>
+                                  customer.status === JobStatus.COMPLETED
+                              ),
                             }}
                             technicians={state.technician.data}
                           />

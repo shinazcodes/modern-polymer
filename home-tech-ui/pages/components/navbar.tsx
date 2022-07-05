@@ -18,7 +18,7 @@ const navigation = [
 const userNavigation = [
   { name: "Your Profile", href: "#" },
   { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Sign out", href: "/auth/login" },
 ];
 
 function classNames(...classes) {
@@ -38,7 +38,7 @@ export default function NavBar() {
         ```
       */}
       <div className="h-16 fixed top-0 w-full">
-        <Disclosure as="nav" className="bg-orange-400">
+        <Disclosure as="nav" className="bg-blue-400">
           {({ open }) => (
             <>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,11 +115,13 @@ export default function NavBar() {
                                 <Menu.Item key={item.name}>
                                   {({ active }) => (
                                     <a
-                                      href={item.href}
                                       className={classNames(
                                         active ? "bg-gray-100" : "",
                                         "block px-4 py-2 text-sm text-gray-700"
                                       )}
+                                      onClick={() => {
+                                        router.push(item.href);
+                                      }}
                                     >
                                       {item.name}
                                     </a>

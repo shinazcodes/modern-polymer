@@ -37,6 +37,7 @@ export default function ListBoxComponent({
         value={selected}
         onChange={(value) => {
           selectedTechnician?.(value);
+          setSelected(value);
         }}
       >
         <div className="relative mt-1">

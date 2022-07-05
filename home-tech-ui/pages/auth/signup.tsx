@@ -41,6 +41,7 @@ export interface EmailVerifyItems {
   passbook?: string | number | string[] | undefined;
   pancard?: string | number | string[] | undefined;
   userType?: string;
+  _id?: string;
 }
 export default function SignUpPage() {
   //   const { state } = useSelector<RootState, string>((state) =>
@@ -133,7 +134,7 @@ export default function SignUpPage() {
                     biodata: biodatafile,
                     adhar: adharFile,
                     certificate: certificatefile,
-                    userType: "admin",
+                    userType: "technician",
                   })
                 );
                 setFile(undefined);

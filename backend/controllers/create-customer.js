@@ -32,6 +32,45 @@ module.exports.createCustomer = async function(req, res) {
     
       customer.save(function(err) {
         if(!err) {
+        //   User.findOneAndUpdate({email: req.body.assignedTo}, {...user, assignedTasks: [...user.assignedTasks, customer._customerId]}, {new: true}, (err, user) =>{
+        //     console.log("err" + err);
+        //     console.log("user")
+        //     console.log(user); 
+        //     // if(err) {
+        //     //   console.log("err register:", err)
+        //     //   res.status(401).json({
+        //     //     "response": null,
+        //     //     "message": "something went wrong!"
+        //     //   });
+        //     // } else {
+        //     // res.status(200);
+        //     // res.json({
+        //     //   "response" : "user created successfully",
+        //     //   "message": "SUCCESS"
+        //     // });
+        //   // }
+        // });
+        console.log(req.body.assignedTo)
+        User
+          .findById(req.body.assignedTo)
+          .exec(function(err, user) {
+    
+            console.log("user:" + user._id);
+            User.findByIdAndUpdate(req.body.assignedTo, {$set:{assignedTasks: [...user.assignedTasks, customer._customerId]}}, {new: true}, (err, doc) => {
+              if (err) {
+                  console.log("Something wrong when updating data!");
+                  // res.status(401).json({
+                  //   "message": err
+                  // });
+                }
+          // console.log({...user, assignedTasks: [...user.assignedTasks, customer._customerId]})
+          // user.save();
+
+              console.log("hi");
+              console.log(doc);
+              console.log(doc.email);
+          });
+          });
             res.status(200).json({
               "response": "job created successfully!"
                 });
@@ -59,19 +98,19 @@ module.exports.createCustomer = async function(req, res) {
     try {
 
 
-      const resp = await User.aggregate([
-          {
-              $match: { email: req.payload.assignedTo}
-          },
+      // const resp = await User.aggregate([
+      //     {
+      //         $match: { email: req.body.assignedTo}
+      //     },
          
-      ]);
+      // ]);
+      // console.log("find tech");
+      // console.log(resp);
       
-      console.log(resp);
-      
-      
+     
        
-      } catch {
-        res.status(401).json({eror: "somethingsssss went wrong"});
+      } catch (err) {
+        res.status(401).json({eror: err});
   
       }
      

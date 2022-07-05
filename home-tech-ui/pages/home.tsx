@@ -48,7 +48,7 @@ export default function Example() {
   }, [token]);
 
   return (
-    <div className="py-12 bg-white">
+    <div className="py-12 bg-white mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center justify-center flex flex-col items-center">
           <div className=" flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
