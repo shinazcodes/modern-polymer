@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 import { EmailVerifyItems } from "../../pages/auth/signup";
-import { ApiResponse, buildPath, GetApi, PostApi } from "./Base";
+import { OtpSentResponse, SendOtprequest } from "../model";
+import { ApiResponse, buildPath, GetApi, PostApi, PostSmsApi } from "./Base";
 
 export enum ApiState {
   IDLE = "idle",
@@ -22,6 +23,11 @@ export interface Customer {
   altMobileNumber: string;
   assignedTo: string;
   status: string;
+  customerId: string;
+}
+export interface AssignJobRequest {
+  technicianId: string;
+  customerId: string;
 }
 const initialState: InitialAuthState = {
   customerList: [] as Customer[],
@@ -45,6 +51,7 @@ export const createCustomer = createAsyncThunk(
     return response.data as ApiResponse<any>;
   }
 );
+
 export const getCustomers = createAsyncThunk(
   "customer/getCustomers",
   async () => {
@@ -53,6 +60,16 @@ export const getCustomers = createAsyncThunk(
 
     // The value we return becomes the `fulfilled` action payload
     return response.data as ApiResponse<Customer[]>;
+  }
+);
+export const assignJob = createAsyncThunk(
+  "customer/assignJob",
+  async (data: AssignJobRequest) => {
+    const response = await PostApi(buildPath("assign-job"), data);
+    console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
   }
 );
 
@@ -112,6 +129,24 @@ export const customerSlice = createSlice({
         // state.value += action.payload;
       })
       .addCase(getCustomers.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        console.log(state);
+
+        // state.value += action.payload;
+      });
+    builder
+      .addCase(assignJob.pending, (state) => {
+        state.status = ApiState.LOADING;
+        console.log(state);
+      })
+      .addCase(assignJob.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        // console.log(current(state).data);
+        console.log(action.payload);
+
+        // state.value += action.payload;
+      })
+      .addCase(assignJob.rejected, (state, action) => {
         state.status = ApiState.ERROR;
         console.log(state);
 

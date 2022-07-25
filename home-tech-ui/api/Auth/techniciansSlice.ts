@@ -36,6 +36,24 @@ export const getTechnicianList = createAsyncThunk(
     }
   }
 );
+export const getTechnician = createAsyncThunk(
+  "technician/getTechnician",
+  async (dataType: string = "full") => {
+    try {
+      const response = await GetApi(buildPath("getTechnician"), {
+        params: {
+          dataType,
+        },
+      });
+      console.log(response);
+
+      // The value we return becomes the `fulfilled` action payload
+      return response.data as ApiResponse<EmailVerifyItems[]>;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
 
 export const technicianSlice = createSlice({
   name: "technician",

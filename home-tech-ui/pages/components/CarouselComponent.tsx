@@ -1,6 +1,8 @@
 import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/solid";
-import { Customer } from "../../api/Auth/customerSlice";
+import { useState } from "react";
+import { assignJob, Customer } from "../../api/Auth/customerSlice";
+import { store } from "../../api/store";
 import { EmailVerifyItems } from "../auth/signup";
 import AssignedTechnician from "./AssignedTechnician";
 import ListBoxComponent from "./ListBox";
@@ -12,6 +14,10 @@ export default function CarouselComponent({
   customers: Customer[];
   technicians: EmailVerifyItems[];
 }) {
+  const [selectedTechnician, setSelectedTechnician] = useState(
+    {} as EmailVerifyItems
+  );
+
   return (
     <div className="w-full">
       <div className="mx-0 w-full rounded-2xl bg-white p-2">
@@ -49,12 +55,23 @@ export default function CarouselComponent({
                       </p>
                       <div className="flex">
                         <div className="min-w-fit m-auto"> assign to:</div>
-                        <ListBoxComponent technicians={technicians} />
+                        <ListBoxComponent
+                          technicians={technicians}
+                          selectedTechnician={(technicians) => {
+                            setSelectedTechnician(technicians);
+                          }}
+                        />
                         <div className="px-4  bg-gray-50 text-right sm:px-6">
                           <button
                             type="button"
                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             onClick={(e: React.MouseEvent) => {
+                              store.dispatch(
+                                assignJob({
+                                  technicianId: selectedTechnician._id ?? "",
+                                  customerId: customer.name,
+                                })
+                              );
                               e.preventDefault();
                             }}
                           >

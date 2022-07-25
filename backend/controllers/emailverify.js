@@ -11,6 +11,7 @@ module.exports.verifyEmail = function(req, res) {
     if(
         !req.body.email ||
         !req.body.firstName ||
+        !req.body.adharNumber ||
         !req.body.lastName ||
         !req.body.streetAddress ||
         !req.body.city ||
@@ -54,7 +55,9 @@ var transporter = nodemailer.createTransport({
     user.passbook = req.body.passbook;
     user.pancard = req.body.pancard;
     user.biodata = req.body.biodata;
+    user.phoneNumber = req.body.phoneNumber;
     user.photo = req.body.photo;
+    user.adharNumber = req.body.adharNumber;
     user.license = req.body.license;
     user.adharNumber = req.body.adharNumber;
     user.certificate = req.body.certificate;
@@ -83,20 +86,20 @@ var transporter = nodemailer.createTransport({
 
 // <a href="shinaz://password/${user.emailToken}">click here to verify your email and set your password</a>`
 
-            transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                console.log(error);
-                } else {
-                console.log('Email sent: ' + info.response);
-                }
-            });
+            // transporter.sendMail(mailOptions, function(error, info){
+            //     if (error) {
+            //     console.log(error);
+            //     } else {
+            //     console.log('Email sent: ' + info.response);
+            //     }
+            // });
             
             console.log("transporter new usr")
             user.save(function(err) {
                 res.status(200);
                 res.json({
                     "response": null,
-                    "message": "success! email verification link has been sent to your email!"
+                    "message": "success! otp  has been sent to your mobile number!"
                 });
                 
                 });
@@ -136,17 +139,17 @@ var transporter = nodemailer.createTransport({
                     //   <a href="http://localhost:4200/password/${doc.emailToken}">click here to verify your email and set your password</a>`
 
                       
-                      transporter.sendMail(mailOptions, function(error, info){
-                        if (error) {
-                          console.log(error);
-                        } else {
-                          console.log('Email sent: ' + info.response);
-                        }
-                      });
+                    //   transporter.sendMail(mailOptions, function(error, info){
+                    //     if (error) {
+                    //       console.log(error);
+                    //     } else {
+                    //       console.log('Email sent: ' + info.response);
+                    //     }
+                    //   });
                           res.status(200);
                           res.json({
                             "response": null,
-                            "message": "success! email verification link has been sent to your email!"
+                            "message": " otp  has been sent to your mobile number"
                         });
                 });
             }

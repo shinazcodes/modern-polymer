@@ -19,20 +19,26 @@
 // biodata, certificate, license, passbook, pancard
 
 import { Formik } from "formik";
+import { stat } from "fs";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
+import authSlice, {
+  ApiState,
+  sendOtp,
+  verifyEmail,
+} from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
 
 export interface EmailVerifyItems {
-  firstName: string;
-  lastName: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  email: string;
+  firstName?: string;
+  lastName?: string;
+  streetAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  phoneNumber?: string;
+  email?: string;
   photo?: string | number | string[] | undefined;
   adhar?: string | number | string[] | undefined;
   biodata?: string | number | string[] | undefined;
@@ -41,6 +47,7 @@ export interface EmailVerifyItems {
   passbook?: string | number | string[] | undefined;
   pancard?: string | number | string[] | undefined;
   userType?: string;
+  adharNumber?: string;
   _id?: string;
 }
 export default function SignUpPage() {
@@ -56,10 +63,19 @@ export default function SignUpPage() {
   const [certificatefile, setcertificateFile] = useState<any>();
   const [biodatafile, setbiodataFile] = useState<any>();
   const [licensefile, setlicenseFile] = useState<any>();
+  const [values, setValues] = useState<EmailVerifyItems>();
 
   const router = useRouter();
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [hasSubmittedOtp, setHasSubmittedOtp] = useState(false);
+
+  // useEffect(() => {
+  //   if (state.auth.status === ApiState.SUCCESS) {
+
+  //     setHasSubmitted(true);
+  //   }
+  // }, [state, hasSubmittedOtp]);
 
   function getBase64(file: any) {
     return new Promise((resolve, reject) => {
@@ -69,11 +85,37 @@ export default function SignUpPage() {
       reader.onerror = (error) => reject(error);
     });
   }
+
+  const api = async () => {
+    const res = await store.dispatch(
+      verifyEmail({
+        ...values,
+        photo: photoFile,
+        pancard: pancardfile,
+        passbook: passbookfile,
+        license: licensefile,
+        biodata: biodatafile,
+        adhar: adharFile,
+        certificate: certificatefile,
+        userType: "technician",
+      })
+    );
+    setHasSubmitted(true);
+  };
   useEffect(() => {
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
       router.replace("/auth/verify-email");
     }
   }, [state, hasSubmitted]);
+
+  useEffect(() => {
+    if (state.auth.status === ApiState.SUCCESS && hasSubmittedOtp) {
+      api();
+    } else if (state.auth.status === ApiState.ERROR && hasSubmittedOtp) {
+      setHasSubmittedOtp(false);
+    }
+  }, [state, hasSubmitted, values]);
+
   return (
     <>
       <div className="mt-16">
@@ -91,6 +133,7 @@ export default function SignUpPage() {
                 lastName: "",
                 streetAddress: "",
                 city: "",
+                phoneNumber: "",
                 state: "",
                 zipCode: "",
                 email: "",
@@ -101,6 +144,7 @@ export default function SignUpPage() {
                 license: "",
                 passbook: "",
                 pancard: "",
+                adharNumber: "",
               } as EmailVerifyItems
             }
             validate={(values) => {
@@ -124,23 +168,11 @@ export default function SignUpPage() {
             ) => {
               console.log(JSON.stringify({ ...values, id: file }));
               try {
-                const res = await store.dispatch(
-                  verifyEmail({
-                    ...values,
-                    photo: photoFile,
-                    pancard: pancardfile,
-                    passbook: passbookfile,
-                    license: licensefile,
-                    biodata: biodatafile,
-                    adhar: adharFile,
-                    certificate: certificatefile,
-                    userType: "technician",
-                  })
+                const otpRes = await store.dispatch(
+                  sendOtp(values.phoneNumber ?? "")
                 );
-                setFile(undefined);
-                setFieldValue("id", "");
-                setHasSubmitted(true);
-                console.log(res);
+                setValues(values);
+                setHasSubmittedOtp(true);
               } catch (err) {
                 console.log(err);
                 resetForm();
@@ -218,7 +250,7 @@ export default function SignUpPage() {
                           name="photo"
                           id="photo"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
+                            if (e.target.files[0]?.size > 2097152) {
                               alert("File is too big!");
                               values.photo = undefined;
                             } else {
@@ -235,6 +267,24 @@ export default function SignUpPage() {
                           onBlur={handleBlur}
                           value={values.photo}
                           autoComplete="postal-code"
+                          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        />
+                      </div>
+
+                      <div className="col-span-6 sm:col-span-4">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Phone Number
+                        </label>
+                        <input
+                          type="text"
+                          name="phoneNumber"
+                          id="phoneNumber"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.phoneNumber}
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
@@ -363,7 +413,7 @@ export default function SignUpPage() {
                           name="pancard"
                           id="pancard"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
+                            if (e.target.files[0]?.size > 2097152) {
                               alert("File is too big!");
                               values.pancard = undefined;
                             } else {
@@ -395,7 +445,7 @@ export default function SignUpPage() {
                           name="passbook"
                           id="passbook"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
+                            if (e.target.files[0]?.size > 2097152) {
                               alert("File is too big!");
                               values.passbook = undefined;
                             } else {
@@ -427,7 +477,7 @@ export default function SignUpPage() {
                           name="certificate"
                           id="certificate"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
+                            if (e.target.files[0]?.size > 2097152) {
                               alert("File is too big!");
                               values.certificate = undefined;
                             } else {
@@ -459,7 +509,7 @@ export default function SignUpPage() {
                           name="license"
                           id="license"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
+                            if (e.target.files[0]?.size > 2097152) {
                               alert("File is too big!");
                               values.license = undefined;
                             } else {
@@ -491,7 +541,7 @@ export default function SignUpPage() {
                           name="biodata"
                           id="biodata"
                           onChange={(e: any) => {
-                            if (e.target.files[0].size > 2097152) {
+                            if (e.target.files[0]?.size > 2097152) {
                               alert("File is too big!");
                               values.biodata = undefined;
                             } else {
@@ -510,6 +560,24 @@ export default function SignUpPage() {
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
+                      <div className="col-span-6 sm:col-span-6 lg:col-span-2">
+                        <label
+                          htmlFor="adharNumber"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Adhar Number
+                        </label>
+                        <input
+                          type="text"
+                          name="adharNumber"
+                          id="adharNumber"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.adharNumber}
+                          autoComplete="address-level2"
+                          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        />
+                      </div>
                       <div className="col-span-6 sm:col-span-3 lg:col-span-2">
                         <label
                           htmlFor="id"
@@ -523,7 +591,7 @@ export default function SignUpPage() {
                           id="adhar"
                           onChange={(e: any) => {
                             if (e.target.files[0]) {
-                              if (e.target.files[0].size > 2097152) {
+                              if (e.target.files[0]?.size > 2097152) {
                                 alert("File is too big!");
                                 values.adhar = undefined;
                               } else {

@@ -16,6 +16,10 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  adharNumber:{
+    type: String,
+    required: true
+  },
   city: {
     type: String,
     required: true
@@ -70,6 +74,10 @@ var userSchema = new mongoose.Schema({
     required: false
   },
   photo: {
+    type: String,
+    required: false
+  },
+  phoneNumber: {
     type: String,
     required: false
   },

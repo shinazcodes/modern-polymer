@@ -13,7 +13,8 @@ const user = {
 const navigation = [
   { name: "Job List", href: "/admin/customer-list", current: true },
   { name: "Create Job", href: "/admin/create-job", current: false },
-  { name: "Reports", href: "#", current: false },
+  { name: "Reports", href: "/admin/report", current: false },
+  { name: "Invoice", href: "/admin/invoice", current: false },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "#" },
@@ -37,7 +38,7 @@ export default function NavBar() {
         <body class="h-full">
         ```
       */}
-      <div className="h-16 fixed top-0 w-full">
+      <div className="h-16 fixed z-50 top-0 w-full">
         <Disclosure as="nav" className="bg-blue-400">
           {({ open }) => (
             <>

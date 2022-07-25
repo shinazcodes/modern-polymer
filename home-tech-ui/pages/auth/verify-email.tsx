@@ -18,20 +18,39 @@ import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { ApiState, verifyOtp } from "../../api/Auth/authSlice";
+import { ApiState, otpVerification, verifyOtp } from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
 
-  const email = useSelector<RootState, string>(
-    (state) => state.auth.data.email
+  const phoneNumber = useSelector<RootState, string>(
+    (state) => state.auth.data.phoneNumber
   );
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [hasSubmittedOtp, setHasSubmittedOtp] = useState(false);
+  useEffect(() => {
+    if (state.auth.status === ApiState.SUCCESS && hasSubmittedOtp) {
+      router.replace("/auth/password");
+    }
+  }, [state, hasSubmittedOtp]);
+
+  const otpverified = async () => {
+    const res = await store.dispatch(
+      otpVerification({
+        otpVerified: true,
+        phoneNumber,
+      })
+    );
+    if (res) {
+      setHasSubmittedOtp(true);
+    }
+  };
+
   useEffect(() => {
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
-      router.replace("/auth/password");
+      otpverified();
     }
   }, [state, hasSubmitted]);
   return (
@@ -57,12 +76,12 @@ export default function VerifyEmailPage() {
               values,
               { setSubmitting, setFieldValue, resetForm }
             ) => {
-              console.log("otp data sending:", values.otp + " " + email);
+              console.log("otp data sending:", values.otp + " " + phoneNumber);
               try {
                 const res = await store.dispatch(
                   verifyOtp({
                     otp: values.otp,
-                    email,
+                    phoneNumber,
                   })
                 );
                 if (res) {
@@ -100,10 +119,10 @@ export default function VerifyEmailPage() {
                           type="text"
                           name="otp"
                           id="otp"
+                          autoComplete="one-time-code"
                           onChange={handleChange}
                           onBlur={handleBlur}
                           value={values.otp}
-                          autoComplete="email"
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>

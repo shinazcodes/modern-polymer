@@ -237,6 +237,7 @@ export default function Example() {
                     onClick={() => {
                       router.push("/auth/signup");
                     }}
+                    type="button"
                   >
                     <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                       <LockClosedIcon

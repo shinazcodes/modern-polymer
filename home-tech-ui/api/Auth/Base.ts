@@ -28,6 +28,13 @@ export const HomeTechApi = axios.create({
   ],
 });
 
+export const SmsBuddyApi = axios.create({
+  baseURL: "http://thesmsbuddy.com/api/v1",
+  responseType: "json",
+  timeout: 60 * 1000,
+  timeoutErrorMessage: "timed out",
+});
+
 export enum HomeTechBase {
   api = "/api/",
 }
@@ -47,6 +54,21 @@ export function PostApi(
   config?: AxiosRequestConfig | undefined
 ): Promise<AxiosResponse<ApiResponse<unknown>>> {
   return HomeTechApi.post(path, data, config);
+}
+
+export function PostSmsApi(
+  path: string,
+  data?: any,
+  config?: AxiosRequestConfig | undefined
+): Promise<AxiosResponse<ApiResponse<unknown>>> {
+  return SmsBuddyApi.post(path, data, config);
+}
+
+export function GetSmsApi(
+  path: string,
+  config?: AxiosRequestConfig | undefined
+): Promise<AxiosResponse<ApiResponse<unknown>>> {
+  return SmsBuddyApi.get(path, config);
 }
 
 export function GetApi(

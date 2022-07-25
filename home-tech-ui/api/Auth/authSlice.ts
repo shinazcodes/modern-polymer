@@ -1,7 +1,15 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 import { EmailVerifyItems } from "../../pages/auth/signup";
-import { ApiResponse, buildPath, PostApi } from "./Base";
+import {
+  ApiResponse,
+  buildPath,
+  GetSmsApi,
+  HomeTechApi,
+  PostApi,
+  PostSmsApi,
+} from "./Base";
 import jwt_decode from "jwt-decode";
+import { OtpSentResponse, OtpVerifyResponse, SendOtprequest } from "../model";
 
 export enum ApiState {
   IDLE = "idle",
@@ -44,19 +52,90 @@ export const verifyEmail = createAsyncThunk(
   }
 );
 
+export const otpVerification = createAsyncThunk(
+  "auth/otpVerification",
+  async (data: { otpVerified: boolean; phoneNumber: string }) => {
+    console.log(data);
+    const response = await PostApi(buildPath("otpVerification"), data);
+    console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<{ emailToken: string }>;
+  }
+);
+
 export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
-  async (data: { otp: string; email: string }) => {
-    console.log(data);
-    try {
-      const response = await PostApi(buildPath("verifyOtp"), data);
-      console.log(response);
+  async (data: { otp: string; phoneNumber: string }) => {
+    const otpData: SendOtprequest = {
+      key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
+      to: data.phoneNumber,
+      otp: data.otp,
+    };
+    const response = await PostSmsApi("/otp/verify", otpData);
+    console.log(response);
 
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<{ emailToken: string }>;
-    } catch (err) {
-      console.log(err);
-    }
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as OtpVerifyResponse;
+  }
+);
+
+// digits default 6,
+// expiry default 2hours
+// otp  created and sent from the sms buddy if not created here
+
+export const sendOtp = createAsyncThunk(
+  "customer/sendOtp",
+  async (mobileNumber: string) => {
+    const otpData: SendOtprequest = {
+      key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
+      sender: "HOMTEC",
+      to: mobileNumber,
+      message:
+        "{#otp#} is your OTP for registering as a technician at HomeTech World. OTP is valid for 2 hours.",
+    };
+    // console.log(data);
+
+    const response = await GetSmsApi("/sms/send", {
+      params: {
+        key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
+        template_id: "1307165821178488810",
+        type: 1,
+        to: mobileNumber,
+        sender: "HOMTEC",
+        message:
+          "Dear customer, your Test complaint has registered in Home Tech World. Our service engineer will contact you within 24 hours. Thank you HOME TECH WORLD Customer Support: 9744850738",
+      },
+    });
+
+    console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as OtpSentResponse;
+  }
+);
+
+export const sendSms = createAsyncThunk(
+  "customer/sendSms",
+  async (mobileNumber: string) => {
+    // console.log(data);
+
+    const response = await GetSmsApi("/sms/send", {
+      params: {
+        key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
+        template_id: "1307165821178488810",
+        type: 1,
+        to: mobileNumber,
+        sender: "HOMTEC",
+        message:
+          "Dear customer, your Test complaint has registered in Home Tech World. Our service engineer will contact you within 24 hours. Thank you HOME TECH WORLD Customer Support: 9744850738",
+      },
+    });
+
+    console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as OtpSentResponse;
   }
 );
 
@@ -140,14 +219,17 @@ export const authSlice = createSlice({
         console.log(state);
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
-        state.status = ApiState.SUCCESS;
         // state.data = { ...action.meta.arg };
         console.log(current(state).data);
         console.log(action.payload);
-        state.emailToken = action.payload?.response?.emailToken ?? "";
+        if (action.payload.status === "200") {
+          state.status = ApiState.SUCCESS;
+        } else {
+          state.status = ApiState.ERROR;
+        }
         // state.value += action.payload;
       })
-      .addCase(verifyOtp.rejected, (state, action) => {
+      .addCase(verifyOtp.rejected, (state) => {
         state.status = ApiState.ERROR;
         console.log(state);
 
@@ -196,6 +278,29 @@ export const authSlice = createSlice({
         // state.value += action.payload;
       })
       .addCase(login.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        console.log(state);
+
+        // state.value += action.payload;
+      });
+
+    builder
+      .addCase(sendOtp.pending, (state) => {
+        state.status = ApiState.LOADING;
+        console.log(state);
+      })
+      .addCase(sendOtp.fulfilled, (state, action) => {
+        // console.log(current(state).data);
+        console.log(action.payload);
+        if (action.payload.status === "200") {
+          state.status = ApiState.SUCCESS;
+        } else {
+          state.status = ApiState.ERROR;
+        }
+
+        // state.value += action.payload;
+      })
+      .addCase(sendOtp.rejected, (state, action) => {
         state.status = ApiState.ERROR;
         console.log(state);
 
