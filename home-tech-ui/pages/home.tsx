@@ -6,35 +6,62 @@ import {
   ScaleIcon,
 } from "@heroicons/react/outline";
 import { useSelector } from "react-redux";
-import { RootState } from "../api/store";
+import { RootState, store } from "../api/store";
 import jwt_decode from "jwt-decode";
 import { useEffect, useState } from "react";
 import { decode } from "punycode";
-
-const features = [
-  {
-    name: "My jobs",
-    total: "5",
-    icon: GlobeAltIcon,
-  },
-  {
-    name: "Pending jobs",
-    total: "2",
-    icon: ScaleIcon,
-  },
-  {
-    name: "Ongoing jobs",
-    total: "0",
-    icon: LightningBoltIcon,
-  },
-];
+import { getTechnicianList } from "../api/Auth/techniciansSlice";
+import { Customer } from "../api/Auth/customerSlice";
+import { useRouter } from "next/router";
 
 export default function Example() {
   const token = useSelector<RootState, string | undefined>(
     (state) => state.auth.accessToken
   );
+  const jobs = useSelector<RootState, Customer[] | undefined>(
+    (state) => state.auth.jobs
+  );
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const router = useRouter();
+  const [features, setFeatures] = useState([
+    {
+      name: "My jobs",
+      total: 0,
+      icon: GlobeAltIcon,
+    },
+    {
+      name: "Pending jobs",
+      total: 0,
+      icon: ScaleIcon,
+    },
+    {
+      name: "Completed jobs",
+      total: 0,
+      icon: LightningBoltIcon,
+    },
+  ]);
+
+  useEffect(() => {
+    console.log(jobs);
+    let tempFeatures = features;
+    console.log(jobs);
+
+    if (!!jobs?.length) {
+      tempFeatures[0].total = jobs?.length;
+      tempFeatures[1].total = jobs.filter(
+        (job) => job.status && job.status === "pending"
+      ).length;
+      tempFeatures[2].total = jobs.filter(
+        (job) => job.status && job.status === "completed"
+      ).length;
+      console.log(
+        jobs.filter((job) => job.status && job.status === "pending").length
+      );
+    }
+    setFeatures(tempFeatures);
+  }, [jobs]);
+
   useEffect(() => {
     if (token) {
       var decoded: {
@@ -44,6 +71,7 @@ export default function Example() {
       console.log(decoded);
       setName(decoded.name);
       setEmail(decoded.email);
+      // store.dispatch(getTechnicianList)
     }
   }, [token]);
 
@@ -63,13 +91,25 @@ export default function Example() {
         </div>
 
         <dl className="flex flex-row flex-wrap content-between justify-around fixed p-4 bottom-0 left-0 w-full">
-          {features.map((feature) => (
-            <div key={feature.name} className="relative">
+          {features.map((feature, index) => (
+            <div
+              key={feature.name}
+              onClick={() => {
+                if (index === 0) {
+                  router.push("/jobs/all");
+                } else if (index === 1) {
+                  router.push("/jobs/pending");
+                } else {
+                  router.push("/jobs/completed");
+                }
+              }}
+              className="relative w-1/3"
+            >
               <div className="flex flex-col items-center">
                 <div className=" flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
                   <feature.icon className="h-6 w-6" aria-hidden="true" />
                 </div>
-                <p className=" text-lg font-medium text-gray-900">
+                <p className=" md:text-lg text-sm font-medium text-gray-900">
                   {feature.name}
                 </p>
                 <p className=" text-lg font-medium text-gray-900">

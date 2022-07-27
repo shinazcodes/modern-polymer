@@ -11,7 +11,8 @@ module.exports.jobDetails = function(req, res) {
 
   if(!req.body || !req.body.otp || !req.body.email) {
     sendJSONresponse(res, 400, {
-      "response": null,
+      "response": "error",
+
       "message": "All fields required"
     });
     return;
@@ -20,13 +21,13 @@ module.exports.jobDetails = function(req, res) {
   User.findOne({email: req.body.email, otp: req.body.otp}, (err, user)=>{
     if(err) {
       res.status(401).json({
-      "repsonse": null,
+      "repsonse": "error",
       "message": "user not found"});
     } else {
       console.log("user1" + user);
       if(!user){
         res.status(401).json({
-          "response": null,
+          "response": "error",
           "message": "somthing went wrong"
         });
       } else {
@@ -42,7 +43,7 @@ module.exports.jobDetails = function(req, res) {
         console.log("user" + user);
         if(err) {
           res.status(401).json({
-            "response":null,
+            "response":"error",
             "message": "something went wrong!"
           });
         } else {

@@ -112,7 +112,9 @@ export default function SignUpPage() {
     if (state.auth.status === ApiState.SUCCESS && hasSubmittedOtp) {
       api();
     } else if (state.auth.status === ApiState.ERROR && hasSubmittedOtp) {
-      setHasSubmittedOtp(false);
+      api();
+
+      // setHasSubmittedOtp(false);
     }
   }, [state, hasSubmitted, values]);
 

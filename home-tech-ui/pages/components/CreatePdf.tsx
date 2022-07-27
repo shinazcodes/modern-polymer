@@ -22,6 +22,16 @@ const styles = StyleSheet.create({
     width: "45%",
     padding: 10,
   },
+  bigSection: {
+    minWidth: "55%",
+    width: "55%",
+    padding: 10,
+  },
+  smallSection: {
+    minWidth: "35%",
+    width: "35%",
+    padding: 10,
+  },
   rows: {
     borderWidth: 1,
     borderColor: "black",
@@ -35,7 +45,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     margin: "0.25%",
-    minWidth: "19%",
+    minWidth: "19.35%",
     height: 40,
     lineHeight: "100%",
     marginVertical: "auto",
@@ -47,11 +57,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     margin: "0.25%",
-    minWidth: "59.5%",
+    minWidth: "59.1%",
     textAlign: "center",
     minHeight: 40,
 
     backgroundColor: "lightgrey",
+  },
+  small: {
+    fontSize: 16,
+    lineHeight: 1.25,
   },
 });
 
@@ -68,12 +82,13 @@ const PdfDocument = () => (
         <Text
           style={{
             textAlign: "center",
+            width: "100%",
           }}
         >
           Service Reciept
         </Text>
       </View>
-      <View style={styles.section}>
+      <View style={styles.bigSection}>
         <View>
           <Text
             style={{
@@ -84,15 +99,17 @@ const PdfDocument = () => (
           </Text>
         </View>
         <View>
-          <Text>
+          <Text style={styles.small}>
             hometechworld.complaints@gmail.com Sulite 23 M,1 St Floor, A Square
             Building, Edathala PO, Kuzhivelippady, Ernakulam, Kerala 683561
-            GSTIN: 32FOMPB7395GIZP Account number: 921020016570009 Ifsc code:
-            UTIB0002748 Branch: vennala Bank: axis Bank
           </Text>
+          <Text style={styles.small}>GSTIN: 32FOMPB7395GIZP</Text>
+          <Text style={styles.small}>Account number: 921020016570009 </Text>
+          <Text style={styles.small}>Ifsc code: UTIB0002748 </Text>
+          <Text style={styles.small}>Branch: vennala Bank: axis Bank</Text>
         </View>
       </View>
-      <View style={styles.section}>
+      <View style={styles.smallSection}>
         <Text>home</Text>
         <Image
           src={"/newlogo.png"}
@@ -110,11 +127,16 @@ const PdfDocument = () => (
         }}
       ></View>
 
-      <Text style={styles.section}>
-        Customer Name: Test Address : Bdhdhdydbd,hehhs phone:974648488 Email :
-        jsodbdbdh@ysgdvvd
-      </Text>
-      <Text style={styles.section}>Inv-No: #PAY04852 Date :2022-07-12</Text>
+      <View style={styles.section}>
+        <Text style={styles.small}>Customer Name: Test</Text>
+        <Text style={styles.small}>Address : Bdhdhdydbd,hehhs</Text>
+        <Text style={styles.small}>phone:974648488</Text>
+        <Text style={styles.small}>Email : jsodbdbdh@ysgdvvd</Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.small}>Inv-No: #PAY04852 </Text>
+        <Text style={styles.small}>Date :2022-07-12 </Text>
+      </View>
     </Page>
     <Page size="A4" style={styles.page}>
       <View
@@ -280,10 +302,10 @@ const PdfDocument = () => (
               borderWidth: 1,
               borderColor: "black",
               margin: "0.25%",
-              minWidth: "59.5%",
+              minWidth: "59.1%",
               textAlign: "center",
               minHeight: 20,
-              maxWidth: "59.5%",
+              maxWidth: "59.1%",
               backgroundColor: "lightgrey",
             }}
           >
@@ -340,35 +362,35 @@ const PdfDocument = () => (
           marginVertical: 24,
         }}
       ></View>
-      <Text>
+      <Text style={styles.small}>
         o The Service Partners Are Fully Responsible For Complained Attended By
         HOME TECH WORLD The Service Partners Are Fully Responsible For
         Complained Attended By Them.
       </Text>
-      <Text>
+      <Text style={styles.small}>
         o The Service Partners Are Fully Responsible For Complained Attended By
         Them.
       </Text>
-      <Text>
+      <Text style={styles.small}>
         o Out Responsibility Is Limited to Service Of The Equipment Only. We Are
         Not Responsible For AnyConsequential Damage Arising From Delay In Non
         Repair Of Equipment.
       </Text>
 
-      <Text>
+      <Text style={styles.small}>
         o Our Service And Its Associates(Service Partner) Are Not Responsible
         For The Direct Or Indirect Damage& Breakage At The Time Of
         Repairing/Installation/Servicing.
       </Text>
-      <Text>
+      <Text style={styles.small}>
         o Guarantee Of The Parts Which Replaced Will Be Under Terms & Condition.
       </Text>
-      <Text>
+      <Text style={styles.small}>
         o Ones Sold Part Will Not Be Taken Back & Cash Will Not
         Refundable.Service Will Provided By Service Partner Within Warranty
         Period(30 Days)
       </Text>
-      <Text>o Payment Mode Will Be On Cash only</Text>
+      <Text style={styles.small}>o Payment Mode Will Be On Cash only</Text>
     </Page>
   </Document>
 );

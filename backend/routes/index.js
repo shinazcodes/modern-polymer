@@ -19,6 +19,7 @@ var ctrlOtp = require('../controllers/verify-otp');
 var ctrlOtpVerification= require('../controllers/verify-user');
 var ctrlEmailVerify = require('../controllers/emailverify');
 var ctrlPurchaseHistory = require('../controllers/purchase-history');
+var ctrlgenerateInvoice = require('../controllers/generateInvoice');
 
 // profile
 router.get('/profile', auth, ctrlProfile.profileRead);
@@ -30,6 +31,8 @@ router.post('/purchase', auth, ctrlPurchase.purchase);
 router.post('/assign-job', auth, ctrlAssignJob.assignJob);
 router.post('/verifyEmail', ctrlEmailVerify.verifyEmail);
 router.post('/purchaseHistory', auth, ctrlPurchaseHistory.purchaseHistory);
+router.post('/generateInvoice', auth, ctrlgenerateInvoice.generateInvoice);
+router.post('/getInvoice', auth, ctrlgenerateInvoice.getInvoice);
 router.post('/verifyOtp', ctrlOtp.verifyOtp);
 router.post('/otpVerification', ctrlOtpVerification.otpVerification);
 

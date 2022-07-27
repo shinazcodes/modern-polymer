@@ -32,7 +32,9 @@ export default function PasswordPage() {
   const [hasSubmittedLogin, setHasSubmittedLogin] = useState(false);
 
   async function callLogin() {
-    await store.dispatch(login({ password, email: state.auth.data.email }));
+    await store.dispatch(
+      login({ password, email: state.auth.data.email ?? "" })
+    );
   }
   useEffect(() => {
     if (

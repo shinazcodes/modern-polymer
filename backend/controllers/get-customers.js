@@ -5,7 +5,7 @@ module.exports.getCustomers = function(req, res) {
 
   if (!req.payload._id) {
     res.status(401).json({
-      "message" : "UnauthorizedError: private profile"
+      "response": "error", "message" : "UnauthorizedError: private profile"
     });
   } else {
     Customers
@@ -13,7 +13,9 @@ module.exports.getCustomers = function(req, res) {
       .exec(function(err, customer) {
           if(err){
               res.status(400).json({
-                  "message": "sometihng went wrong"
+                  "message": "sometihng went wrong",
+      "response": "error",
+
               })
           } 
             res.status(200).json({

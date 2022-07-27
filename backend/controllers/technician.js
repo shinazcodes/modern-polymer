@@ -7,38 +7,34 @@ module.exports.techniciansList = function(req, res) {
     res.status(401).json({
       "response": "error", "message" : "UnauthorizedError: private profile"
     });
+  } else if(req.body.id){
+    res.status(403).json({
+        "response": "error", "message" : "data unavailable"
+      });
   } else {
     User
-      .find({})
+      .findOne({email: req.body.email})
       .exec(function(err, user) {
         const orderID = req.query.dataType
           if(err){
-              res.status(400).json({
-                  "message": "sometihng went wrong",
-      "response": "error",
-
+              res.status(403).json({
+                  "response": "error", "message": "sometihng went wrong"
               })
           } 
-          if(orderID && orderID !== "full") {
+         
             res.status(200).json({
                 "response":
                     user.map((user)=>{
                         return {
-                            "firstName": user.firstName,
-                            "lastName": user.lastName,
-                            "email": user.email
+                            "data": {
+                                "tasks": user.assignedTasks
+                              }
                         } 
                     })
                 
             });
 
-          } else {
-            res.status(200).json({
-                "response":
-                    user
-                
-            });
-          }
+         
       });
   }
 

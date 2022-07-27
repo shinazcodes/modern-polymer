@@ -18,12 +18,13 @@ import { LockClosedIcon } from "@heroicons/react/solid";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
 import { ApiState, login } from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "./signup";
 import verifyEmail from "./verify-email";
-declare var navigator: any = "";
+declare var navigator: any;
 export default function Example() {
   const router = useRouter();
   const [showPrompt, setShowPrompt] = useState(false);
@@ -35,14 +36,14 @@ export default function Example() {
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", function () {
           navigator.serviceWorker.register("/sw.js").then(
-            function (registration) {
+            function (registration: any) {
               // Registration was successful
               console.log(
                 "ServiceWorker registration successful with scope: ",
                 registration.scope
               );
             },
-            function (err) {
+            function (err: any) {
               // registration failed :(
               console.log("ServiceWorker registration failed: ", err);
             }
@@ -64,7 +65,7 @@ export default function Example() {
   let deferredPrompt: any;
   // div.style.display = 'none';
 
-  const clicked = (e) => {
+  const clicked = (e: any) => {
     // hide our user interface that shows our A2HS button
     // div.style.display = 'none';
     // Show the prompt
@@ -84,9 +85,9 @@ export default function Example() {
     if (hasSubmitted && state.auth.status === ApiState.SUCCESS) {
       console.log(localStorage.getItem("userType"));
       if (localStorage.getItem("userType") === "admin") {
-        router.push("/admin/create-job");
+        router.push("/admin/customer-list");
       } else {
-        router.replace("/home");
+        router.push("/home");
       }
     }
   }, [hasSubmitted]);
@@ -142,15 +143,21 @@ export default function Example() {
               values,
               { setSubmitting, setFieldValue, resetForm }
             ) => {
+              console.log(values);
               try {
-                const res = await store.dispatch(login(values));
+                const res = await store.dispatch(login(values)).unwrap();
                 console.log(res);
-                if (res) {
-                  setHasSubmitted(true);
-                }
-              } catch (err) {
+                setHasSubmitted(true);
+              } catch (err: any) {
+                confirmAlert({
+                  title: err?.message ?? "",
+                  buttons: [
+                    {
+                      label: "okay",
+                    },
+                  ],
+                });
                 setHasSubmitted(false);
-
                 console.log(err);
                 resetForm();
               }

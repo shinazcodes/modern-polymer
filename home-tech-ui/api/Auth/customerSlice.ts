@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
+import { Services } from "../../pages/admin/invoice";
 import { EmailVerifyItems } from "../../pages/auth/signup";
 import { OtpSentResponse, SendOtprequest } from "../model";
 import { ApiResponse, buildPath, GetApi, PostApi, PostSmsApi } from "./Base";
@@ -13,25 +14,46 @@ export enum ApiState {
 export interface InitialAuthState {
   customerList: Customer[] | undefined;
   status: ApiState;
+  selectedForInvoice?: Customer;
+  selectedForInvoiceGeneration?: Customer;
 }
 export interface Customer {
   machine: string;
   name: string;
   fullAddress: string;
   brand: string;
+  email: string;
   mobileNumber: string;
   altMobileNumber: string;
   assignedTo: string;
   status: string;
-  customerId: string;
+  _customerId?: string;
 }
 export interface AssignJobRequest {
-  technicianId: string;
-  customerId: string;
+  technicianEmail: string | null;
+  customer: Customer;
+  remove: boolean;
 }
+
+export interface GenerateInvoiceRequest {
+  machine?: string;
+  name: string;
+  fullAddress: string;
+  brand?: string;
+  email: string;
+  mobileNumber: string;
+  altMobileNumber?: string;
+  assignedTo: string;
+  status?: string;
+  _customerId?: string;
+  services: Services[];
+}
+
 const initialState: InitialAuthState = {
   customerList: [] as Customer[],
   status: ApiState.IDLE,
+  selectedForInvoice: undefined,
+  selectedForInvoiceGeneration: undefined,
 };
 
 // The function below is called a thunk and allows us to perform async logic. It
@@ -56,8 +78,6 @@ export const getCustomers = createAsyncThunk(
   "customer/getCustomers",
   async () => {
     const response = await GetApi(buildPath("get-customers"));
-    console.log(response);
-
     // The value we return becomes the `fulfilled` action payload
     return response.data as ApiResponse<Customer[]>;
   }
@@ -66,7 +86,30 @@ export const assignJob = createAsyncThunk(
   "customer/assignJob",
   async (data: AssignJobRequest) => {
     const response = await PostApi(buildPath("assign-job"), data);
-    console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
+  }
+);
+
+export const generateInvoice = createAsyncThunk(
+  "customer/generateInvoice",
+  async (invoiceDetails: GenerateInvoiceRequest) => {
+    const response = await PostApi(buildPath("generateInvoice"), {
+      invoiceDetails,
+    });
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
+  }
+);
+
+export const getInvoice = createAsyncThunk(
+  "customer/getInvoice",
+  async ({ _customerId }: { _customerId: string }) => {
+    const response = await PostApi(buildPath("getInvoice"), {
+      _customerId: _customerId,
+    });
 
     // The value we return becomes the `fulfilled` action payload
     return response.data as ApiResponse<any>;
@@ -78,13 +121,9 @@ export const customerSlice = createSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    // increment: (state) => {
-    //   // Redux Toolkit allows us to write "mutating" logic in reducers. It
-    //   // doesn't actually mutate the state because it uses the Immer library,
-    //   // which detects changes to a "draft state" and produces a brand new
-    //   // immutable state based off those changes
-    //   state.value += 1;
-    // },
+    custInvoice: (state, action) => {
+      state.selectedForInvoice = action.payload.customer;
+    },
     // decrement: (state) => {
     //   state.value -= 1;
     // },
@@ -99,13 +138,12 @@ export const customerSlice = createSlice({
     builder
       .addCase(createCustomer.pending, (state) => {
         state.status = ApiState.LOADING;
-        console.log(state);
       })
       .addCase(createCustomer.fulfilled, (state, action) => {
         state.status = ApiState.SUCCESS;
         // state.data = { ...action.meta.arg };
         // console.log(current(state).data);
-        console.log(action.payload);
+        // console.log(action.payload);
 
         // state.value += action.payload;
       })
@@ -118,37 +156,74 @@ export const customerSlice = createSlice({
     builder
       .addCase(getCustomers.pending, (state) => {
         state.status = ApiState.LOADING;
-        console.log(state);
+        // console.log(state);
       })
       .addCase(getCustomers.fulfilled, (state, action) => {
         state.status = ApiState.SUCCESS;
         state.customerList = action.payload?.response;
         // console.log(current(state).data);
-        console.log(action.payload);
+        // console.log(action.payload);
 
         // state.value += action.payload;
       })
       .addCase(getCustomers.rejected, (state, action) => {
         state.status = ApiState.ERROR;
-        console.log(state);
+        // console.log(state);
 
         // state.value += action.payload;
       });
     builder
       .addCase(assignJob.pending, (state) => {
         state.status = ApiState.LOADING;
-        console.log(state);
+        // console.log(state);
       })
       .addCase(assignJob.fulfilled, (state, action) => {
         state.status = ApiState.SUCCESS;
         // console.log(current(state).data);
-        console.log(action.payload);
+        // console.log(action.payload);
 
         // state.value += action.payload;
       })
       .addCase(assignJob.rejected, (state, action) => {
         state.status = ApiState.ERROR;
-        console.log(state);
+        // console.log(state);
+
+        // state.value += action.payload;
+      });
+    builder
+      .addCase(generateInvoice.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(generateInvoice.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        // console.log(current(state).data);
+        // console.log(action.payload);
+
+        // state.value += action.payload;
+      })
+      .addCase(generateInvoice.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        // console.log(state);
+
+        // state.value += action.payload;
+      });
+    builder
+      .addCase(getInvoice.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(getInvoice.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        state.selectedForInvoiceGeneration = action.payload.response.customer;
+        // console.log(current(state).data);
+        // console.log(action.payload);
+
+        // state.value += action.payload;
+      })
+      .addCase(getInvoice.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        // console.log(state);
 
         // state.value += action.payload;
       });

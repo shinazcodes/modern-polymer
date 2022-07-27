@@ -21,37 +21,29 @@ const initialState: InitialTechState = {
 export const getTechnicianList = createAsyncThunk(
   "technician/getTechnicianList",
   async (dataType: string = "full") => {
-    try {
-      const response = await GetApi(buildPath("techniciansList"), {
-        params: {
-          dataType,
-        },
-      });
-      console.log(response);
+    const response = await GetApi(buildPath("techniciansList"), {
+      params: {
+        dataType,
+      },
+    });
+    // console.log(response);
 
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<EmailVerifyItems[]>;
-    } catch (err) {
-      console.log(err);
-    }
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<EmailVerifyItems[]>;
   }
 );
 export const getTechnician = createAsyncThunk(
   "technician/getTechnician",
   async (dataType: string = "full") => {
-    try {
-      const response = await GetApi(buildPath("getTechnician"), {
-        params: {
-          dataType,
-        },
-      });
-      console.log(response);
+    const response = await GetApi(buildPath("getTechnician"), {
+      params: {
+        dataType,
+      },
+    });
+    // console.log(response);
 
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<EmailVerifyItems[]>;
-    } catch (err) {
-      console.log(err);
-    }
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<EmailVerifyItems[]>;
   }
 );
 
@@ -81,20 +73,20 @@ export const technicianSlice = createSlice({
     builder
       .addCase(getTechnicianList.pending, (state) => {
         state.status = ApiState.LOADING;
-        console.log(state);
+        // console.log(state);
       })
       .addCase(getTechnicianList.fulfilled, (state, action) => {
         state.status = ApiState.SUCCESS;
         // state.data = { ...action.meta.arg };
-        console.log(current(state).data);
-        console.log(action.payload);
+        // console.log(current(state).data);
+        // console.log(action.payload);
 
         state.data = action.payload?.response as EmailVerifyItems[];
         // state.value += action.payload;
       })
       .addCase(getTechnicianList.rejected, (state, action) => {
         state.status = ApiState.ERROR;
-        console.log(state);
+        // console.log(state);
 
         // state.value += action.payload;
       });

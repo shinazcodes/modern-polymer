@@ -62,7 +62,7 @@ export default function CreateJobPage() {
 
   const getTechnicians = async () => {
     try {
-      const res = await store.dispatch(getTechnicianList());
+      const res = await store.dispatch(getTechnicianList("partial"));
       setgotTechnicians(true);
     } catch (err) {
       console.log(err);
@@ -314,7 +314,7 @@ export default function CreateJobPage() {
                               technician: EmailVerifyItems
                             ) => {
                               console.log(technician);
-                              setSelectedTechnician(technician._id ?? "");
+                              setSelectedTechnician(technician.email ?? "");
                             }}
                           />
                         )}

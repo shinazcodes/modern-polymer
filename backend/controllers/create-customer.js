@@ -12,13 +12,15 @@ module.exports.createCustomer = async function(req, res) {
 
   if(!req.body || !req.body.machine || !req.body.email) {
     sendJSONresponse(res, 400, {
-      "message": "All fields required"
+      "message": "All fields required",
+      "response": "error",
+
     });
     return;
   }
   if (!req.payload._id) {
     res.status(401).json({
-      "message" : "UnauthorizedError: private profile"
+      "response": "error", "message" : "UnauthorizedError: private profile"
     });
   } else {
     try {
@@ -46,21 +48,21 @@ module.exports.createCustomer = async function(req, res) {
         //     // res.status(200);
         //     // res.json({
         //     //   "response" : "user created successfully",
-        //     //   "message": "SUCCESS"
+        //     //   "response": "error", "message": "SUCCESS"
         //     // });
         //   // }
         // });
         console.log(req.body.assignedTo)
         User
-          .findById(req.body.assignedTo)
+          .findOne({email: req.body.assignedTo})
           .exec(function(err, user) {
     
             console.log("user:" + user._id);
-            User.findByIdAndUpdate(req.body.assignedTo, {$set:{assignedTasks: [...user.assignedTasks, customer._customerId]}}, {new: true}, (err, doc) => {
+            User.findByIdAndUpdate(req.body.assignedTo, {$set:{assignedTasks: [...user.assignedTasks, customer]}}, {new: true}, (err, doc) => {
               if (err) {
                   console.log("Something wrong when updating data!");
                   // res.status(401).json({
-                  //   "message": err
+                  //   "response": "error", "message": err
                   // });
                 }
           // console.log({...user, assignedTasks: [...user.assignedTasks, customer._customerId]})
@@ -76,7 +78,7 @@ module.exports.createCustomer = async function(req, res) {
                 });
         } else {
             res.status(401).json({
-                "message": err
+                "response": "error", "message": err
               });
         }
     });
@@ -110,13 +112,15 @@ module.exports.createCustomer = async function(req, res) {
      
        
       } catch (err) {
-        res.status(401).json({eror: err});
+        res.status(401).json({      "response": "error", "message" : "something went wrong"
+      });
   
       }
      
      
     } catch {
-      res.status(401).json({eror: "something went wrong"});
+      res.status(401).json({      "response": "error", "message" : "something went wrong"
+      });
 
     }
    

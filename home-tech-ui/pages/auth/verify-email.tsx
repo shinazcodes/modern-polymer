@@ -24,7 +24,7 @@ import { RootState, store } from "../../api/store";
 export default function VerifyEmailPage() {
   const router = useRouter();
 
-  const phoneNumber = useSelector<RootState, string>(
+  const phoneNumber = useSelector<RootState, string | undefined>(
     (state) => state.auth.data.phoneNumber
   );
   const state = useSelector<RootState, RootState>((state) => state);
@@ -40,16 +40,17 @@ export default function VerifyEmailPage() {
     const res = await store.dispatch(
       otpVerification({
         otpVerified: true,
-        phoneNumber,
+        phoneNumber: phoneNumber ?? "",
       })
     );
-    if (res) {
-      setHasSubmittedOtp(true);
-    }
+    setHasSubmittedOtp(true);
   };
 
   useEffect(() => {
+    // todo change this
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+      otpverified();
+    } else if (hasSubmitted) {
       otpverified();
     }
   }, [state, hasSubmitted]);
@@ -81,7 +82,7 @@ export default function VerifyEmailPage() {
                 const res = await store.dispatch(
                   verifyOtp({
                     otp: values.otp,
-                    phoneNumber,
+                    phoneNumber: phoneNumber ?? "",
                   })
                 );
                 if (res) {

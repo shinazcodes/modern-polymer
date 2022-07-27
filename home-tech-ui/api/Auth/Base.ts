@@ -4,6 +4,8 @@ import axios, {
   AxiosRequestHeaders,
   AxiosRequestTransformer,
   AxiosResponse,
+  AxiosResponseHeaders,
+  AxiosResponseTransformer,
 } from "axios";
 
 export interface ApiResponse<Payload> {
@@ -17,6 +19,7 @@ export const HomeTechApi = axios.create({
   timeoutErrorMessage: "timed out",
   transformRequest: [
     (data: any, headers?: AxiosRequestHeaders): any => {
+      console.log("xfgsffsg");
       if (headers) {
         headers["Authorization"] = `Bearer ${localStorage
           .getItem("accessToken")
@@ -26,10 +29,24 @@ export const HomeTechApi = axios.create({
     },
     ...(axios.defaults.transformRequest as AxiosRequestTransformer[]),
   ],
+  transformResponse: [
+    (data: any, headers?: AxiosResponseHeaders): any => {
+      if (typeof data === "string") {
+        const r = JSON.parse(data);
+        console.log(r.response);
+        console.log(headers);
+        if (r.response === "error") {
+          throw Error(r.message);
+        }
+      }
+      return JSON.parse(data);
+    },
+  ],
+  ...(axios.defaults.transformResponse as AxiosResponseTransformer[]),
 });
 
 export const SmsBuddyApi = axios.create({
-  baseURL: "http://thesmsbuddy.com/api/v1",
+  baseURL: "https://thesmsbuddy.com/api/v1",
   responseType: "json",
   timeout: 60 * 1000,
   timeoutErrorMessage: "timed out",

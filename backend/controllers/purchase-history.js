@@ -12,13 +12,13 @@ module.exports.purchaseHistory = async (req, res) => {
 
 //   if(!req.body || !req.body.itemId || !req.body.itemPrice) {
 //     sendJSONresponse(res, 400, {
-//       "message": "All fields required"
+//       "response": "error", "message": "All fields required"
 //     });
 //     return;
 //   }
   if (!req.payload._id) {
     res.status(401).json({
-      "message" : "UnauthorizedError: private profile"
+      "response": "error", "message" : "UnauthorizedError: private profile"
     });
   } else {
     try {

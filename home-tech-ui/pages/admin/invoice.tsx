@@ -5,30 +5,53 @@ import { useEffect, useState } from "react";
 import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
 import { ApiState, login } from "../../api/Auth/authSlice";
+import { generateInvoice } from "../../api/Auth/customerSlice";
 import { RootState, store } from "../../api/store";
 
+export interface Services {
+  name: string;
+  quantity: number | string;
+  price: number | string;
+}
 export default function Invoice() {
   const router = useRouter();
   const [showPrompt, setShowPrompt] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
+  const [service, setService] = useState<Services[]>([] as Services[]);
+  const [serviceName, setServiceName] = useState<any>("");
+  const [serviceQuanity, setServiceQuantity] = useState<any>("");
+  const [servicePrice, setServicePrice] = useState<any>("");
+  const [hasCreatedService, setHasCreatedService] = useState<any>(false);
 
   useEffect(() => {});
 
   useEffect(() => {
-    if (hasSubmitted && state.auth.status === ApiState.SUCCESS) {
-      console.log(localStorage.getItem("userType"));
-      if (localStorage.getItem("userType") === "admin") {
-        router.push("/admin/create-job");
-      } else {
-        router.replace("/home");
-      }
+    if (hasSubmitted && state.customer.status === ApiState.SUCCESS) {
+      router.replace(
+        "/admin/report/" + state.customer.selectedForInvoice?._customerId
+      );
     }
-  }, [hasSubmitted]);
+  }, [hasSubmitted, state]);
+
+  useEffect(() => {
+    console.log(serviceName);
+    if (hasCreatedService && serviceName && servicePrice && serviceQuanity) {
+      setService([
+        ...service,
+        {
+          name: serviceName,
+          quantity: serviceQuanity,
+          price: servicePrice,
+        },
+      ]);
+      setHasCreatedService(false);
+    }
+  }, [serviceName, serviceQuanity, servicePrice, hasCreatedService]);
 
   const openServiceDialog = () => {
     confirmAlert({
-      customUI: () => (
+      customUI: ({ title, message, onClose }) => (
         <>
           <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
             <h1 className="m-6 mb-0">Add Service</h1>
@@ -40,6 +63,11 @@ export default function Invoice() {
                 id="serviceName"
                 name="serviceName"
                 required
+                onChange={(e: any) => {
+                  e.preventDefault();
+
+                  setServiceName(e.target.value);
+                }}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="service name"
               />
@@ -52,6 +80,10 @@ export default function Invoice() {
                 id="quantity"
                 name="quantity"
                 required
+                onChange={(e: any) => {
+                  e.preventDefault();
+                  setServiceQuantity(e.target.value);
+                }}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="quantity"
               />
@@ -64,6 +96,12 @@ export default function Invoice() {
                 id="price"
                 name="price"
                 required
+                onChange={(e: any) => {
+                  e.preventDefault();
+
+                  console.log(e.target.value);
+                  setServicePrice(e.target.value);
+                }}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="price"
               />
@@ -72,7 +110,8 @@ export default function Invoice() {
               type="submit"
               className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               onClick={() => {
-                //   router.push("/auth/signup");
+                setHasCreatedService(true);
+                onClose();
               }}
             >
               ADD
@@ -89,11 +128,11 @@ export default function Invoice() {
         <div className="rounded-md bg-white p-6 mx-6 shadow-lg -space-y-px">
           <Formik
             initialValues={{
-              custName: "",
-              custMob: "",
-              technicianName: "",
-              custAddress: "",
-              custEmail: "",
+              name: state.customer.selectedForInvoice?.name,
+              mobileNumber: state.customer.selectedForInvoice?.mobileNumber,
+              technicianName: state.customer.selectedForInvoice?.assignedTo,
+              custAddress: state.customer.selectedForInvoice?.fullAddress,
+              custEmail: state.customer.selectedForInvoice?.email,
             }}
             validate={(values) => {
               const errors = {};
@@ -115,11 +154,32 @@ export default function Invoice() {
               { setSubmitting, setFieldValue, resetForm }
             ) => {
               try {
-                // const res = await store.dispatch(login(values));
-                // console.log(res);
-                // if (res) {
-                //   setHasSubmitted(true);
-                // }
+                const customer = state.customer.selectedForInvoice;
+                if (
+                  customer?._customerId &&
+                  values.mobileNumber &&
+                  customer?.assignedTo &&
+                  values.custEmail &&
+                  values?.custAddress &&
+                  values?.name
+                ) {
+                  const res = await store.dispatch(
+                    generateInvoice({
+                      _customerId: customer?._customerId,
+                      mobileNumber: values.mobileNumber,
+                      assignedTo: customer?.assignedTo,
+                      services: service,
+                      email: values.custEmail,
+                      fullAddress: values?.custAddress,
+                      name: values.name,
+                    })
+                  );
+
+                  console.log(res);
+                  if (res) {
+                    setHasSubmitted(true);
+                  }
+                }
               } catch (err) {
                 setHasSubmitted(false);
 
@@ -148,16 +208,16 @@ export default function Invoice() {
               >
                 <div className="rounded-md shadow-sm z-0 w-1/3">
                   <div className="pb-6 ">
-                    <label htmlFor="custName" className="sr-only">
+                    <label htmlFor="name" className="sr-only">
                       Customer Name
                     </label>
                     <input
-                      id="custName"
-                      name="custName"
+                      id="name"
+                      name="name"
                       type="text"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.custName}
+                      value={values.name}
                       autoComplete="email"
                       required
                       className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -180,15 +240,15 @@ export default function Invoice() {
                     />
                   </div>
                   <div className="pb-6 ">
-                    <label htmlFor="custMob" className="sr-only">
+                    <label htmlFor="mobileNumber" className="sr-only">
                       Customer Phone Number
                     </label>
                     <input
-                      id="custMob"
-                      name="custMob"
+                      id="mobileNumber"
+                      name="mobileNumber"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.custMob}
+                      value={values.mobileNumber}
                       required
                       className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                       placeholder="customer phone number"
@@ -228,6 +288,7 @@ export default function Invoice() {
                     onClick={() => {
                       openServiceDialog();
                     }}
+                    type="button"
                     className="group m-auto relative mb-4  w-44 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Add Service
@@ -251,6 +312,22 @@ export default function Invoice() {
               </form>
             )}
           </Formik>
+          {!!service.length && (
+            <div className="flex flex-col w-1/2 m-auto">
+              <div className="flex flex-row flex-wrap w-full m-auto align-middle justify-around">
+                <h1 className="w-1/3 text-center">Name</h1>
+                <h1 className="w-1/3 text-center">Quantity</h1>
+                <h1 className="w-1/3 text-center">Price</h1>
+              </div>
+              {service.map((item) => (
+                <div className="flex flex-row flex-wrap  w-full m-auto align-middle justify-around">
+                  <h1 className="w-1/3 text-center">{item.name}</h1>
+                  <h1 className="w-1/3 text-center">{item.quantity}</h1>
+                  <h1 className="w-1/3 text-center">Rs.{item.price}</h1>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

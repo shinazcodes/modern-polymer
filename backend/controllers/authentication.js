@@ -11,22 +11,23 @@ module.exports.register = function(req, res) {
 
   if(!req.body || !req.body.emailToken || !req.body.password) {
     sendJSONresponse(res, 400, {
-      "response": null,
+      "response": "error",
       "message": "All fields required"
     });
     return;
   }
-  console.log("request:" +req.body);
+  // console.log("request:" +req.body);
   User.findOne({emailToken: req.body.emailToken}, (err, user)=>{
     if(err) {
       res.status(401).json({
-      "repsonse": null,
+      "response": "error",
       "message": "user not found"});
     } else {
-      console.log("user1" + user);
+
+      // console.log("user1" + user);
       if(!user){
         res.status(401).json({
-          "response": null,
+          "response": "error",
           "message": "somthing went wrong"
         });
       } else {
@@ -36,15 +37,13 @@ module.exports.register = function(req, res) {
       user.email = user.email;
       // user.name = user.name;
       emailToken = user.generateJwt();
-      console.log("user2" + user);
 
       User.findOneAndUpdate({emailToken: req.body.emailToken}, {...user}, {new: true}, (err, user) =>{
         console.log("err" + err);
-        console.log("user" + user);
         if(err) {
           console.log("err register:", err)
           res.status(401).json({
-            "response": null,
+            "response": "error",
             "message": "something went wrong!"
           });
         } else {
@@ -65,6 +64,9 @@ module.exports.login = function(req, res) {
   if(!req.body || !req.body.email || !req.body.password) {
     sendJSONresponse(res, 400, {
       "message": "All fields required"
+      ,
+      "response": "error",
+
     });
     return;
   }
@@ -74,10 +76,11 @@ module.exports.login = function(req, res) {
 
     // If Passport throws/catches an error
     if (err) {
+
       res.status(404).json(err);
       return;
     }
-    console.log(user);
+    console.log("logging in ",user.password)
     // If a user is found
     if(user){
       token = user.generateJwt();
@@ -85,12 +88,16 @@ module.exports.login = function(req, res) {
       res.json({
       "response" : 
         {
-        "token" : token
+        "token" : token,
+        "data": {
+          "tasks": user.assignedTasks
+        }
         }
     });
     } else {
       // If user is not found
-      res.status(401).json(info);
+      res.status(403).json({"message": "incorrect credentials",
+      "response": "error",});
     }
   })(req, res);
 

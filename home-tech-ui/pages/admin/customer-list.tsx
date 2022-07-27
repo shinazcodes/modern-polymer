@@ -21,7 +21,7 @@
 import { Listbox } from "@headlessui/react";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
 import { createCustomer, getCustomers } from "../../api/Auth/customerSlice";
@@ -73,12 +73,29 @@ export default function CustomerList() {
   };
   const getTechnicians = async () => {
     try {
-      const res = await store.dispatch(getTechnicianList());
+      const res = await store.dispatch(getTechnicianList("partial"));
       setgotTechnicians(true);
     } catch (err) {
       console.log(err);
     }
   };
+
+  const getCustomerSorted = useCallback(() => {
+    return {
+      all: state.customer.customerList,
+
+      unAssigned: state.customer.customerList?.filter(
+        (customer) =>
+          !customer.status || customer.status === JobStatus.UNASSIGNED
+      ),
+      pending: state.customer.customerList?.filter(
+        (customer) => customer.status === JobStatus.PENDING
+      ),
+      completed: state.customer.customerList?.filter(
+        (customer) => customer.status === JobStatus.COMPLETED
+      ),
+    };
+  }, [state]);
 
   useEffect(() => {
     if (!gotTechnicians) {
@@ -164,24 +181,12 @@ export default function CustomerList() {
                       {
                         state.customer.customerList && (
                           <TabComponent
-                            customers={{
-                              all: state.customer.customerList,
-
-                              unAssigned: state.customer.customerList.filter(
-                                (customer) =>
-                                  !customer.status ||
-                                  customer.status === JobStatus.UNASSIGNED
-                              ),
-                              pending: state.customer.customerList.filter(
-                                (customer) =>
-                                  customer.status === JobStatus.PENDING
-                              ),
-                              completed: state.customer.customerList.filter(
-                                (customer) =>
-                                  customer.status === JobStatus.COMPLETED
-                              ),
-                            }}
+                            customers={getCustomerSorted()}
                             technicians={state.technician.data}
+                            refresh={() => {
+                              setHasSubmitted(false);
+                              setgotTechnicians(false);
+                            }}
                           />
                         )
                         /* <div className="grid grid-cols-6 gap-6">

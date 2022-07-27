@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 
+
 var customerSchema = new mongoose.Schema({
    _customerId: {
     type: String,
@@ -39,6 +40,52 @@ var customerSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  invoiceDetails: {
+    type:{
+      name: {
+      type: String,
+      required: true,
+      unique:false
+    },
+    email: {
+      type: String,
+      required: true
+    },
+     mobileNumber: {
+      type: Number,
+      required: true
+    },
+    fullAddress: {
+        type: String,
+        required: false
+    },
+    assignedTo: {
+      type: String,
+      required: false
+    },
+    services: {
+      type: [{
+        name: {
+          type: String,
+        required: false,
+    
+        },
+        quantity: {
+          type: String,
+        required: false,
+    
+        },
+        price: {
+          type: String,
+        required: false,
+    
+        }
+      }],
+      required: false
+    }
+  },
+    required: false
+  },
 });
 
 
@@ -55,6 +102,5 @@ customerSchema.methods.setCustomer = function (id, data) {
   this.assignedTo = data.assignedTo;
   this.status = data.status;
 };
-
 
 mongoose.model('Customer', customerSchema);

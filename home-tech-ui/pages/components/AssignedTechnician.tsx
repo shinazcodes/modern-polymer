@@ -14,7 +14,7 @@ export default function AssignedTechnician({
   technicians: EmailVerifyItems[];
 }) {
   const assignedTechnician = useMemo(() => {
-    return technicians.filter((tech) => tech._id === customer.assignedTo)[0];
+    return technicians.filter((tech) => tech.email === customer.assignedTo)[0];
   }, [customer, technicians]);
   return assignedTechnician ? (
     <>{`${assignedTechnician.firstName} ${assignedTechnician.lastName} - (${assignedTechnician.email})`}</>

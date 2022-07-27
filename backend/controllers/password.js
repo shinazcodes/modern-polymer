@@ -5,7 +5,7 @@ module.exports.password = function(req, res) {
 
   if (!req.payload._id) {
     res.status(401).json({
-      "message" : "UnauthorizedError: private profile"
+      "response": "error", "message" : "UnauthorizedError: private profile"
     });
   } else {
     User

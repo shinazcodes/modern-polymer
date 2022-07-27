@@ -4,21 +4,23 @@ import CarouselComponent from "./CarouselComponent";
 import { Customer } from "../../api/Auth/customerSlice";
 import { EmailVerifyItems } from "../auth/signup";
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function TabComponent({
   customers,
   technicians,
+  refresh,
 }: {
   customers: {
-    all: Customer[];
-    unAssigned: Customer[];
-    pending: Customer[];
-    completed: Customer[];
+    all?: Customer[];
+    unAssigned?: Customer[];
+    pending?: Customer[];
+    completed?: Customer[];
   };
   technicians: EmailVerifyItems[];
+  refresh: () => void;
 }) {
   let [categories] = useState({
     All: [],
@@ -28,22 +30,23 @@ export default function TabComponent({
   });
   useEffect(() => {
     console.log(customers);
+    console.log("technicians", technicians);
   }, []);
 
   return (
     <div className="w-full px-2 py-2 sm:px-0">
       <Tab.Group>
-        <Tab.List className="flex space-x-1 rounded-xl bg-yellow-200 p-1">
+        <Tab.List className="flex space-x-1 rounded-xl bg-blue-200 p-1">
           {Object.keys(categories).map((category) => (
             <Tab
               key={category}
               className={({ selected }) =>
                 classNames(
                   "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-white",
-                  "ring-yellow-400 ring-opacity-60 ring-offset-2 ring-offset-yellow-400 focus:outline-none focus:ring-2",
+                  "ring-blue-400 ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2",
                   selected
-                    ? "bg-orange-300 shadow"
-                    : "text-yellow-500 hover:bg-white/[0.12] hover:text-yellow-900"
+                    ? "bg-blue-300 shadow"
+                    : "text-blue-500 hover:bg-white/[0.12] hover:text-blue-900"
                 )
               }
             >
@@ -63,6 +66,7 @@ export default function TabComponent({
               <CarouselComponent
                 customers={customer}
                 technicians={technicians}
+                refresh={refresh}
               />
             </Tab.Panel>
           ))}

@@ -10,6 +10,7 @@ import {
 } from "./Base";
 import jwt_decode from "jwt-decode";
 import { OtpSentResponse, OtpVerifyResponse, SendOtprequest } from "../model";
+import { Customer } from "./customerSlice";
 
 export enum ApiState {
   IDLE = "idle",
@@ -23,9 +24,11 @@ export interface InitialAuthState {
   status: ApiState;
   emailToken?: string;
   accessToken?: string;
+  jobs?: Customer[];
 }
 const initialState: InitialAuthState = {
   data: {} as EmailVerifyItems,
+  jobs: [] as Customer[],
   status: ApiState.IDLE,
   emailToken: "",
   accessToken: "",
@@ -40,15 +43,11 @@ export const verifyEmail = createAsyncThunk(
   "auth/verifyEmail",
   async (data: EmailVerifyItems) => {
     console.log(data);
-    try {
-      const response = await PostApi(buildPath("verifyEmail"), data);
-      console.log(response);
+    const response = await PostApi(buildPath("verifyEmail"), data);
+    console.log(response);
 
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<any>;
-    } catch (err) {
-      console.log(err);
-    }
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
   }
 );
 
@@ -72,7 +71,13 @@ export const verifyOtp = createAsyncThunk(
       to: data.phoneNumber,
       otp: data.otp,
     };
-    const response = await PostSmsApi("/otp/verify", otpData);
+    const response = await GetSmsApi("/otp/verify", {
+      params: {
+        key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
+        to: data.phoneNumber,
+        otp: data.otp,
+      },
+    });
     console.log(response);
 
     // The value we return becomes the `fulfilled` action payload
@@ -87,24 +92,14 @@ export const verifyOtp = createAsyncThunk(
 export const sendOtp = createAsyncThunk(
   "customer/sendOtp",
   async (mobileNumber: string) => {
-    const otpData: SendOtprequest = {
-      key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
-      sender: "HOMTEC",
-      to: mobileNumber,
-      message:
-        "{#otp#} is your OTP for registering as a technician at HomeTech World. OTP is valid for 2 hours.",
-    };
-    // console.log(data);
-
-    const response = await GetSmsApi("/sms/send", {
+    const response = await GetSmsApi("/otp/create", {
       params: {
         key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
-        template_id: "1307165821178488810",
-        type: 1,
         to: mobileNumber,
         sender: "HOMTEC",
         message:
-          "Dear customer, your Test complaint has registered in Home Tech World. Our service engineer will contact you within 24 hours. Thank you HOME TECH WORLD Customer Support: 9744850738",
+          "{#otp#} is your OTP for registering as a technician at HomeTech World. OTP is valid for 2 hours.",
+        template_id: "1307165872288244490",
       },
     });
 
@@ -159,15 +154,15 @@ export const login = createAsyncThunk(
   "auth/login",
   async (data: { email: string; password: string }) => {
     console.log(data);
-    try {
-      const response = await PostApi(buildPath("login"), data);
-      console.log(response);
-
-      // The value we return becomes the `fulfilled` action payload
-      return response.data as ApiResponse<{ token: string }>;
-    } catch (err) {
-      console.log(err);
-    }
+    const response = await PostApi(buildPath("login"), data);
+    console.log(response);
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<{
+      token: string;
+      data: {
+        tasks: Customer[];
+      };
+    }>;
   }
 );
 
@@ -269,12 +264,18 @@ export const authSlice = createSlice({
           "accessToken",
           action.payload?.response?.token?.toString() ?? ""
         );
+        console.log(action.payload?.response?.token);
+        try {
+          const decoded: {
+            userType: string;
+          } = jwt_decode(action.payload?.response?.token?.toString() ?? "");
+          // localStorage.setItem("userType", decoded.userType);
 
-        const decoded: {
-          userType: string;
-        } = jwt_decode(action.payload?.response?.token?.toString() ?? "");
-        localStorage.setItem("userType", decoded.userType);
-        state.data = {} as EmailVerifyItems;
+          state.data = {} as EmailVerifyItems;
+          state.jobs = action.payload.response?.data.tasks;
+        } catch (err) {
+          console.log(err);
+        }
         // state.value += action.payload;
       })
       .addCase(login.rejected, (state, action) => {
@@ -301,6 +302,24 @@ export const authSlice = createSlice({
         // state.value += action.payload;
       })
       .addCase(sendOtp.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        console.log(state);
+
+        // state.value += action.payload;
+      });
+    builder
+      .addCase(otpVerification.pending, (state) => {
+        state.status = ApiState.LOADING;
+        console.log(state);
+      })
+      .addCase(otpVerification.fulfilled, (state, action) => {
+        // console.log(current(state).data);
+        console.log(action.payload);
+        state.status = ApiState.SUCCESS;
+        state.emailToken = action.payload.response?.emailToken;
+        // state.value += action.payload;
+      })
+      .addCase(otpVerification.rejected, (state, action) => {
         state.status = ApiState.ERROR;
         console.log(state);
 

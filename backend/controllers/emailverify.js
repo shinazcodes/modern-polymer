@@ -27,7 +27,7 @@ module.exports.verifyEmail = function(req, res) {
          
     ) {
         res.status(401).json({
-            "response": null,
+            "response": "null",
             "message": "please enter all details"
         }); 
     } else {
@@ -107,13 +107,13 @@ var transporter = nodemailer.createTransport({
             console.log("same user");
             if(!doc){
                 res.status(401).json({
-                    "response": null,
+                    "response": "error",
                     "message": "user not found"
                 }); 
             }
             if(doc.isVerified){
                 res.status(401).json({
-                    "response": null,
+                    "response": "error",
                     "messsage": "user already exists!!"
                 });
             } else {

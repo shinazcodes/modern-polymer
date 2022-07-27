@@ -19,6 +19,7 @@ require('./model/users');
 require('./model/db');
 require('./model/purchases');
 require('./model/customer');
+require('./model/invoice');
 // [SH] Bring in the Passport config after model is defined
 require('./config/passport');
 
@@ -152,10 +153,10 @@ app.use(function (err, req, res, next) {
   if(req)
   console.log('request on ' + JSON.stringify(req));
   res.status(401);
-  res.json({ "message": ""+req +"" + ": " + err.message });
+  res.json({ "response": "error", "message": ""+req +"" + ": " + err.message });
   if (err.name === 'UnauthorizedError') {
     res.status(401);
-    res.json({ "message": err.name + ": " + err.message });
+    res.json({ "response": "error", "message": err.name + ": " + err.message });
   }
 });
 

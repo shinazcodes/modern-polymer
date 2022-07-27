@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { EmailVerifyItems } from "../auth/signup";
@@ -21,12 +21,16 @@ export default function ListBoxComponent({
 }) {
   const [selected, setSelected] = useState(technicians[0]);
   const [query, setQuery] = useState("");
+  useEffect(() => {
+    console.log("technicians", technicians);
+  }, []);
+
   const filteredtechnicians =
     query === ""
       ? technicians
       : technicians.filter((technician) =>
-          technician.email
-            .toLowerCase()
+          technician?.email
+            ?.toLowerCase()
             .replace(/\s+/g, "")
             .includes(query.toLowerCase().replace(/\s+/g, ""))
         );

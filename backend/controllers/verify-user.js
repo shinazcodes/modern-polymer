@@ -11,26 +11,26 @@ module.exports.otpVerification = function(req, res) {
 
   if(!req.body || !req.body.otpVerified || !req.body.phoneNumber) {
     sendJSONresponse(res, 400, {
-      "response": null,
+      "response": "error",
       "message": "All fields required"
     });
     return;
   }
   console.log("request otpVerified:" +req.body);
-  User.findOne({phoneNumber: req.body.phoneNumber, otp: req.body.otp}, (err, user)=>{
+  User.findOne({phoneNumber: req.body.phoneNumber}, (err, user)=>{
     if(err) {
       res.status(401).json({
-      "repsonse": null,
+      "repsonse": "error",
       "message": "user not found"});
     } else {
       console.log("user1" + user);
       if(!user){
         res.status(401).json({
-          "response": null,
+          "response": "error",
           "message": "somthing went wrong"
         });
       } else {
-      user.isVerified = otpVerified;
+      user.isVerified = req.body.otpVerified;
       user.emailToken = crypto.randomBytes(64).toString('hex');  
       user.otp = '';
       user.phoneNumber = user.phoneNumber;
@@ -42,7 +42,7 @@ module.exports.otpVerification = function(req, res) {
         console.log("user" + user);
         if(err) {
           res.status(401).json({
-            "response":null,
+            "response":"error",
             "message": "something went wrong!"
           });
         } else {
