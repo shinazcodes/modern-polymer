@@ -2,15 +2,17 @@ import { Disclosure } from "@headlessui/react";
 import { ChevronUpIcon } from "@heroicons/react/solid";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   assignJob,
   Customer,
   customerSlice,
 } from "../../api/Auth/customerSlice";
-import { store } from "../../api/store";
+import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "../auth/signup";
 import AssignedTechnician from "./AssignedTechnician";
 import ListBoxComponent from "./ListBox";
+import jwt_decode from "jwt-decode";
 
 export default function CarouselComponent({
   customers,
@@ -24,6 +26,7 @@ export default function CarouselComponent({
   const [selectedTechnician, setSelectedTechnician] = useState(
     {} as EmailVerifyItems
   );
+  const state = useSelector<RootState, RootState>((state) => state);
 
   const router = useRouter();
   useEffect(() => {
@@ -35,9 +38,9 @@ export default function CarouselComponent({
     <div className="w-full">
       <div className="mx-0 w-full rounded-2xl bg-white p-2">
         <div>
-          {customers.map((customer: Customer) => {
+          {customers.map((customer: Customer, index) => {
             return (
-              <Disclosure>
+              <Disclosure key={index}>
                 {({ open }) => (
                   <>
                     <Disclosure.Button className="flex mt-2 w-full justify-between rounded-lg bg-blue-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-blue-200 focus:outline-none focus-visible:ring focus-visible:ring-yellow-500 focus-visible:ring-opacity-75">
@@ -51,52 +54,58 @@ export default function CarouselComponent({
                       />
                     </Disclosure.Button>
                     <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                      <p>name: {customer.name}</p>
-                      <p>phone number: {customer.mobileNumber}</p>
-                      <p>address: {customer.fullAddress}</p>
-                      <p>machine: {customer.machine}</p>
-                      <p>status: {customer.status}</p>
-                      <p>brand: {customer.brand}</p>
+                      <p className="font-bold">name: {customer.name}</p>
+                      <p className="font-bold">
+                        phone number: {customer.mobileNumber}
+                      </p>
+                      <p className="font-bold">
+                        address: {customer.fullAddress}
+                      </p>
+                      <p className="font-bold">machine: {customer.machine}</p>
+                      <p className="font-bold">status: {customer.status}</p>
+                      <p className="font-bold">brand: {customer.brand}</p>
                       {technicians && (
-                        <p>
+                        <p className="font-bold">
                           <>
                             assigned to:{" "}
                             <AssignedTechnician
                               customer={customer}
                               technicians={technicians}
                             />
-                            <button
-                              type="button"
-                              disabled={!!!customer.assignedTo}
-                              className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                              onClick={async (e: React.MouseEvent) => {
-                                console.log(selectedTechnician);
-                                const assignedTechnician = customer.assignedTo;
-                                console.log(!!assignedTechnician);
-                                if (!!assignedTechnician)
-                                  await store.dispatch(
-                                    assignJob({
-                                      technicianEmail:
-                                        technicians.filter(
-                                          (tech) =>
-                                            tech.email === customer.assignedTo
-                                        )[0]?.email ?? "",
-                                      customer: customer,
-                                      remove: true,
-                                    })
-                                  );
-                                refresh();
+                            {!!customer.assignedTo && (
+                              <button
+                                type="button"
+                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                onClick={async (e: React.MouseEvent) => {
+                                  console.log(selectedTechnician);
+                                  const assignedTechnician =
+                                    customer.assignedTo;
+                                  console.log(!!assignedTechnician);
+                                  if (!!assignedTechnician)
+                                    await store.dispatch(
+                                      assignJob({
+                                        technicianEmail:
+                                          technicians.filter(
+                                            (tech) =>
+                                              tech.email === customer.assignedTo
+                                          )[0]?.email ?? "",
+                                        customer: customer,
+                                        remove: true,
+                                      })
+                                    );
+                                  refresh();
 
-                                e.preventDefault();
-                              }}
-                            >
-                              unAssign
-                            </button>
+                                  e.preventDefault();
+                                }}
+                              >
+                                cancel
+                              </button>
+                            )}
                             {!!customer.assignedTo && (
                               <button
                                 type="button"
                                 disabled={!!!customer.assignedTo}
-                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
                                 onClick={async (e: React.MouseEvent) => {
                                   const assignedTechnician =
                                     customer.assignedTo;
@@ -118,8 +127,11 @@ export default function CarouselComponent({
                         </p>
                       )}
                       {technicians && (
-                        <div className="flex">
-                          <div className="min-w-fit m-auto"> assign to:</div>
+                        <div className="flex mt-6">
+                          <div className="min-w-fit m-auto font-bold">
+                            {" "}
+                            assign to:
+                          </div>
                           <ListBoxComponent
                             technicians={technicians}
                             selectedTechnician={(technicians) => {
@@ -150,24 +162,50 @@ export default function CarouselComponent({
                         </div>
                       )}
                       {!!!technicians && (
-                        <button
-                          type="button"
-                          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                          onClick={(e: React.MouseEvent) => {
-                            console.log(selectedTechnician);
-                            store.dispatch(
-                              assignJob({
-                                technicianEmail: selectedTechnician.email ?? "",
-                                customer: customer,
-                                remove: false,
-                              })
-                            );
-
-                            e.preventDefault();
-                          }}
-                        >
-                          cancel
-                        </button>
+                        <div className="mt-6">
+                          <button
+                            type="button"
+                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            onClick={(e: React.MouseEvent) => {
+                              console.log(customer);
+                              var decoded: {
+                                name: string;
+                                email: string;
+                              } = jwt_decode(state.auth.accessToken ?? "");
+                              console.log(decoded);
+                              store.dispatch(
+                                assignJob({
+                                  technicianEmail: decoded.email ?? "",
+                                  customer: customer,
+                                  remove: true,
+                                })
+                              );
+                              refresh();
+                              e.preventDefault();
+                            }}
+                          >
+                            cancel
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!!!customer.assignedTo}
+                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                            onClick={async (e: React.MouseEvent) => {
+                              const assignedTechnician = customer.assignedTo;
+                              console.log(!!assignedTechnician);
+                              if (!!assignedTechnician)
+                                await store.dispatch(
+                                  customerSlice.actions.custInvoice({
+                                    customer: customer,
+                                  })
+                                );
+                              router.push("/invoice");
+                              e.preventDefault();
+                            }}
+                          >
+                            generate invoice
+                          </button>
+                        </div>
                       )}
                     </Disclosure.Panel>
                   </>

@@ -269,7 +269,7 @@ export const authSlice = createSlice({
           const decoded: {
             userType: string;
           } = jwt_decode(action.payload?.response?.token?.toString() ?? "");
-          // localStorage.setItem("userType", decoded.userType);
+          localStorage.setItem("userType", decoded.userType);
 
           state.data = {} as EmailVerifyItems;
           state.jobs = action.payload.response?.data.tasks;

@@ -49,11 +49,11 @@ export default function ListBoxComponent({
             <Combobox.Input
               className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
               displayValue={(technician: any) =>
-                technician.firstName +
+                technician?.firstName +
                 " " +
-                technician.lastName +
+                technician?.lastName +
                 "(" +
-                technician.email +
+                technician?.email +
                 ")"
               }
               onChange={(event) => setQuery(event.target.value)}

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
+import { Customer } from "../../api/Auth/customerSlice";
 
 // Create styles
 const styles = StyleSheet.create({
@@ -67,10 +68,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 1.25,
   },
+  smaller: {
+    fontSize: 12,
+    lineHeight: 1.25,
+  },
 });
 
 // Create Document Component
-const PdfDocument = () => (
+const PdfDocument = ({ data }: { data: Customer | undefined }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View
@@ -128,14 +133,22 @@ const PdfDocument = () => (
       ></View>
 
       <View style={styles.section}>
-        <Text style={styles.small}>Customer Name: Test</Text>
-        <Text style={styles.small}>Address : Bdhdhdydbd,hehhs</Text>
-        <Text style={styles.small}>phone:974648488</Text>
-        <Text style={styles.small}>Email : jsodbdbdh@ysgdvvd</Text>
+        <Text style={styles.small}>
+          Customer Name: {data?.invoiceDetails?.name}
+        </Text>
+        <Text style={styles.small}>
+          Address : {data?.invoiceDetails?.fullAddress}
+        </Text>
+        <Text style={styles.small}>
+          phone:{data?.invoiceDetails?.mobileNumber}
+        </Text>
+        <Text style={styles.small}>Email : {data?.invoiceDetails?.email}</Text>
       </View>
       <View style={styles.section}>
         <Text style={styles.small}>Inv-No: #PAY04852 </Text>
-        <Text style={styles.small}>Date :2022-07-12 </Text>
+        <Text style={styles.small}>
+          Date:{new Date().toISOString().slice(0, 10)}
+        </Text>
       </View>
     </Page>
     <Page size="A4" style={styles.page}>
@@ -198,54 +211,56 @@ const PdfDocument = () => (
             </Text>
           </View>
         </View>
+        {data?.invoiceDetails?.services.map((service, index) => (
+          <View key={index} style={styles.rows}>
+            <View style={styles.columns}>
+              <Text
+                style={{
+                  margin: "auto",
+                }}
+              >
+                {index + 1}
+              </Text>
+            </View>
+            <View style={styles.columns}>
+              <Text
+                style={{
+                  margin: "auto",
+                }}
+              >
+                {service.name}
+              </Text>
+            </View>
+            <View style={styles.columns}>
+              <Text
+                style={{
+                  margin: "auto",
+                }}
+              >
+                {service.price}
+              </Text>
+            </View>
+            <View style={styles.columns}>
+              <Text
+                style={{
+                  margin: "auto",
+                }}
+              >
+                {service.quantity}
+              </Text>
+            </View>
+            <View style={styles.columns}>
+              <Text
+                style={{
+                  margin: "auto",
+                }}
+              >
+                {Number(service.price) * Number(service.quantity)}
+              </Text>
+            </View>
+          </View>
+        ))}
 
-        <View style={styles.rows}>
-          <View style={styles.columns}>
-            <Text
-              style={{
-                margin: "auto",
-              }}
-            >
-              1
-            </Text>
-          </View>
-          <View style={styles.columns}>
-            <Text
-              style={{
-                margin: "auto",
-              }}
-            >
-              something
-            </Text>
-          </View>
-          <View style={styles.columns}>
-            <Text
-              style={{
-                margin: "auto",
-              }}
-            >
-              1000
-            </Text>
-          </View>
-          <View style={styles.columns}>
-            <Text
-              style={{
-                margin: "auto",
-              }}
-            >
-              3
-            </Text>
-          </View>
-          <View style={styles.columns}>
-            <Text
-              style={{
-                margin: "auto",
-              }}
-            >
-              3000
-            </Text>
-          </View>
-        </View>
         <View style={styles.rows}>
           <View style={styles.bigColumns}>
             <Text
@@ -344,7 +359,7 @@ const PdfDocument = () => (
           margin: 24,
         }}
       >
-        Serviced by : Test
+        Serviced by : {data?.invoiceDetails?.assignedTo}
       </Text>
       <Text
         style={{
@@ -362,35 +377,35 @@ const PdfDocument = () => (
           marginVertical: 24,
         }}
       ></View>
-      <Text style={styles.small}>
+      <Text style={styles.smaller}>
         o The Service Partners Are Fully Responsible For Complained Attended By
         HOME TECH WORLD The Service Partners Are Fully Responsible For
         Complained Attended By Them.
       </Text>
-      <Text style={styles.small}>
+      <Text style={styles.smaller}>
         o The Service Partners Are Fully Responsible For Complained Attended By
         Them.
       </Text>
-      <Text style={styles.small}>
+      <Text style={styles.smaller}>
         o Out Responsibility Is Limited to Service Of The Equipment Only. We Are
         Not Responsible For AnyConsequential Damage Arising From Delay In Non
         Repair Of Equipment.
       </Text>
 
-      <Text style={styles.small}>
+      <Text style={styles.smaller}>
         o Our Service And Its Associates(Service Partner) Are Not Responsible
         For The Direct Or Indirect Damage& Breakage At The Time Of
         Repairing/Installation/Servicing.
       </Text>
-      <Text style={styles.small}>
+      <Text style={styles.smaller}>
         o Guarantee Of The Parts Which Replaced Will Be Under Terms & Condition.
       </Text>
-      <Text style={styles.small}>
+      <Text style={styles.smaller}>
         o Ones Sold Part Will Not Be Taken Back & Cash Will Not
         Refundable.Service Will Provided By Service Partner Within Warranty
         Period(30 Days)
       </Text>
-      <Text style={styles.small}>o Payment Mode Will Be On Cash only</Text>
+      <Text style={styles.smaller}>o Payment Mode Will Be On Cash only</Text>
     </Page>
   </Document>
 );

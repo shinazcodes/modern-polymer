@@ -28,7 +28,24 @@ export interface Customer {
   assignedTo: string;
   status: string;
   _customerId?: string;
+  invoiceDetails?: InvoiceDetails;
 }
+
+export interface Service {
+  name: string;
+  quantity: string;
+  price: string;
+}
+
+export interface InvoiceDetails {
+  name: string;
+  fullAddress: string;
+  mobileNumber: number;
+  email: string;
+  assignedTo: string;
+  services: Service[];
+}
+
 export interface AssignJobRequest {
   technicianEmail: string | null;
   customer: Customer;
@@ -122,6 +139,7 @@ export const customerSlice = createSlice({
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
     custInvoice: (state, action) => {
+      console.log(action.payload);
       state.selectedForInvoice = action.payload.customer;
     },
     // decrement: (state) => {

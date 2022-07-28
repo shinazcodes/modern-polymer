@@ -27,6 +27,7 @@ import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
 import { createCustomer, getCustomers } from "../../api/Auth/customerSlice";
 import { getTechnicianList } from "../../api/Auth/techniciansSlice";
 import { RootState, store } from "../../api/store";
+import ApprovalTabs from "../components/ApprovalTabs";
 import CarouselComponent from "../components/CarouselComponent";
 import ListBoxComponent from "../components/ListBox";
 import TabComponent from "../components/TabComponent";
@@ -175,7 +176,7 @@ export default function CustomerList() {
                         Jobs List
                       </h1>
                       {state.customer.customerList && (
-                        <TabComponent
+                        <ApprovalTabs
                           customers={getCustomerSorted()}
                           technicians={state.technician.data}
                           refresh={() => {

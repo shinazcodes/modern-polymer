@@ -108,7 +108,7 @@ export default function CreateJobPage() {
                 fullAddress: "",
                 mobileNumber: "",
                 altMobileNumber: "",
-                machine: "",
+                machine: "Washing Machine",
                 brand: "",
                 email: "",
               } as CreateJobItems
@@ -279,8 +279,10 @@ export default function CreateJobPage() {
                           value={values.machine}
                           className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         >
-                          {Machines.map((item) => (
-                            <option value={item}>{item}</option>
+                          {Machines.map((item, index) => (
+                            <option key={index} value={item}>
+                              {item}
+                            </option>
                           ))}
                         </select>
                       </div>

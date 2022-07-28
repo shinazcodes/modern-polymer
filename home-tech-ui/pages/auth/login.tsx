@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
 import { ApiState, login } from "../../api/Auth/authSlice";
-import { RootState, store } from "../../api/store";
+import { persistor, RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "./signup";
 import verifyEmail from "./verify-email";
 declare var navigator: any;
@@ -30,7 +30,10 @@ export default function Example() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
-
+  useEffect(() => {
+    localStorage.removeItem("accessToken");
+    persistor.purge();
+  }, []);
   useEffect(() => {
     if (typeof window !== undefined) {
       if ("serviceWorker" in navigator) {
@@ -103,7 +106,7 @@ export default function Example() {
         ```
       */}
       {showPrompt && (
-        <div className="absolute w-11 h-9 top-0 border-2 border-solid bg-slate-200">
+        <div className="absolute w-11 h-9 top-16 border-2 border-solid bg-slate-200">
           <button onClick={clicked}>Add to home screen</button>
         </div>
       )}
@@ -215,7 +218,7 @@ export default function Example() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                   <div className="text-sm">
                     <a
                       href="#"
@@ -224,7 +227,7 @@ export default function Example() {
                       Forgot your password?
                     </a>
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   <button

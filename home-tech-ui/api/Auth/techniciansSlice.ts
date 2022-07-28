@@ -11,6 +11,7 @@ export enum ApiState {
 
 export interface InitialTechState {
   data: EmailVerifyItems[];
+  showTechnician?: EmailVerifyItems;
   status: ApiState;
 }
 const initialState: InitialTechState = {
@@ -34,16 +35,14 @@ export const getTechnicianList = createAsyncThunk(
 );
 export const getTechnician = createAsyncThunk(
   "technician/getTechnician",
-  async (dataType: string = "full") => {
-    const response = await GetApi(buildPath("getTechnician"), {
-      params: {
-        dataType,
-      },
+  async ({ email }: { email: string }) => {
+    const response = await PostApi(buildPath("getTechnician"), {
+      email,
     });
     // console.log(response);
 
     // The value we return becomes the `fulfilled` action payload
-    return response.data as ApiResponse<EmailVerifyItems[]>;
+    return response.data as ApiResponse<EmailVerifyItems>;
   }
 );
 
@@ -85,6 +84,25 @@ export const technicianSlice = createSlice({
         // state.value += action.payload;
       })
       .addCase(getTechnicianList.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        // console.log(state);
+
+        // state.value += action.payload;
+      });
+    builder
+      .addCase(getTechnician.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(getTechnician.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        // state.data = { ...action.meta.arg };
+        // console.log(current(state).data);
+        // console.log(action.payload);
+        state.showTechnician = action.payload.response;
+        // state.value += action.payload;
+      })
+      .addCase(getTechnician.rejected, (state, action) => {
         state.status = ApiState.ERROR;
         // console.log(state);
 

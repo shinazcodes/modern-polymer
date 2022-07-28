@@ -4,9 +4,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
-import { ApiState, login } from "../../api/Auth/authSlice";
-import { generateInvoice } from "../../api/Auth/customerSlice";
-import { RootState, store } from "../../api/store";
+import { ApiState, generateInvoice } from "../api/Auth/customerSlice";
+import { RootState, store } from "../api/store";
 
 export interface Services {
   name: string;
@@ -24,18 +23,22 @@ export default function Invoice() {
   const [servicePrice, setServicePrice] = useState<any>("");
   const [hasCreatedService, setHasCreatedService] = useState<any>(false);
 
-  useEffect(() => {
-    console.log(state.customer.selectedForInvoice);
-    setService(
-      state.customer.selectedForInvoice?.invoiceDetails?.services ?? []
-    );
-  }, []);
+  useEffect(() => {});
 
   useEffect(() => {
     if (hasSubmitted && state.customer.status === ApiState.SUCCESS) {
-      router.replace(
-        "/admin/report/" + state.customer.selectedForInvoice?._customerId
-      );
+      confirmAlert({
+        title:
+          "invoice generated successfully! please wait for approval from admin.",
+        buttons: [
+          {
+            label: "ok",
+            onClick: () => {
+              router.push("/home");
+            },
+          },
+        ],
+      });
     }
   }, [hasSubmitted, state]);
 
@@ -211,7 +214,7 @@ export default function Invoice() {
                 onSubmit={handleSubmit}
                 className="mt-8 space-y-6 flex flex-row flex-wrap align-middle justify-center m-auto w-full"
               >
-                <div className="rounded-md shadow-sm z-0 w-1/3">
+                <div className="rounded-md shadow-sm z-0 w-full">
                   <div className="pb-6 ">
                     <label htmlFor="name" className="sr-only">
                       Customer Name
