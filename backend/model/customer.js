@@ -12,6 +12,10 @@ var customerSchema = new mongoose.Schema({
     required: true,
     unique:false
   },
+  fullAddress: {
+    type: String,
+    required: false
+},
   email: {
     type: String,
     required: true

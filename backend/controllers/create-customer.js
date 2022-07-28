@@ -56,9 +56,9 @@ module.exports.createCustomer = async function(req, res) {
         User
           .findOne({email: req.body.assignedTo})
           .exec(function(err, user) {
-    
+          
             console.log("user:" + user._id);
-            User.findByIdAndUpdate(req.body.assignedTo, {$set:{assignedTasks: [...user.assignedTasks, customer]}}, {new: true}, (err, doc) => {
+            User.findOneAndUpdate({email: req.body.assignedTo}, {$set:{assignedTasks: [...user.assignedTasks, customer]}}, {new: true}, (err, doc) => {
               if (err) {
                   console.log("Something wrong when updating data!");
                   // res.status(401).json({
@@ -70,7 +70,7 @@ module.exports.createCustomer = async function(req, res) {
 
               console.log("hi");
               console.log(doc);
-              console.log(doc.email);
+              // console.log(doc.email);
           });
           });
             res.status(200).json({

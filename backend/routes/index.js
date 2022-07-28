@@ -20,11 +20,13 @@ var ctrlOtpVerification= require('../controllers/verify-user');
 var ctrlEmailVerify = require('../controllers/emailverify');
 var ctrlPurchaseHistory = require('../controllers/purchase-history');
 var ctrlgenerateInvoice = require('../controllers/generateInvoice');
+var ctrlGetTechnician = require('../controllers/technician');
 
 // profile
 router.get('/profile', auth, ctrlProfile.profileRead);
 router.get('/jobDetails', auth, ctrlJobDetails.jobDetails);
 router.get('/techniciansList', auth, ctrlTechniciansList.techniciansList);
+router.post('/getTechnician', auth, ctrlGetTechnician.getTechnician);
 router.post('/createCustomer', auth, ctrlCreateCustomer.createCustomer);
 router.get('/get-customers', auth, ctrlGetCustomers.getCustomers);
 router.post('/purchase', auth, ctrlPurchase.purchase);

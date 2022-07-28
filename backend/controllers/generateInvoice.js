@@ -42,7 +42,8 @@ module.exports.generateInvoice = async function(req, res) {
           mobileNumber: req.body.invoiceDetails.mobileNumber,
           email: req.body.invoiceDetails.email,
           assignedTo: req.body.invoiceDetails.assignedTo,
-          services: serviceArray
+          services: serviceArray,
+          custId: req.body.invoiceDetails._customerId
         };
         // invoice.setInvoice(req.body.invoiceDetails.email, req.body._id,req.body.invoiceDetails, [...serviceArray]);
         
@@ -114,7 +115,7 @@ module.exports.getInvoice = async function(req, res) {
          
             res.status(200).json({
                 "response":{
-                                "customer": user.invoiceDetails
+                                "customer": user
 
                             }
          

@@ -100,5 +100,4 @@ module.exports.login = function(req, res) {
       "response": "error",});
     }
   })(req, res);
-
 };

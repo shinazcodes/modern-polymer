@@ -35,26 +35,18 @@ var invoiceDetailsSchema = new mongoose.Schema({
       type: Number,
       required: true
     },
-    altMobileNumber: {
-      type: Number,
-      required: false
-    },
-    machine: {
-      type: String,
-      required: false
-    },
-    brand: {
-      type: String,
-      required: false
-    },
-    status: {
-      type: String,
-      required: false
+    fullAddress: {
+        type: String,
+        required: false
     },
     assignedTo: {
       type: String,
       required: false
     },
+    custId: {
+        type: String,
+        required: false
+      },
     services: {
       type: [{
         name: {
@@ -89,7 +81,6 @@ var invoiceDetailsSchema = new mongoose.Schema({
     this.assignedTo = data.assignedTo;
     this.status = data.status;
     this.services = array
-
   };
   mongoose.model('Invoice', invoiceDetailsSchema);
 
