@@ -1,7 +1,6 @@
 
 
 var mongoose = require('mongoose');
-const  ObjectID = require('mongodb').ObjectId;
 var servicesSchema = new mongoose.Schema({
     name: {
       type: String,
@@ -47,6 +46,23 @@ var invoiceDetailsSchema = new mongoose.Schema({
         type: String,
         required: false
       },
+    approved: {
+        default: false,
+        type: Boolean,
+        required: false
+      },
+      invoiceId:{
+        type: String,
+        required: false,
+      },
+      invoiceDate:{
+        type: String,
+        required: false,
+      },
+      gst:{
+        type: Number,
+        required: false,
+      },
     services: {
       type: [{
         name: {
@@ -80,7 +96,12 @@ var invoiceDetailsSchema = new mongoose.Schema({
     this.altMobileNumber = data.altMobileNumber;
     this.assignedTo = data.assignedTo;
     this.status = data.status;
-    this.services = array
+    this.services = array;
+    this.custId = data.custId;
+    this.invoiceId = data.invoiceId;
+    this.gst = data.gst;
+    this.invoiceDate = data.invoiceDate;
+
   };
   mongoose.model('Invoice', invoiceDetailsSchema);
 

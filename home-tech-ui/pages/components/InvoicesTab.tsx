@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
 import { Tab } from "@headlessui/react";
 import CarouselComponent from "./CarouselComponent";
-import { Customer } from "../../api/Auth/customerSlice";
+import { Customer, InvoiceDetails } from "../../api/Auth/customerSlice";
 import { EmailVerifyItems } from "../auth/signup";
 import ApprovalCarousel from "./ApprovalCarousel";
+import InvoicesCarousel from "./InvoicesCarousel";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function ApprovalTabs({
+export default function InvoicesTab({
   customers,
-  technicians,
   refresh,
 }: {
   customers: {
-    pending?: Customer[];
-    approved?: Customer[];
+    pending?: InvoiceDetails[];
+    approved?: InvoiceDetails[];
   };
-  technicians: EmailVerifyItems[];
   refresh: () => void;
 }) {
   let [categories] = useState({
@@ -28,7 +27,6 @@ export default function ApprovalTabs({
 
   useEffect(() => {
     console.log(customers);
-    console.log("technicians", technicians);
   }, []);
 
   return (
@@ -61,11 +59,7 @@ export default function ApprovalTabs({
                 "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2"
               )}
             >
-              <ApprovalCarousel
-                customers={customer}
-                technicians={technicians}
-                refresh={refresh}
-              />
+              <InvoicesCarousel invoices={customer} refresh={refresh} />
             </Tab.Panel>
           ))}
         </Tab.Panels>

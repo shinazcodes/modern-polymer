@@ -40,9 +40,14 @@ export interface Service {
 export interface InvoiceDetails {
   name: string;
   fullAddress: string;
+  custId?: string;
   mobileNumber: number;
   email: string;
   assignedTo: string;
+  invoiceId?: string;
+  invoiceDate?: string;
+  gst?: number;
+  approved?: boolean;
   services: Service[];
 }
 
@@ -64,6 +69,9 @@ export interface GenerateInvoiceRequest {
   status?: string;
   _customerId?: string;
   services: Services[];
+  invoiceId?: string;
+  invoiceDate?: string;
+  gst?: number;
 }
 
 const initialState: InitialAuthState = {
@@ -125,6 +133,17 @@ export const getInvoice = createAsyncThunk(
   "customer/getInvoice",
   async ({ _customerId }: { _customerId: string }) => {
     const response = await PostApi(buildPath("getInvoice"), {
+      _customerId: _customerId,
+    });
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
+  }
+);
+export const approveInvoice = createAsyncThunk(
+  "customer/approveInvoice",
+  async ({ _customerId }: { _customerId: string }) => {
+    const response = await PostApi(buildPath("approveInvoice"), {
       _customerId: _customerId,
     });
 
@@ -240,6 +259,26 @@ export const customerSlice = createSlice({
         // state.value += action.payload;
       })
       .addCase(getInvoice.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        // console.log(state);
+
+        // state.value += action.payload;
+      });
+
+    builder
+      .addCase(approveInvoice.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(approveInvoice.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        // state.selectedForInvoiceGeneration = action.payload.response.customer;
+        // console.log(current(state).data);
+        // console.log(action.payload);
+
+        // state.value += action.payload;
+      })
+      .addCase(approveInvoice.rejected, (state, action) => {
         state.status = ApiState.ERROR;
         // console.log(state);
 

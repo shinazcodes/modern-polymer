@@ -22,13 +22,18 @@ import { Formik } from "formik";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
-import { createCustomer } from "../../api/Auth/customerSlice";
+import authSlice, {
+  ApiState,
+  sendSms,
+  verifyEmail,
+} from "../../api/Auth/authSlice";
+import { createCustomer, Customer } from "../../api/Auth/customerSlice";
 import { getTechnicianList } from "../../api/Auth/techniciansSlice";
 import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "../auth/signup";
 import ListBoxComponent from "../components/ListBox";
 import { confirmAlert } from "react-confirm-alert";
+import { getSMS, SMS } from "../../api/model";
 export interface CreateJobItems {
   name: string;
   fullAddress: string;
@@ -53,7 +58,13 @@ export default function CreateJobPage() {
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [gotTechnicians, setgotTechnicians] = useState(false);
-  const [selectedTechnician, setSelectedTechnician] = useState("");
+  const [selectedTechnician, setSelectedTechnician] =
+    useState<EmailVerifyItems>();
+  const [assignedTechnician, setAssignedTechnician] =
+    useState<EmailVerifyItems>();
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(
+    {} as Customer
+  );
   const onNext = (e: React.MouseEvent) => {
     e.preventDefault();
     // router.replace("/auth/verify-email");
@@ -80,7 +91,44 @@ export default function CreateJobPage() {
     }
     if (state.customer.status === ApiState.SUCCESS && hasSubmitted) {
       //   router.replace("/auth/verify-email");
+      store.dispatch(
+        sendSms({
+          mobileNumber: selectedCustomer.mobileNumber,
+          sms: getSMS(SMS.COMPLAINT_REGISTERED, {
+            machineType: selectedCustomer.machine,
+          }),
+        })
+      );
 
+      if (
+        !!selectedCustomer.assignedTo ||
+        selectedCustomer.status === "pending"
+      ) {
+        store.dispatch(
+          sendSms({
+            mobileNumber: selectedCustomer.mobileNumber,
+            sms: getSMS(SMS.WORK_ASSIGNED_CUSTOMER, {
+              machineType: selectedCustomer.machine,
+              technicianMob: assignedTechnician?.phoneNumber,
+              technicianName:
+                assignedTechnician?.firstName +
+                " " +
+                assignedTechnician?.lastName,
+            }),
+          })
+        );
+        store.dispatch(
+          sendSms({
+            mobileNumber: assignedTechnician?.phoneNumber!,
+            sms: getSMS(SMS.WORK_ASSIGNED_TECHNICIAN, {
+              machineType: selectedCustomer.machine,
+              custName: selectedCustomer?.name,
+              brand: selectedCustomer.brand,
+              custEmail: selectedCustomer.email,
+            }),
+          })
+        );
+      }
       confirmAlert({
         title: "Job Created Successfully",
       });
@@ -137,10 +185,20 @@ export default function CreateJobPage() {
                 const res = await store.dispatch(
                   createCustomer({
                     ...values,
+                    mobileNumber: "91" + values.mobileNumber,
+                    altMobileNumber: "91" + values.altMobileNumber,
                     status: selectedTechnician ? "pending" : "unassigned",
-                    assignedTo: selectedTechnician ?? "",
+                    assignedTo: selectedTechnician?.email ?? "",
                   })
                 );
+                setAssignedTechnician(selectedTechnician);
+                setSelectedCustomer({
+                  ...values,
+                  mobileNumber: "91" + values.mobileNumber,
+                  altMobileNumber: "91" + values.altMobileNumber,
+                  status: selectedTechnician ? "pending" : "unassigned",
+                  assignedTo: selectedTechnician?.email ?? "",
+                });
                 setHasSubmitted(true);
               } catch (err) {
                 console.log(err);
@@ -316,7 +374,7 @@ export default function CreateJobPage() {
                               technician: EmailVerifyItems
                             ) => {
                               console.log(technician);
-                              setSelectedTechnician(technician.email ?? "");
+                              setSelectedTechnician(technician);
                             }}
                           />
                         )}

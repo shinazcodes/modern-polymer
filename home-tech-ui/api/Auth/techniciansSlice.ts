@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 import { EmailVerifyItems } from "../../pages/auth/signup";
 import { ApiResponse, buildPath, GetApi, PostApi } from "./Base";
+import { InvoiceDetails } from "./customerSlice";
 
 export enum ApiState {
   IDLE = "idle",
@@ -12,6 +13,7 @@ export enum ApiState {
 export interface InitialTechState {
   data: EmailVerifyItems[];
   showTechnician?: EmailVerifyItems;
+  invoiceDetails?: InvoiceDetails[];
   status: ApiState;
 }
 const initialState: InitialTechState = {
@@ -43,6 +45,29 @@ export const getTechnician = createAsyncThunk(
 
     // The value we return becomes the `fulfilled` action payload
     return response.data as ApiResponse<EmailVerifyItems>;
+  }
+);
+export const removeTechnician = createAsyncThunk(
+  "technician/removeTechnician",
+  async ({ email }: { email: string }) => {
+    const response = await PostApi(buildPath("removeTechnician"), {
+      email,
+    });
+    // console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<EmailVerifyItems>;
+  }
+);
+
+export const getInvoices = createAsyncThunk(
+  "technician/getInvoices",
+  async () => {
+    const response = await PostApi(buildPath("getInvoices"), {});
+    // console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<InvoiceDetails[]>;
   }
 );
 
@@ -108,24 +133,47 @@ export const technicianSlice = createSlice({
 
         // state.value += action.payload;
       });
+    builder
+      .addCase(removeTechnician.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(removeTechnician.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        // state.data = { ...action.meta.arg };
+        // console.log(current(state).data);
+        // console.log(action.payload);
+        state.showTechnician = action.payload.response;
+        // state.value += action.payload;
+      })
+      .addCase(removeTechnician.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        // console.log(state);
+
+        // state.value += action.payload;
+      });
+    builder
+      .addCase(getInvoices.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(getInvoices.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+        // state.data = { ...action.meta.arg };
+        // console.log(current(state).data);
+        // console.log(action.payload);
+        state.invoiceDetails = action.payload.response;
+        // state.value += action.payload;
+      })
+      .addCase(getInvoices.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
+        // console.log(state);
+
+        // state.value += action.payload;
+      });
   },
 });
 
 // export const { increment, decrement, incrementByAmount } = counterSlice.actions;
-
-// The function below is called a selector and allows us to select a value from
-// the state. Selectors can also be defined inline where they're used instead of
-// in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
-export const selectCount = (state: any) => state.counter.value;
-
-// We can also write thunks by hand, which may contain both sync and async logic.
-// Here's an example of conditionally dispatching actions based on current state.
-export const incrementIfOdd =
-  (amount: any) => (dispatch: any, getState: any) => {
-    const currentValue = selectCount(getState());
-    if (currentValue % 2 === 1) {
-      //   dispatch(incrementByAmount(amount));
-    }
-  };
 
 export default technicianSlice.reducer;

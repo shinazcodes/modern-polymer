@@ -14,45 +14,103 @@
   }
   ```
 */
+
+// passport size photo, full name , full address, fathers mothers name, mobile, city state pincode, adhar id, adhar photo,
+// biodata, certificate, license, passbook, pancard
+
+import { Listbox } from "@headlessui/react";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { ApiState, login, register } from "../../api/Auth/authSlice";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
+import { createCustomer, getCustomers } from "../../api/Auth/customerSlice";
+import {
+  getInvoices,
+  getTechnicianList,
+} from "../../api/Auth/techniciansSlice";
 import { RootState, store } from "../../api/store";
+import ApprovalTabs from "../components/ApprovalTabs";
+import CarouselComponent from "../components/CarouselComponent";
+import InvoicesTab from "../components/InvoicesTab";
+import ListBoxComponent from "../components/ListBox";
+import TabComponent from "../components/TabComponent";
+import { JobStatus } from "./create-job";
 
-export default function PasswordPage() {
-  const router = useRouter();
-  const emailToken = useSelector<RootState, string | undefined>(
-    (state) => state.auth.emailToken
-  );
+export interface CreateJobItems {
+  name: string;
+  fullAddress: string;
+  mobileNumber: string;
+  altMobileNumber: string;
+  machine: string;
+  email: string;
+  brand: string;
+}
+
+export const Machines = ["Washing Machine", "Fridge", "AC"];
+export default function CustomerList() {
+  //   const { state } = useSelector<RootState, string>((state) =>
+  //     state.counter.value.toString()
+  //   );
+
   const state = useSelector<RootState, RootState>((state) => state);
-  const [password, setPassword] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [hasSubmittedLogin, setHasSubmittedLogin] = useState(false);
+  const [gotTechnicians, setgotTechnicians] = useState(false);
 
-  async function callLogin() {
-    await store.dispatch(
-      login({ password, email: state.auth.data.email ?? "" })
-    );
-  }
   useEffect(() => {
-    if (
-      state.auth.status === ApiState.SUCCESS &&
-      hasSubmitted &&
-      !hasSubmittedLogin
-    ) {
-      callLogin();
-      setHasSubmittedLogin(true);
-    }
-    if (state.auth.status === ApiState.SUCCESS && hasSubmittedLogin) {
-      if (localStorage.getItem("userType") === "admin") {
-        router.push("/admin/create-job");
-      } else {
-        router.replace("/home");
+    getCust();
+  }, [hasSubmitted]);
+
+  const getCust = async () => {
+    if (!hasSubmitted) {
+      try {
+        const res = await store.dispatch(getInvoices());
+        setHasSubmitted(true);
+      } catch (err) {
+        console.log(err);
       }
     }
-  }, [state, hasSubmitted, hasSubmittedLogin]);
+  };
+
+  const getTechnicians = async () => {
+    try {
+      const res = await store.dispatch(getTechnicianList("partial"));
+      setgotTechnicians(true);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getCustomerSorted = useCallback(() => {
+    return {
+      pending: state.technician?.invoiceDetails?.filter(
+        (customer) => !customer?.approved
+      ),
+      approved: state.technician?.invoiceDetails?.filter(
+        (customer) => customer?.approved
+      ),
+    };
+  }, [state]);
+
+  useEffect(() => {
+    if (!gotTechnicians) {
+      getTechnicians();
+    }
+  }, [gotTechnicians]);
+
+  useEffect(() => {
+    if (state.technician.status === ApiState.SUCCESS && gotTechnicians) {
+      console.log(state.technician.data);
+    }
+    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+      //   router.replace("/auth/verify-email");
+    }
+  }, [state, hasSubmitted]);
+  useEffect(() => {
+    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+      //   router.replace("/auth/verify-email");
+    }
+  }, [state, hasSubmitted]);
   return (
     <>
       <div className="mt-16">
@@ -63,7 +121,74 @@ export default function PasswordPage() {
             </div>
           </div> */}
         <div className="mt-5 md:mt-0 md:col-span-2 justify-centers">
-          <div></div>
+          <Formik
+            initialValues={{} as CreateJobItems}
+            validate={(values) => {
+              const errors = {} as CreateJobItems;
+              //   console.log(values);
+              //   if (!values.email) {
+              //     console.log(values.email);
+              //     errors.email = "Required";
+              //   } else if (
+              //     !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+              //   ) {
+              //     console.log(values.email);
+
+              //     errors.email = "Invalid email address";
+              //   }
+              return errors;
+            }}
+            onSubmit={async (
+              values,
+              { setSubmitting, setFieldValue, resetForm }
+            ) => {
+              console.log(JSON.stringify({ ...values }));
+              try {
+                const res = await store.dispatch(getCustomers());
+                setHasSubmitted(true);
+              } catch (err) {
+                console.log(err);
+                resetForm();
+              }
+              //   setTimeout(() => {
+              //     alert(JSON.stringify({ ...values, id: file }, null, 2));
+              //     setSubmitting(false);
+              //   }, 400);
+            }}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+              /* and other goodies */
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <div className="shadow overflow-hidden sm:rounded-md">
+                  <div className="px-4 py-5 bg-white overflow-scroll h-screen sm:p-6">
+                    <div className="max-w-full bg-white shadow mx-auto py-6 px-4 h-auto sm:px-6 lg:px-8">
+                      <h1 className="text-3xl font-bold text-gray-900">
+                        Jobs List
+                      </h1>
+                      {state.technician?.invoiceDetails &&
+                        state.technician?.invoiceDetails?.length > 0 && (
+                          <InvoicesTab
+                            customers={getCustomerSorted()}
+                            refresh={() => {
+                              setHasSubmitted(false);
+                              setgotTechnicians(false);
+                            }}
+                          />
+                        )}
+                    </div>
+                  </div>
+                </div>
+              </form>
+            )}
+          </Formik>
         </div>
       </div>
     </>

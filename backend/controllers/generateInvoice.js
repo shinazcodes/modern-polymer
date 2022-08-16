@@ -7,7 +7,6 @@ var sendJSONresponse = function(res, status, content) {
   res.status(status);
   res.json(content);
 };
-
 module.exports.generateInvoice = async function(req, res) {
   console.log(req.body);
 
@@ -43,20 +42,25 @@ module.exports.generateInvoice = async function(req, res) {
           email: req.body.invoiceDetails.email,
           assignedTo: req.body.invoiceDetails.assignedTo,
           services: serviceArray,
-          custId: req.body.invoiceDetails._customerId
+          custId: req.body.invoiceDetails._customerId,
+          invoiceId: "#PAY" + Math.floor(100000 + Math.random() * 900000),
+          invoiceDate: req.body.invoiceDetails.invoiceDate,
+          gst: req.body.invoiceDetails.gst,
+          
         };
-        // invoice.setInvoice(req.body.invoiceDetails.email, req.body._id,req.body.invoiceDetails, [...serviceArray]);
+        var inv = new Invoice();
+        inv.setInvoice(invoice, [...serviceArray]);
         
         // services.name = req.body.invoiceDetails.services.name;
         // services.quantity = req.body.invoiceDetails.services.quantity;
         // services.price = req.body.invoiceDetails.services.price;
         console.log("serviuces", invoice)
-        // invoice.save(function(err) {
+        invoice.save(function(err) {
          
-        //   console.log("sdfgsfggferrr", err)
-        //   console.log("sfgsggfs", invoice)
+          console.log("sdfgsfggferrr", err)
+          console.log("sfgsggfs", invoice)
           
-        //   });
+          });
      
 
           Customer.findOneAndUpdate({_customerId: req.body.invoiceDetails._customerId}, {$set:{ invoiceDetails: invoice}}, {new: true}, (err, doc) => {
@@ -79,7 +83,6 @@ module.exports.generateInvoice = async function(req, res) {
    
   }
 };
-
 
 
 module.exports.getInvoice = async function(req, res) {
@@ -111,7 +114,7 @@ module.exports.getInvoice = async function(req, res) {
               })
           } 
           console.log("user", user);
-          console.log("invoiceDetails", user.invoiceDetails);
+          // console.log("invoiceDetails", user.invoiceDetails);
          
             res.status(200).json({
                 "response":{
@@ -121,6 +124,56 @@ module.exports.getInvoice = async function(req, res) {
          
       });
     });
+  } catch {
+      res.status(403).json({      "response": "error", 
+      "message" : "something went wrong"
+      });
+
+    }
+   
+  }
+};
+
+module.exports.approveInvoice = async function(req, res) {
+  console.log(req.body);
+
+  if(!req.body || !req.body._customerId ) {
+    sendJSONresponse(res, 400, {
+      "message": "All fields required",
+      "response": "error",
+
+    });
+    return;
+  }
+  if (!req.payload._id) {
+    res.status(401).json({
+      "response": "error", "message" : "UnauthorizedError: private profile"
+    });
+  } else {
+    try {
+      Customer
+      .findOne({_customerId: req.body._customerId})
+      .exec(function(err, user) {
+          if(err || !user){
+              res.status(403).json({
+                  "response": "error", 
+                  "message": "sometihng went wrong"
+              })
+          } 
+          console.log(user)
+          var invoiceDetails = {...user.invoiceDetails, approved: true}
+
+          Customer.findOneAndUpdate({_customerId: req.body._customerId}, {$set:{ invoiceDetails: invoiceDetails}}, {new: true}, (err, doc) => {
+            if (err) {
+                console.log("Something wrong when updating data!");
+            }
+          console.log("sfgsggfs", doc)
+            
+            res.status(200).json({
+              "response": "invoice approved!"
+                });
+              });
+            });
   } catch {
       res.status(403).json({      "response": "error", 
       "message" : "something went wrong"

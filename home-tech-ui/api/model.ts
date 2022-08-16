@@ -50,47 +50,79 @@ export enum SMS {
   CANCELLATION = "CANCELLATION",
   WORK_ASSIGNED_TECHNICIAN = "WORK_ASSIGNED_TECHNICIAN",
 }
+export interface SMSParams {
+  type: SMS;
+  machineType: string;
+  technicianName: string;
+  technicianMob: string;
+  billAmount: string;
+  downloadLink: string;
+  custName: string;
+  brand: string;
+  custEmail: string;
+}
 
 export function getSMS(
   type: SMS,
-  machineType: string,
-  technicianName: string,
-  technicianMob: string,
-  billAmount: string,
-  downloadLink: string,
-  custName: string,
-  brand: string,
-  custEmail: string
-) {
+  data: {
+    machineType?: string;
+    technicianName?: string;
+    technicianMob?: string;
+    billAmount?: string;
+    downloadLink?: string;
+    custName?: string;
+    brand?: string;
+    custEmail?: string;
+  }
+): { message: string; template_id: string } {
+  const {
+    machineType,
+    technicianName,
+    technicianMob,
+    billAmount,
+    downloadLink,
+    custName,
+    brand,
+    custEmail,
+  } = data;
   switch (type) {
     case SMS.CANCELLATION:
-      return `Dear customer, your ${machineType} complaint request has been cancelled.
+      return {
+        message: `Dear customer, your ${machineType} complaint request has been cancelled.
       For any assistance, call 9744850738.
        
       Thank you
-      HOME TECH WORLD`;
+      HOME TECH WORLD`,
+        template_id: "1307165821359532810",
+      };
       break;
     case SMS.WORK_ASSIGNED_CUSTOMER:
-      return `Dear customer, your ${machineType} complaint is assigned to service engineer ${technicianName} with mobile ${technicianMob}.
+      return {
+        message: `Dear customer, your ${machineType} complaint is assigned to service engineer ${technicianName} with mobile ${technicianMob}.
         Technician will contact you.
          
         Thank you
         HOME TECH WORLD
-        Customer Support: 9744850738`;
+        Customer Support: 9744850738`,
+        template_id: "1307165821332506614",
+      };
       break;
     case SMS.WORK_COMPLETED:
-      return `Dear customer, your service request has been completed by service engineer ${technicianName} with mobile ${technicianMob}.
+      return {
+        message: `Dear customer, your service request has been completed by service engineer ${technicianName} with mobile ${technicianMob}.
       The bill amount: INR ${billAmount}
       Download bill in pdf: ${downloadLink}
        
        
       Thank you
       HOME TECH WORLD
-      Customer Support: 9744850738`;
-      return;
+      Customer Support: 9744850738`,
+        template_id: "1307165821347892292",
+      };
       break;
     case SMS.WORK_ASSIGNED_TECHNICIAN:
-      return `Dear service engineer, a call has been assigned for you.
+      return {
+        message: `Dear service engineer, a call has been assigned for you.
         Customer name: ${custName}
         Product: ${machineType}
         Brand: ${brand}
@@ -99,14 +131,19 @@ export function getSMS(
         Please contact the customer accordingly.
          
         Thank you
-        HOME TEACH WORLD`;
+        HOME TEACH WORLD`,
+        template_id: "1307165821372522425",
+      };
       break;
     case SMS.COMPLAINT_REGISTERED:
-      return `Dear customer, your ${machineType} complaint has registered in Home Tech World. Our service engineer will contact you within 24 hours.
+      return {
+        message: `Dear customer, your ${machineType} complaint has registered in Home Tech World. Our service engineer will contact you within 24 hours.
  
           Thank you
           HOME TECH WORLD
-          Customer Support: 9744850738`;
+          Customer Support: 9744850738`,
+        template_id: "1307165821178488810",
+      };
       break;
   }
 }

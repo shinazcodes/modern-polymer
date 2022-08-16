@@ -64,9 +64,7 @@ export default function Invoice() {
           <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
             <h1 className="m-6 mb-0">Add Service</h1>
             <div className="p-6">
-              <label htmlFor="serviceName" className="sr-only">
-                Service Name
-              </label>
+              <label htmlFor="serviceName">Service Name</label>
               <input
                 id="serviceName"
                 name="serviceName"
@@ -81,9 +79,7 @@ export default function Invoice() {
               />
             </div>
             <div className="p-6">
-              <label htmlFor="quantity" className="sr-only">
-                Quantity
-              </label>
+              <label htmlFor="quantity">Quantity</label>
               <input
                 id="quantity"
                 name="quantity"
@@ -97,9 +93,7 @@ export default function Invoice() {
               />
             </div>
             <div className="p-6">
-              <label htmlFor="price" className="sr-only">
-                Price
-              </label>
+              <label htmlFor="price">Price</label>
               <input
                 id="price"
                 name="price"
@@ -141,6 +135,8 @@ export default function Invoice() {
               technicianName: state.customer.selectedForInvoice?.assignedTo,
               custAddress: state.customer.selectedForInvoice?.fullAddress,
               custEmail: state.customer.selectedForInvoice?.email,
+              invoiceDate: new Date().toISOString().slice(0, 10),
+              gst: 0,
             }}
             validate={(values) => {
               const errors = {};
@@ -180,6 +176,8 @@ export default function Invoice() {
                       email: values.custEmail,
                       fullAddress: values?.custAddress,
                       name: values.name,
+                      gst: values.gst,
+                      invoiceDate: values.invoiceDate,
                     })
                   );
 
@@ -216,9 +214,7 @@ export default function Invoice() {
               >
                 <div className="rounded-md shadow-sm z-0 w-full">
                   <div className="pb-6 ">
-                    <label htmlFor="name" className="sr-only">
-                      Customer Name
-                    </label>
+                    <label htmlFor="name">Customer Name</label>
                     <input
                       id="name"
                       name="name"
@@ -233,9 +229,7 @@ export default function Invoice() {
                     />
                   </div>
                   <div className="pb-6 ">
-                    <label htmlFor="technicianName" className="sr-only">
-                      Serviced By
-                    </label>
+                    <label htmlFor="technicianName">Serviced By</label>
                     <input
                       id="technicianName"
                       name="technicianName"
@@ -248,9 +242,7 @@ export default function Invoice() {
                     />
                   </div>
                   <div className="pb-6 ">
-                    <label htmlFor="mobileNumber" className="sr-only">
-                      Customer Phone Number
-                    </label>
+                    <label htmlFor="mobileNumber">Customer Phone Number</label>
                     <input
                       id="mobileNumber"
                       name="mobileNumber"
@@ -263,9 +255,7 @@ export default function Invoice() {
                     />
                   </div>
                   <div className="pb-6 ">
-                    <label htmlFor="custEmail" className="sr-only">
-                      Customer Email
-                    </label>
+                    <label htmlFor="custEmail">Customer Email</label>
                     <input
                       id="custEmail"
                       name="custEmail"
@@ -277,10 +267,8 @@ export default function Invoice() {
                       placeholder="customer email"
                     />
                   </div>
-                  <div className="pb-6  h-28">
-                    <label htmlFor="password" className="sr-only">
-                      Customer Address
-                    </label>
+                  <div className="pb-6  min-h-28">
+                    <label htmlFor="password">Customer Address</label>
                     <textarea
                       id="custAddress"
                       name="custAddress"
@@ -290,6 +278,32 @@ export default function Invoice() {
                       required
                       className="appearance-none h-full rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                       placeholder="customer address"
+                    />
+                  </div>
+                  <div className="pb-6 ">
+                    <label htmlFor="gst">GST%</label>
+                    <input
+                      id="gst"
+                      name="gst"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.gst}
+                      required
+                      className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                      placeholder="gst %"
+                    />
+                  </div>
+                  <div className="pb-6">
+                    <label htmlFor="invoiceDate">Date</label>
+                    <input
+                      id="invoiceDate"
+                      name="invoiceDate"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.invoiceDate}
+                      required
+                      className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                      placeholder="invoice date"
                     />
                   </div>
                   <button

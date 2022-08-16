@@ -20,6 +20,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { ApiState, otpVerification, verifyOtp } from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
+import { showErrorAlert } from "../../util/util";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -50,10 +51,12 @@ export default function VerifyEmailPage() {
     // todo change this
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
       otpverified();
-    } else if (hasSubmitted) {
-      otpverified();
+    } else if (state.auth.status === ApiState.ERROR && hasSubmitted) {
+      setHasSubmitted(false);
+      showErrorAlert();
     }
   }, [state, hasSubmitted]);
+
   return (
     <>
       <div className="mt-16">

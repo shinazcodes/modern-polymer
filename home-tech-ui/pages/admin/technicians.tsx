@@ -16,8 +16,10 @@ import {
   ApiState,
   getTechnician,
   getTechnicianList,
+  removeTechnician,
 } from "../../api/Auth/techniciansSlice";
 import TechnicianCarouselComponent from "../components/technicianCarousel";
+import { confirmAlert } from "react-confirm-alert";
 
 export default function Technicians() {
   const [selectedTechnician, setSelectedTechnician] = useState(
@@ -102,9 +104,22 @@ export default function Technicians() {
                 <button
                   type="button"
                   className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                  onClick={(e: React.MouseEvent) => {
+                  onClick={async (e: React.MouseEvent) => {
                     console.log(selectedTechnician);
-
+                    try {
+                      if (state.technician.showTechnician?.email) {
+                        const res = await store.dispatch(
+                          removeTechnician({
+                            email: state.technician.showTechnician?.email,
+                          })
+                        );
+                      }
+                    } catch (error: any) {
+                      confirmAlert({
+                        title: "error",
+                        message: error,
+                      });
+                    }
                     e.preventDefault();
                   }}
                 >

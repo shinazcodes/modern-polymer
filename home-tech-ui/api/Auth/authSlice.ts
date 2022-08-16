@@ -9,7 +9,13 @@ import {
   PostSmsApi,
 } from "./Base";
 import jwt_decode from "jwt-decode";
-import { OtpSentResponse, OtpVerifyResponse, SendOtprequest } from "../model";
+import {
+  getSMS,
+  OtpSentResponse,
+  OtpVerifyResponse,
+  SendOtprequest,
+  SMSParams,
+} from "../model";
 import { Customer } from "./customerSlice";
 
 export enum ApiState {
@@ -112,18 +118,26 @@ export const sendOtp = createAsyncThunk(
 
 export const sendSms = createAsyncThunk(
   "customer/sendSms",
-  async (mobileNumber: string) => {
+  async ({
+    mobileNumber,
+    sms,
+  }: {
+    mobileNumber: string;
+    sms: {
+      message: string;
+      template_id: string;
+    };
+  }) => {
     // console.log(data);
 
     const response = await GetSmsApi("/sms/send", {
       params: {
         key: "IngQUAiVkwDHG2lR4T6E5KhMoDnhKfSp",
-        template_id: "1307165821178488810",
+        template_id: sms.template_id,
         type: 1,
         to: mobileNumber,
         sender: "HOMTEC",
-        message:
-          "Dear customer, your Test complaint has registered in Home Tech World. Our service engineer will contact you within 24 hours. Thank you HOME TECH WORLD Customer Support: 9744850738",
+        message: sms.message,
       },
     });
 
@@ -333,16 +347,8 @@ export const authSlice = createSlice({
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
-export const selectCount = (state: any) => state.counter.value;
 
 // We can also write thunks by hand, which may contain both sync and async logic.
 // Here's an example of conditionally dispatching actions based on current state.
-export const incrementIfOdd =
-  (amount: any) => (dispatch: any, getState: any) => {
-    const currentValue = selectCount(getState());
-    if (currentValue % 2 === 1) {
-      //   dispatch(incrementByAmount(amount));
-    }
-  };
 
 export default authSlice.reducer;

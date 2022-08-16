@@ -15,6 +15,7 @@ const navigation = [
   { name: "Create Job", href: "/admin/create-job", current: false },
   { name: "Technicians", href: "/admin/technicians", current: false },
   { name: "Approvals", href: "/admin/approvals", current: false },
+  { name: "Invoices", href: "/admin/invoices", current: false },
 ];
 const userNavigation = [{ name: "Sign out", href: "/auth/login" }];
 

@@ -7,6 +7,7 @@ import {
   approveInvoice,
   Customer,
   customerSlice,
+  InvoiceDetails,
   Service,
 } from "../../api/Auth/customerSlice";
 import { RootState, store } from "../../api/store";
@@ -80,13 +81,11 @@ const styles = StyleSheet.create({
     lineHeight: 1.25,
   },
 });
-export default function ApprovalCarousel({
-  customers,
-  technicians,
+export default function InvoicesCarousel({
+  invoices,
   refresh,
 }: {
-  customers: Customer[];
-  technicians?: EmailVerifyItems[];
+  invoices?: InvoiceDetails[];
   refresh: () => void;
 }) {
   const [selectedTechnician, setSelectedTechnician] = useState(
@@ -95,12 +94,13 @@ export default function ApprovalCarousel({
   const state = useSelector<RootState, RootState>((state) => state);
   const router = useRouter();
   useEffect(() => {}, [state]);
-  function getGst(customer: Customer): ReactNode {
+
+  function getGst(customer: InvoiceDetails): ReactNode {
     let total: number = 0.0;
-    customer?.invoiceDetails?.services.map((item) => {
+    customer?.services.map((item) => {
       total += Number(item.price) * Number(item.quantity);
     });
-    let gstA = (total * (customer?.invoiceDetails?.gst ?? 0.0)) / 100;
+    let gstA = (total * (customer?.gst ?? 0.0)) / 100;
     return <>{gstA}</>;
   }
 
@@ -120,37 +120,38 @@ export default function ApprovalCarousel({
     return <>{total}</>;
   }
 
-  function getTotal(customer: Customer): ReactNode {
+  function getTotal(customer: InvoiceDetails): ReactNode {
     let total: number = 0.0;
-    customer?.invoiceDetails?.services.map((item) => {
+    customer?.services.map((item) => {
       total += Number(item.price) * Number(item.quantity);
     });
-    let gstA = (total * (customer?.invoiceDetails?.gst ?? 0.0)) / 100;
+    let gstA = (total * (customer?.gst ?? 0.0)) / 100;
     return <>{total + gstA}</>;
   }
-  function getTotalnum(customer: Customer) {
+
+  function getTotalnum(customer: InvoiceDetails) {
     let total: number = 0;
-    customer?.invoiceDetails?.services.map((item) => {
+    customer?.services.map((item) => {
       total += Number(item.price) * Number(item.quantity);
     });
-    let gstA = (total * (customer?.invoiceDetails?.gst ?? 0.0)) / 100;
+    let gstA = (total * (customer?.gst ?? 0.0)) / 100;
     return total + gstA;
   }
   return (
     <div className="w-full">
       <div className="mx-0 w-full rounded-2xl bg-white p-2">
         <div>
-          {customers.map((customer: Customer, index) => {
+          {invoices?.map((customer: InvoiceDetails, index) => {
             return (
-              customer.invoiceDetails &&
-              customer.invoiceDetails.services.length > 0 && (
+              customer &&
+              customer.services.length > 0 && (
                 <Disclosure key={index}>
                   {({ open }) => (
                     <>
                       <Disclosure.Button className="flex mt-2 w-full justify-between rounded-lg bg-blue-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-blue-200 focus:outline-none focus-visible:ring focus-visible:ring-yellow-500 focus-visible:ring-opacity-75">
                         <span>
-                          {customer.name} - {customer.machine} -{" "}
-                          {customer.brand}
+                          {customer.name} - {customer.email} -{" "}
+                          {customer.invoiceId}
                         </span>
                         <ChevronUpIcon
                           className={`${
@@ -166,9 +167,6 @@ export default function ApprovalCarousel({
                         <p className="font-bold">
                           address: {customer.fullAddress}
                         </p>
-                        <p className="font-bold">machine: {customer.machine}</p>
-                        <p className="font-bold">status: {customer.status}</p>
-                        <p className="font-bold">brand: {customer.brand}</p>
 
                         <div
                           style={{
@@ -229,58 +227,56 @@ export default function ApprovalCarousel({
                               </p>
                             </div>
                           </div>
-                          {customer?.invoiceDetails?.services.map(
-                            (service, index) => (
-                              <div key={index} style={styles.rows}>
-                                <div style={styles.columns}>
-                                  <p
-                                    style={{
-                                      margin: "auto",
-                                    }}
-                                  >
-                                    {index + 1}
-                                  </p>
-                                </div>
-                                <div style={styles.columns}>
-                                  <p
-                                    style={{
-                                      margin: "auto",
-                                    }}
-                                  >
-                                    {service.name}
-                                  </p>
-                                </div>
-                                <div style={styles.columns}>
-                                  <p
-                                    style={{
-                                      margin: "auto",
-                                    }}
-                                  >
-                                    {service.price}
-                                  </p>
-                                </div>
-                                <div style={styles.columns}>
-                                  <p
-                                    style={{
-                                      margin: "auto",
-                                    }}
-                                  >
-                                    {service.quantity}
-                                  </p>
-                                </div>
-                                <div style={styles.columns}>
-                                  <p
-                                    style={{
-                                      margin: "auto",
-                                    }}
-                                  >
-                                    {Number(service.price) *
-                                      Number(service.quantity)}
-                                  </p>
-                                </div>
+                          {customer?.services.map((service, index) => (
+                            <div key={index} style={styles.rows}>
+                              <div style={styles.columns}>
+                                <p
+                                  style={{
+                                    margin: "auto",
+                                  }}
+                                >
+                                  {index + 1}
+                                </p>
                               </div>
-                            )
-                          )}
+                              <div style={styles.columns}>
+                                <p
+                                  style={{
+                                    margin: "auto",
+                                  }}
+                                >
+                                  {service.name}
+                                </p>
+                              </div>
+                              <div style={styles.columns}>
+                                <p
+                                  style={{
+                                    margin: "auto",
+                                  }}
+                                >
+                                  {service.price}
+                                </p>
+                              </div>
+                              <div style={styles.columns}>
+                                <p
+                                  style={{
+                                    margin: "auto",
+                                  }}
+                                >
+                                  {service.quantity}
+                                </p>
+                              </div>
+                              <div style={styles.columns}>
+                                <p
+                                  style={{
+                                    margin: "auto",
+                                  }}
+                                >
+                                  {Number(service.price) *
+                                    Number(service.quantity)}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
 
                           <div style={styles.rows}>
                             <div style={styles.bigColumns}>
@@ -298,9 +294,7 @@ export default function ApprovalCarousel({
                                   margin: "auto",
                                 }}
                               >
-                                {getTotalQuantity(
-                                  customer.invoiceDetails?.services
-                                )}
+                                {getTotalQuantity(customer?.services)}
                               </p>
                             </div>
                             <div style={styles.columns}>
@@ -309,9 +303,7 @@ export default function ApprovalCarousel({
                                   margin: "auto",
                                 }}
                               >
-                                {getTotalServiceCost(
-                                  customer.invoiceDetails?.services
-                                )}
+                                {getTotalServiceCost(customer?.services)}
                               </p>
                             </div>
                           </div>
@@ -323,7 +315,7 @@ export default function ApprovalCarousel({
                                   margin: "auto",
                                 }}
                               >
-                                GST @{customer.invoiceDetails?.gst}%
+                                GST @{customer?.gst}%
                               </p>
                             </div>
                             <div style={styles.columns}>
@@ -357,7 +349,9 @@ export default function ApprovalCarousel({
                               >
                                 INR(
                                 {converter.toWords(
-                                  getTotalnum(customer) ?? 0.0
+                                  isNaN(getTotalnum(customer))
+                                    ? 0.0
+                                    : getTotalnum(customer)
                                 )}
                                 )
                               </p>
@@ -386,44 +380,20 @@ export default function ApprovalCarousel({
                         <div className="mt-8">
                           <button
                             type="button"
-                            disabled={!!!customer.assignedTo}
-                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
-                            onClick={async (e: React.MouseEvent) => {
-                              const assignedTechnician = customer.assignedTo;
-                              console.log(!!assignedTechnician);
-                              if (!!assignedTechnician)
-                                await store.dispatch(
-                                  approveInvoice({
-                                    _customerId: customer._customerId ?? "",
-                                  })
-                                );
-
-                              e.preventDefault();
-                            }}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            type="button"
                             className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
                             onClick={async (e: React.MouseEvent) => {
                               const assignedTechnician = customer.assignedTo;
                               console.log(!!assignedTechnician);
                               console.log(customer);
                               try {
-                                store.dispatch(
-                                  customerSlice.actions.custInvoice({
-                                    customer: customer,
-                                  })
-                                );
-                                router.push("/admin/invoice");
+                                router.push("/admin/report/" + customer.custId);
                               } catch (err) {
                                 console.log(err);
                               }
                               e.preventDefault();
                             }}
                           >
-                            Edit
+                            Download
                           </button>
                         </div>
                       </Disclosure.Panel>

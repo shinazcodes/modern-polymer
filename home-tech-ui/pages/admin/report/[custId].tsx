@@ -10,6 +10,7 @@ import {
 } from "../../../api/Auth/customerSlice";
 import { RootState, store } from "../../../api/store";
 import { useSelector } from "react-redux";
+import { totalmem } from "os";
 
 export default function ReportPdf() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function ReportPdf() {
   );
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [gstAmount, setGstAmount] = useState(0.0);
+  const [total, setTotal] = useState(0.0);
 
   async function getInvoiceData() {
     return await store.dispatch(
@@ -28,6 +31,18 @@ export default function ReportPdf() {
 
   useEffect(() => {
     if (hasSubmitted && state?.status === ApiState.SUCCESS) {
+      let total: number = 0.0;
+      state?.selectedForInvoiceGeneration?.invoiceDetails?.services.map(
+        (item) => {
+          total += Number(item.price) * Number(item.quantity);
+        }
+      );
+      let gstA =
+        (total *
+          (state.selectedForInvoiceGeneration?.invoiceDetails?.gst ?? 0.0)) /
+        100;
+      setGstAmount(gstA);
+      setTotal(total + gstA);
     }
   }, [hasSubmitted, state]);
 
@@ -39,11 +54,18 @@ export default function ReportPdf() {
       setHasSubmitted(true);
     }
   }, [custId]);
+
   return (
     <div className="h-full w-full mt-16">
-      <PDFViewer className="h-full w-full">
-        <PdfDocument data={state?.selectedForInvoiceGeneration} />
-      </PDFViewer>
+      {total !== 0.0 && (
+        <PDFViewer className="h-full w-full">
+          <PdfDocument
+            data={state?.selectedForInvoiceGeneration}
+            gstAmount={gstAmount}
+            total={total}
+          />
+        </PDFViewer>
+      )}
     </div>
   );
 }

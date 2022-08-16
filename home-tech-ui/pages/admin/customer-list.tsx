@@ -170,7 +170,7 @@ export default function CustomerList() {
               <form onSubmit={handleSubmit}>
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white overflow-scroll h-screen sm:p-6">
-                    <div className="max-w-full bg-white shadow mx-auto py-6 px-4 h-full sm:px-6 lg:px-8">
+                    <div className="max-w-full bg-white shadow mx-auto py-6 px-4 h-auto sm:px-6 lg:px-8">
                       <h1 className="text-3xl font-bold text-gray-900">
                         Jobs List
                       </h1>

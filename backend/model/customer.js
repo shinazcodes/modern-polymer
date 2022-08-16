@@ -51,6 +51,23 @@ var customerSchema = new mongoose.Schema({
       required: true,
       unique:false
     },
+    approved: {
+      default: false,
+      type: Boolean,
+      required: false
+    },
+    invoiceId:{
+      type: String,
+      required: false,
+    },
+    invoiceDate:{
+      type: String,
+      required: false,
+    },
+    gst:{
+      type: Number,
+      required: false,
+    },
     email: {
       type: String,
       required: true

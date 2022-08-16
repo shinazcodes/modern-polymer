@@ -29,6 +29,7 @@ import authSlice, {
   verifyEmail,
 } from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
+import { showErrorAlert } from "../../util/util";
 
 export interface EmailVerifyItems {
   firstName?: string;
@@ -90,6 +91,7 @@ export default function SignUpPage() {
     const res = await store.dispatch(
       verifyEmail({
         ...values,
+        phoneNumber: "91" + values?.phoneNumber,
         photo: photoFile,
         pancard: pancardfile,
         passbook: passbookfile,
@@ -112,9 +114,8 @@ export default function SignUpPage() {
     if (state.auth.status === ApiState.SUCCESS && hasSubmittedOtp) {
       api();
     } else if (state.auth.status === ApiState.ERROR && hasSubmittedOtp) {
-      api();
-
-      // setHasSubmittedOtp(false);
+      showErrorAlert();
+      setHasSubmittedOtp(false);
     }
   }, [state, hasSubmitted, values]);
 
@@ -171,7 +172,7 @@ export default function SignUpPage() {
               console.log(JSON.stringify({ ...values, id: file }));
               try {
                 const otpRes = await store.dispatch(
-                  sendOtp(values.phoneNumber ?? "")
+                  sendOtp("91" + values.phoneNumber ?? "")
                 );
                 setValues(values);
                 setHasSubmittedOtp(true);
@@ -280,15 +281,18 @@ export default function SignUpPage() {
                         >
                           Phone Number
                         </label>
-                        <input
-                          type="text"
-                          name="phoneNumber"
-                          id="phoneNumber"
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          value={values.phoneNumber}
-                          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        />
+                        <div className="input-box">
+                          <span className="prefix">+91</span>
+                          <input
+                            type="text"
+                            name="phoneNumber"
+                            id="phoneNumber"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.phoneNumber}
+                            className="mt-1 block w-full sm:text-sm shadow-none rounded-md"
+                          />
+                        </div>
                       </div>
 
                       <div className="col-span-6 sm:col-span-4">

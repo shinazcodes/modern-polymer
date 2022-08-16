@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
+  ApiState,
   assignJob,
   Customer,
   customerSlice,
@@ -13,6 +14,8 @@ import { EmailVerifyItems } from "../auth/signup";
 import AssignedTechnician from "./AssignedTechnician";
 import ListBoxComponent from "./ListBox";
 import jwt_decode from "jwt-decode";
+import { sendSms } from "../../api/Auth/authSlice";
+import { getSMS, SMS } from "../../api/model";
 
 export default function CarouselComponent({
   customers,
@@ -23,6 +26,12 @@ export default function CarouselComponent({
   technicians?: EmailVerifyItems[];
   refresh: () => void;
 }) {
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [assignedTechnician, setAssignedTechnician] =
+    useState<EmailVerifyItems>();
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(
+    {} as Customer
+  );
   const [selectedTechnician, setSelectedTechnician] = useState(
     {} as EmailVerifyItems
   );
@@ -30,9 +39,33 @@ export default function CarouselComponent({
 
   const router = useRouter();
   useEffect(() => {
-    console.log(customers);
-    console.log("technicians", technicians);
-  }, []);
+    if (hasSubmitted && state.customer.status === ApiState.SUCCESS) {
+      store.dispatch(
+        sendSms({
+          mobileNumber: selectedCustomer.mobileNumber,
+          sms: getSMS(SMS.WORK_ASSIGNED_CUSTOMER, {
+            machineType: selectedCustomer.machine,
+            technicianMob: assignedTechnician?.phoneNumber,
+            technicianName:
+              assignedTechnician?.firstName +
+              " " +
+              assignedTechnician?.lastName,
+          }),
+        })
+      );
+      store.dispatch(
+        sendSms({
+          mobileNumber: assignedTechnician?.phoneNumber!,
+          sms: getSMS(SMS.WORK_ASSIGNED_TECHNICIAN, {
+            machineType: selectedCustomer.machine,
+            custName: selectedCustomer?.name,
+            brand: selectedCustomer.brand,
+            custEmail: selectedCustomer.email,
+          }),
+        })
+      );
+    }
+  }, [state, hasSubmitted]);
 
   return (
     <div className="w-full">
@@ -64,6 +97,7 @@ export default function CarouselComponent({
                       <p className="font-bold">machine: {customer.machine}</p>
                       <p className="font-bold">status: {customer.status}</p>
                       <p className="font-bold">brand: {customer.brand}</p>
+
                       {technicians && (
                         <p className="font-bold">
                           <>
@@ -81,7 +115,8 @@ export default function CarouselComponent({
                                   const assignedTechnician =
                                     customer.assignedTo;
                                   console.log(!!assignedTechnician);
-                                  if (!!assignedTechnician)
+                                  if (!!assignedTechnician) {
+                                    setSelectedCustomer(customer);
                                     await store.dispatch(
                                       assignJob({
                                         technicianEmail:
@@ -93,6 +128,7 @@ export default function CarouselComponent({
                                         remove: true,
                                       })
                                     );
+                                  }
                                   refresh();
 
                                   e.preventDefault();
@@ -126,6 +162,7 @@ export default function CarouselComponent({
                           </>
                         </p>
                       )}
+
                       {technicians && (
                         <div className="flex mt-6">
                           <div className="min-w-fit m-auto font-bold">
@@ -144,6 +181,7 @@ export default function CarouselComponent({
                               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                               onClick={(e: React.MouseEvent) => {
                                 console.log(selectedTechnician);
+                                setAssignedTechnician(selectedTechnician);
                                 store.dispatch(
                                   assignJob({
                                     technicianEmail:
@@ -161,6 +199,7 @@ export default function CarouselComponent({
                           </div>
                         </div>
                       )}
+
                       {!!!technicians && (
                         <div className="mt-6">
                           <button

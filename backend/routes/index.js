@@ -21,12 +21,15 @@ var ctrlEmailVerify = require('../controllers/emailverify');
 var ctrlPurchaseHistory = require('../controllers/purchase-history');
 var ctrlgenerateInvoice = require('../controllers/generateInvoice');
 var ctrlGetTechnician = require('../controllers/technician');
+var ctrlGetInvoices = require('../controllers/invoices');
 
 // profile
 router.get('/profile', auth, ctrlProfile.profileRead);
 router.get('/jobDetails', auth, ctrlJobDetails.jobDetails);
 router.get('/techniciansList', auth, ctrlTechniciansList.techniciansList);
 router.post('/getTechnician', auth, ctrlGetTechnician.getTechnician);
+router.post('/getInvoices', auth, ctrlGetInvoices.getInvoices);
+router.post('/removeTechnician', auth, ctrlGetTechnician.removeTechnician);
 router.post('/createCustomer', auth, ctrlCreateCustomer.createCustomer);
 router.get('/get-customers', auth, ctrlGetCustomers.getCustomers);
 router.post('/purchase', auth, ctrlPurchase.purchase);
@@ -34,6 +37,7 @@ router.post('/assign-job', auth, ctrlAssignJob.assignJob);
 router.post('/verifyEmail', ctrlEmailVerify.verifyEmail);
 router.post('/purchaseHistory', auth, ctrlPurchaseHistory.purchaseHistory);
 router.post('/generateInvoice', auth, ctrlgenerateInvoice.generateInvoice);
+router.post('/approveInvoice', auth, ctrlgenerateInvoice.approveInvoice);
 router.post('/getInvoice', auth, ctrlgenerateInvoice.getInvoice);
 router.post('/verifyOtp', ctrlOtp.verifyOtp);
 router.post('/otpVerification', ctrlOtpVerification.otpVerification);
