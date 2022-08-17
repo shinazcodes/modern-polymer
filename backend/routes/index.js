@@ -23,7 +23,6 @@ var ctrlGetTechnician = require('../controllers/technician');
 var ctrlGetInvoices = require('../controllers/invoices');
 
 // profile
-router.get('/profile', auth, ctrlProfile.profileRead);
 router.get('/jobDetails', auth, ctrlJobDetails.jobDetails);
 router.get('/techniciansList', auth, ctrlTechniciansList.techniciansList);
 router.post('/getTechnician', auth, ctrlGetTechnician.getTechnician);
