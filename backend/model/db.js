@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var gracefulShutdown;
-var dbURI = 'mongodb://65.20.77.175:27017/home-tech-dev';
+var dbURI = 'mongodb://localhost:27017/home-tech-dev';
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGOLAB_URI;
 }

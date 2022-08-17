@@ -7,7 +7,6 @@ var auth = jwt({
   algorithms: ['HS256'],
 });
 
-var ctrlPurchase = require('../controllers/purchase');
 var ctrlJobDetails = require('../controllers/job-details');
 var ctrlTechniciansList = require('../controllers/technician-list');
 var ctrlCreateCustomer = require('../controllers/create-customer');
@@ -30,7 +29,6 @@ router.post('/getInvoices', auth, ctrlGetInvoices.getInvoices);
 router.post('/removeTechnician', auth, ctrlGetTechnician.removeTechnician);
 router.post('/createCustomer', auth, ctrlCreateCustomer.createCustomer);
 router.get('/get-customers', auth, ctrlGetCustomers.getCustomers);
-router.post('/purchase', auth, ctrlPurchase.purchase);
 router.post('/assign-job', auth, ctrlAssignJob.assignJob);
 router.post('/verifyEmail', ctrlEmailVerify.verifyEmail);
 router.post('/purchaseHistory', auth, ctrlPurchaseHistory.purchaseHistory);

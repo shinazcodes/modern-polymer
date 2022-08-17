@@ -157,9 +157,11 @@ export default function Example() {
                   buttons: [
                     {
                       label: "okay",
+                      onClick: () => {},
                     },
                   ],
                 });
+
                 setHasSubmitted(false);
                 console.log(err);
                 resetForm();
