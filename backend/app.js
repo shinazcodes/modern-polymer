@@ -175,7 +175,7 @@ app.use(function (err, req, res, next) {
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-  console.log('requestsvsdf on ');
+  console.log('requested on ', req);
 
   res.status(err.status || 500);
   res.json({

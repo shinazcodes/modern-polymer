@@ -117,7 +117,7 @@ userSchema.methods.generateJwt = function () {
     name: this.firstName + " " +this.lastName,
     userType: this.userType ?? "technician",
     exp: parseInt(expiry.getTime() / 1000),
-  }, "MY_SECRET"); // DO NOT KEEP YOUR SECRET IN THE CODE!
+  }, "ALVIN"); // DO NOT KEEP YOUR SECRET IN THE CODE!
 };
 
 mongoose.model('User', userSchema);
