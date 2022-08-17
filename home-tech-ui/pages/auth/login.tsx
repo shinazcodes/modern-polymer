@@ -152,16 +152,6 @@ export default function Example() {
                 console.log(res);
                 setHasSubmitted(true);
               } catch (err: any) {
-                confirmAlert({
-                  title: err?.message ?? "",
-                  buttons: [
-                    {
-                      label: "okay",
-                      onClick: () => {},
-                    },
-                  ],
-                });
-
                 setHasSubmitted(false);
                 console.log(err);
                 resetForm();
