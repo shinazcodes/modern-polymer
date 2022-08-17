@@ -7,7 +7,6 @@ var auth = jwt({
   algorithms: ['HS256'],
 });
 
-var ctrlProfile = require('../controllers/profile');
 var ctrlPurchase = require('../controllers/purchase');
 var ctrlJobDetails = require('../controllers/job-details');
 var ctrlTechniciansList = require('../controllers/technician-list');
