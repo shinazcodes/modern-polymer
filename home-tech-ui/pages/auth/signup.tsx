@@ -28,6 +28,7 @@ import authSlice, {
   sendOtp,
   verifyEmail,
 } from "../../api/Auth/authSlice";
+import { Customer } from "../../api/Auth/customerSlice";
 import { RootState, store } from "../../api/store";
 import { showErrorAlert } from "../../util/util";
 
@@ -50,6 +51,7 @@ export interface EmailVerifyItems {
   userType?: string;
   adharNumber?: string;
   _id?: string;
+  assignedTasks?: Customer[];
 }
 export default function SignUpPage() {
   //   const { state } = useSelector<RootState, string>((state) =>

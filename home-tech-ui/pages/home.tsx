@@ -10,7 +10,7 @@ import { RootState, store } from "../api/store";
 import jwt_decode from "jwt-decode";
 import { useEffect, useState } from "react";
 import { decode } from "punycode";
-import { getTechnicianList } from "../api/Auth/techniciansSlice";
+import { getTechnician, getTechnicianList } from "../api/Auth/techniciansSlice";
 import { Customer } from "../api/Auth/customerSlice";
 import { useRouter } from "next/router";
 
@@ -19,10 +19,11 @@ export default function Example() {
     (state) => state.auth.accessToken
   );
   const jobs = useSelector<RootState, Customer[] | undefined>(
-    (state) => state.auth.jobs
+    (state) => state.technician.showTechnician?.assignedTasks
   );
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const router = useRouter();
   const [features, setFeatures] = useState([
     {
@@ -41,6 +42,21 @@ export default function Example() {
       icon: LightningBoltIcon,
     },
   ]);
+
+  useEffect(() => {
+    if (token && !hasSubmitted) {
+      var decoded: {
+        name: string;
+        email: string;
+      } = jwt_decode(token);
+      console.log(decoded);
+      setName(decoded.name);
+      setEmail(decoded.email);
+      // store.dispatch(getTechnicianList)
+      store.dispatch(getTechnician({ email: decoded.email }));
+      setHasSubmitted(true);
+    }
+  }, [hasSubmitted]);
 
   useEffect(() => {
     console.log(jobs);
