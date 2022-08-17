@@ -115,7 +115,7 @@ userSchema.methods.generateJwt = function () {
     _id: this._id,
     email: this.email,
     name: this.firstName + " " +this.lastName,
-    userType: this.userType ?? "technician",
+    userType: this.userType ? this.userType : "technician" ,
     exp: parseInt(expiry.getTime() / 1000),
   }, "ALVIN"); // DO NOT KEEP YOUR SECRET IN THE CODE!
 };
