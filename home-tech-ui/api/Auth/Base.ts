@@ -13,13 +13,13 @@ export interface ApiResponse<Payload> {
   message: string;
 }
 export const HomeTechApi = axios.create({
-  baseURL: "http://65.20.77.175",
+  baseURL: "https://hometechworld.co.in",
   responseType: "json",
   timeout: 60 * 1000,
   timeoutErrorMessage: "timed out",
   transformRequest: [
     (data: any, headers?: AxiosRequestHeaders): any => {
-      console.log("xfgsffsg");
+      console.log(headers);
       if (headers) {
         headers["Authorization"] = `Bearer ${localStorage
           .getItem("accessToken")
@@ -46,10 +46,20 @@ export const HomeTechApi = axios.create({
 });
 
 export const SmsBuddyApi = axios.create({
-  baseURL: "https://thesmsbuddy.com/api/v1",
+  baseURL: "http://thesmsbuddy.com/api/v1",
   responseType: "json",
   timeout: 60 * 1000,
   timeoutErrorMessage: "timed out",
+  transformRequest: [
+    (data: any, headers?: AxiosRequestHeaders): any => {
+      console.log(headers);
+      if (headers) {
+        headers["Sec-Fetch-Mode"] = "no-cors";
+      }
+      return data;
+    },
+    ...(axios.defaults.transformRequest as AxiosRequestTransformer[]),
+  ],
 });
 
 export enum HomeTechBase {
