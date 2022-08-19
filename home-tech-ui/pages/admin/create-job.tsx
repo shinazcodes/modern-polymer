@@ -182,15 +182,17 @@ export default function CreateJobPage() {
             ) => {
               console.log(JSON.stringify({ ...values }));
               try {
-                const res = await store.dispatch(
-                  createCustomer({
-                    ...values,
-                    mobileNumber: "91" + values.mobileNumber,
-                    altMobileNumber: "91" + values.altMobileNumber,
-                    status: selectedTechnician ? "pending" : "unassigned",
-                    assignedTo: selectedTechnician?.email ?? "",
-                  })
-                );
+                const res = await store
+                  .dispatch(
+                    createCustomer({
+                      ...values,
+                      mobileNumber: "91" + values.mobileNumber,
+                      altMobileNumber: "91" + values.altMobileNumber,
+                      status: selectedTechnician ? "pending" : "unassigned",
+                      assignedTo: selectedTechnician?.email ?? "",
+                    })
+                  )
+                  .unwrap();
                 setAssignedTechnician(selectedTechnician);
                 setSelectedCustomer({
                   ...values,

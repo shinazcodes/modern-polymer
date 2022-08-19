@@ -40,7 +40,7 @@ export default function Technicians() {
 
   const getTechnicians = async () => {
     try {
-      const res = await store.dispatch(getTechnicianList("partial"));
+      const res = await store.dispatch(getTechnicianList("partial")).unwrap();
       setgotTechnicians(true);
     } catch (err) {
       console.log(err);
@@ -108,11 +108,13 @@ export default function Technicians() {
                     console.log(selectedTechnician);
                     try {
                       if (state.technician.showTechnician?.email) {
-                        const res = await store.dispatch(
-                          removeTechnician({
-                            email: state.technician.showTechnician?.email,
-                          })
-                        );
+                        const res = await store
+                          .dispatch(
+                            removeTechnician({
+                              email: state.technician.showTechnician?.email,
+                            })
+                          )
+                          .unwrap();
                       }
                     } catch (error: any) {
                       confirmAlert({

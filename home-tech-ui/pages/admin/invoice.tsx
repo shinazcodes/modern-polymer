@@ -196,19 +196,21 @@ export default function Invoice() {
                   values?.custAddress &&
                   values?.name
                 ) {
-                  const res = await store.dispatch(
-                    generateInvoice({
-                      _customerId: customer?._customerId,
-                      mobileNumber: values.mobileNumber,
-                      assignedTo: customer?.assignedTo,
-                      services: service,
-                      email: values.custEmail,
-                      fullAddress: values?.custAddress,
-                      name: values.name,
-                      gst: values.gst,
-                      invoiceDate: values.invoiceDate,
-                    })
-                  );
+                  const res = await store
+                    .dispatch(
+                      generateInvoice({
+                        _customerId: customer?._customerId,
+                        mobileNumber: values.mobileNumber,
+                        assignedTo: customer?.assignedTo,
+                        services: service,
+                        email: values.custEmail,
+                        fullAddress: values?.custAddress,
+                        name: values.name,
+                        gst: values.gst,
+                        invoiceDate: values.invoiceDate,
+                      })
+                    )
+                    .unwrap();
 
                   console.log(res);
                   if (res) {

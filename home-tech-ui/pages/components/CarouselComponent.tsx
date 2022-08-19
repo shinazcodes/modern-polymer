@@ -16,6 +16,7 @@ import ListBoxComponent from "./ListBox";
 import jwt_decode from "jwt-decode";
 import { sendSms } from "../../api/Auth/authSlice";
 import { getSMS, SMS } from "../../api/model";
+import { showErrorAlert } from "../../util/util";
 
 export default function CarouselComponent({
   customers,
@@ -32,40 +33,65 @@ export default function CarouselComponent({
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>(
     {} as Customer
   );
+  const [isJobRemoved, setIsJobRemoved] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState(
     {} as EmailVerifyItems
   );
+  const [assignedJob, setHasAssignedJob] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
+
+  useEffect(() => {
+    if (state.customer.status === ApiState.SUCCESS && assignedJob) {
+      refresh();
+      setHasAssignedJob(false);
+    }
+  }, [state, assignedJob]);
 
   const router = useRouter();
   useEffect(() => {
-    if (hasSubmitted && state.customer.status === ApiState.SUCCESS) {
-      store.dispatch(
-        sendSms({
-          mobileNumber: selectedCustomer.mobileNumber,
-          sms: getSMS(SMS.WORK_ASSIGNED_CUSTOMER, {
-            machineType: selectedCustomer.machine,
-            technicianMob: assignedTechnician?.phoneNumber,
-            technicianName:
-              assignedTechnician?.firstName +
-              " " +
-              assignedTechnician?.lastName,
-          }),
-        })
-      );
-      store.dispatch(
-        sendSms({
-          mobileNumber: assignedTechnician?.phoneNumber!,
-          sms: getSMS(SMS.WORK_ASSIGNED_TECHNICIAN, {
-            machineType: selectedCustomer.machine,
-            custName: selectedCustomer?.name,
-            brand: selectedCustomer.brand,
-            custEmail: selectedCustomer.email,
-          }),
-        })
-      );
+    if (assignedJob && state.customer.status === ApiState.SUCCESS) {
+      if (!isJobRemoved) {
+        store.dispatch(
+          sendSms({
+            mobileNumber: selectedCustomer.mobileNumber,
+            sms: getSMS(SMS.WORK_ASSIGNED_CUSTOMER, {
+              machineType: selectedCustomer.machine,
+              technicianMob: assignedTechnician?.phoneNumber,
+              technicianName:
+                assignedTechnician?.firstName +
+                " " +
+                assignedTechnician?.lastName,
+            }),
+          })
+        );
+        setHasAssignedJob(false);
+
+        store.dispatch(
+          sendSms({
+            mobileNumber: assignedTechnician?.phoneNumber!,
+            sms: getSMS(SMS.WORK_ASSIGNED_TECHNICIAN, {
+              machineType: selectedCustomer.machine,
+              custName: selectedCustomer?.name,
+              brand: selectedCustomer.brand,
+              custEmail: selectedCustomer.email,
+            }),
+          })
+        );
+        setHasAssignedJob(false);
+      } else {
+        store.dispatch(
+          sendSms({
+            mobileNumber: selectedCustomer?.mobileNumber!,
+            sms: getSMS(SMS.CANCELLATION, {
+              machineType: selectedCustomer.machine,
+            }),
+          })
+        );
+        setIsJobRemoved(false);
+      }
+      setHasAssignedJob(false);
     }
-  }, [state, hasSubmitted]);
+  }, [state, assignedJob, isJobRemoved]);
 
   return (
     <div className="w-full">
@@ -117,19 +143,28 @@ export default function CarouselComponent({
                                   console.log(!!assignedTechnician);
                                   if (!!assignedTechnician) {
                                     setSelectedCustomer(customer);
-                                    await store.dispatch(
-                                      assignJob({
-                                        technicianEmail:
-                                          technicians.filter(
-                                            (tech) =>
-                                              tech.email === customer.assignedTo
-                                          )[0]?.email ?? "",
-                                        customer: customer,
-                                        remove: true,
-                                      })
-                                    );
+                                    try {
+                                      await store
+                                        .dispatch(
+                                          assignJob({
+                                            technicianEmail:
+                                              technicians.filter(
+                                                (tech) =>
+                                                  tech.email ===
+                                                  customer.assignedTo
+                                              )[0]?.email ?? "",
+                                            customer: customer,
+                                            remove: true,
+                                          })
+                                        )
+                                        .unwrap();
+                                      setIsJobRemoved(true);
+                                      setHasAssignedJob(true);
+                                    } catch (err) {
+                                      setHasAssignedJob(false);
+                                      showErrorAlert();
+                                    }
                                   }
-                                  refresh();
 
                                   e.preventDefault();
                                 }}
@@ -182,15 +217,22 @@ export default function CarouselComponent({
                               onClick={(e: React.MouseEvent) => {
                                 console.log(selectedTechnician);
                                 setAssignedTechnician(selectedTechnician);
-                                store.dispatch(
-                                  assignJob({
-                                    technicianEmail:
-                                      selectedTechnician.email ?? "",
-                                    customer: customer,
-                                    remove: false,
-                                  })
-                                );
-                                refresh();
+                                try {
+                                  store
+                                    .dispatch(
+                                      assignJob({
+                                        technicianEmail:
+                                          selectedTechnician.email ?? "",
+                                        customer: customer,
+                                        remove: false,
+                                      })
+                                    )
+                                    .unwrap();
+                                  setHasAssignedJob(true);
+                                } catch (err) {
+                                  setHasAssignedJob(false);
+                                  showErrorAlert();
+                                }
                                 e.preventDefault();
                               }}
                             >
@@ -212,14 +254,19 @@ export default function CarouselComponent({
                                 email: string;
                               } = jwt_decode(state.auth.accessToken ?? "");
                               console.log(decoded);
-                              store.dispatch(
-                                assignJob({
-                                  technicianEmail: decoded.email ?? "",
-                                  customer: customer,
-                                  remove: true,
-                                })
-                              );
-                              refresh();
+                              try {
+                                store.dispatch(
+                                  assignJob({
+                                    technicianEmail: decoded.email ?? "",
+                                    customer: customer,
+                                    remove: true,
+                                  })
+                                );
+                                setIsJobRemoved(true);
+                                setHasAssignedJob(true);
+                              } catch (err) {
+                                setHasAssignedJob(false);
+                              }
                               e.preventDefault();
                             }}
                           >

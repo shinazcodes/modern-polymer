@@ -64,7 +64,7 @@ export default function CustomerList() {
   const getCust = async () => {
     if (!hasSubmitted) {
       try {
-        const res = await store.dispatch(getInvoices());
+        const res = await store.dispatch(getInvoices()).unwrap();
         setHasSubmitted(true);
       } catch (err) {
         console.log(err);
@@ -144,7 +144,7 @@ export default function CustomerList() {
             ) => {
               console.log(JSON.stringify({ ...values }));
               try {
-                const res = await store.dispatch(getCustomers());
+                const res = await store.dispatch(getCustomers()).unwrap();
                 setHasSubmitted(true);
               } catch (err) {
                 console.log(err);

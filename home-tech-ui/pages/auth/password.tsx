@@ -32,9 +32,9 @@ export default function PasswordPage() {
   const [hasSubmittedLogin, setHasSubmittedLogin] = useState(false);
 
   async function callLogin() {
-    await store.dispatch(
-      login({ password, email: state.auth.data.email ?? "" })
-    );
+    await store
+      .dispatch(login({ password, email: state.auth.data.email ?? "" }))
+      .unwrap();
   }
   useEffect(() => {
     if (
@@ -90,9 +90,11 @@ export default function PasswordPage() {
               console.log(JSON.stringify({ ...values }));
               if (emailToken)
                 try {
-                  const res = await store.dispatch(
-                    register({ password: values.password, emailToken })
-                  );
+                  const res = await store
+                    .dispatch(
+                      register({ password: values.password, emailToken })
+                    )
+                    .unwrap();
                   setHasSubmitted(true);
                   setPassword(values.password);
                   console.log(res);

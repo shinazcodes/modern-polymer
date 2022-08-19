@@ -38,13 +38,20 @@ export default function VerifyEmailPage() {
   }, [state, hasSubmittedOtp]);
 
   const otpverified = async () => {
-    const res = await store.dispatch(
-      otpVerification({
-        otpVerified: true,
-        phoneNumber: phoneNumber ?? "",
-      })
-    );
-    setHasSubmittedOtp(true);
+    try {
+      const res = await store
+        .dispatch(
+          otpVerification({
+            otpVerified: true,
+            phoneNumber: phoneNumber ?? "",
+          })
+        )
+        .unwrap();
+      setHasSubmittedOtp(true);
+    } catch (err) {
+      showErrorAlert();
+      setHasSubmittedOtp(false);
+    }
   };
 
   useEffect(() => {
@@ -82,18 +89,21 @@ export default function VerifyEmailPage() {
             ) => {
               console.log("otp data sending:", values.otp + " " + phoneNumber);
               try {
-                const res = await store.dispatch(
-                  verifyOtp({
-                    otp: values.otp,
-                    phoneNumber: phoneNumber ?? "",
-                  })
-                );
+                const res = await store
+                  .dispatch(
+                    verifyOtp({
+                      otp: values.otp,
+                      phoneNumber: phoneNumber ?? "",
+                    })
+                  )
+                  .unwrap();
                 if (res) {
                   setHasSubmitted(true);
                 }
               } catch (err) {
                 resetForm();
                 console.log(err);
+                showErrorAlert();
               }
             }}
           >
@@ -110,7 +120,7 @@ export default function VerifyEmailPage() {
               <form onSubmit={handleSubmit}>
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6">
-                    <div>please enter the otp sent to your email id</div>
+                    <div>please enter the otp sent to your mobile number</div>
                     <div className="grid grid-cols-6 gap-6">
                       <div className="col-span-6 sm:col-span-4">
                         <label

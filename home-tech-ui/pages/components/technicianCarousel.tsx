@@ -33,7 +33,9 @@ export default function TechnicianCarouselComponent({
   const router = useRouter();
   useEffect(() => {
     if (selectedTechnician && selectedTechnician.email) {
-      store.dispatch(getTechnician({ email: selectedTechnician.email }));
+      store
+        .dispatch(getTechnician({ email: selectedTechnician.email }))
+        .unwrap();
       setHasSubmitted(true);
       setSelectedTechnician(undefined);
     }

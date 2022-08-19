@@ -33,8 +33,6 @@ export const HomeTechApi = axios.create({
     (data: any, headers?: AxiosResponseHeaders): any => {
       if (typeof data === "string") {
         const r = JSON.parse(data);
-        console.log(r.response);
-        console.log(headers);
         if (r.response === "error") {
           throw Error(r.message);
         }
@@ -46,7 +44,7 @@ export const HomeTechApi = axios.create({
 });
 
 export const SmsBuddyApi = axios.create({
-  baseURL: "http://thesmsbuddy.com/api/v1",
+  baseURL: "https://thesmsbuddy.com/api/v1",
   responseType: "json",
   timeout: 60 * 1000,
   timeoutErrorMessage: "timed out",

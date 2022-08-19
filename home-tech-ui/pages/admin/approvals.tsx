@@ -70,7 +70,7 @@ export default function CustomerList() {
 
   const getTechnicians = async () => {
     try {
-      const res = await store.dispatch(getTechnicianList("partial"));
+      const res = await store.dispatch(getTechnicianList("partial")).unwrap();
       setgotTechnicians(true);
     } catch (err) {
       console.log(err);
@@ -140,7 +140,7 @@ export default function CustomerList() {
             ) => {
               console.log(JSON.stringify({ ...values }));
               try {
-                const res = await store.dispatch(getCustomers());
+                const res = await store.dispatch(getCustomers()).unwrap();
                 setHasSubmitted(true);
               } catch (err) {
                 console.log(err);

@@ -90,21 +90,30 @@ export default function SignUpPage() {
   }
 
   const api = async () => {
-    const res = await store.dispatch(
-      verifyEmail({
-        ...values,
-        phoneNumber: "91" + values?.phoneNumber,
-        photo: photoFile,
-        pancard: pancardfile,
-        passbook: passbookfile,
-        license: licensefile,
-        biodata: biodatafile,
-        adhar: adharFile,
-        certificate: certificatefile,
-        userType: "technician",
-      })
-    );
-    setHasSubmitted(true);
+    try {
+      const res = await store
+        .dispatch(
+          verifyEmail({
+            ...values,
+            phoneNumber: "91" + values?.phoneNumber,
+            photo: photoFile,
+            pancard: pancardfile,
+            passbook: passbookfile,
+            license: licensefile,
+            biodata: biodatafile,
+            adhar: adharFile,
+            certificate: certificatefile,
+            userType: "admin",
+          })
+        )
+        .unwrap();
+      setHasSubmitted(true);
+    } catch (err) {
+      console.log(err);
+      showErrorAlert();
+      setHasSubmittedOtp(false);
+      setHasSubmitted(false);
+    }
   };
   useEffect(() => {
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
@@ -115,11 +124,8 @@ export default function SignUpPage() {
   useEffect(() => {
     if (state.auth.status === ApiState.SUCCESS && hasSubmittedOtp) {
       api();
-    } else if (state.auth.status === ApiState.ERROR && hasSubmittedOtp) {
-      showErrorAlert();
-      setHasSubmittedOtp(false);
     }
-  }, [state, hasSubmitted, values]);
+  }, [state, hasSubmittedOtp, values]);
 
   return (
     <>
@@ -171,15 +177,18 @@ export default function SignUpPage() {
               values,
               { setSubmitting, setFieldValue, resetForm }
             ) => {
-              console.log(JSON.stringify({ ...values, id: file }));
               try {
-                const otpRes = await store.dispatch(
-                  sendOtp("91" + values.phoneNumber ?? "")
-                );
+                const otpRes = await store
+                  .dispatch(sendOtp("91" + values.phoneNumber ?? ""))
+                  .unwrap();
                 setValues(values);
+
                 setHasSubmittedOtp(true);
               } catch (err) {
                 console.log(err);
+                showErrorAlert();
+                setHasSubmittedOtp(false);
+
                 resetForm();
               }
               //   setTimeout(() => {

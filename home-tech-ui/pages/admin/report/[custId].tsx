@@ -24,9 +24,9 @@ export default function ReportPdf() {
   const [total, setTotal] = useState(0.0);
 
   async function getInvoiceData() {
-    return await store.dispatch(
-      getInvoice({ _customerId: custId?.toString() ?? "" })
-    );
+    return await store
+      .dispatch(getInvoice({ _customerId: custId?.toString() ?? "" }))
+      .unwrap();
   }
 
   useEffect(() => {

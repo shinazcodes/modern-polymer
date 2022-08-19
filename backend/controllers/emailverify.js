@@ -27,7 +27,7 @@ module.exports.verifyEmail = function(req, res) {
          
     ) {
         res.status(401).json({
-            "response": "null",
+            "response": "error",
             "message": "please enter all details"
         }); 
     } else {
