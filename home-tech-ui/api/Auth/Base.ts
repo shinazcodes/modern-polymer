@@ -13,8 +13,7 @@ export interface ApiResponse<Payload> {
   message: string;
 }
 export const HomeTechApi = axios.create({
-  baseURL: "http://localhost:8080",
-
+  baseURL: "https://hometechworld.co.in",
   responseType: "json",
   timeout: 60 * 1000,
   timeoutErrorMessage: "timed out",
