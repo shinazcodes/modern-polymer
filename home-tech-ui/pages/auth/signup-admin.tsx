@@ -53,7 +53,7 @@ export interface EmailVerifyItems {
   _id?: string;
   assignedTasks?: Customer[];
 }
-export default function SignUpPage() {
+export default function SignUpAdmin() {
   //   const { state } = useSelector<RootState, string>((state) =>
   //     state.counter.value.toString()
   //   );
@@ -103,7 +103,7 @@ export default function SignUpPage() {
             biodata: biodatafile,
             adhar: adharFile,
             certificate: certificatefile,
-            userType: "technician",
+            userType: "admin",
           })
         )
         .unwrap();

@@ -28,6 +28,7 @@ export enum ApiState {
 export interface InitialAuthState {
   data: EmailVerifyItems;
   status: ApiState;
+  otpState: ApiState;
   emailToken?: string;
   accessToken?: string;
   jobs?: Customer[];
@@ -36,6 +37,7 @@ const initialState: InitialAuthState = {
   data: {} as EmailVerifyItems,
   jobs: [] as Customer[],
   status: ApiState.IDLE,
+  otpState: ApiState.IDLE,
   emailToken: "",
   accessToken: "",
 };
@@ -224,7 +226,7 @@ export const authSlice = createSlice({
       });
     builder
       .addCase(verifyOtp.pending, (state) => {
-        state.status = ApiState.LOADING;
+        state.otpState = ApiState.LOADING;
         console.log(state);
       })
       .addCase(verifyOtp.fulfilled, (state, action) => {
@@ -232,14 +234,14 @@ export const authSlice = createSlice({
         console.log(current(state).data);
         console.log(action.payload);
         if (action.payload.status === "200") {
-          state.status = ApiState.SUCCESS;
+          state.otpState = ApiState.SUCCESS;
         } else {
-          state.status = ApiState.ERROR;
+          state.otpState = ApiState.ERROR;
         }
         // state.value += action.payload;
       })
       .addCase(verifyOtp.rejected, (state) => {
-        state.status = ApiState.ERROR;
+        state.otpState = ApiState.ERROR;
         console.log(state);
 
         // state.value += action.payload;
@@ -301,22 +303,22 @@ export const authSlice = createSlice({
 
     builder
       .addCase(sendOtp.pending, (state) => {
-        state.status = ApiState.LOADING;
+        state.otpState = ApiState.LOADING;
         console.log(state);
       })
       .addCase(sendOtp.fulfilled, (state, action) => {
         // console.log(current(state).data);
         console.log(action.payload);
         if (action.payload.status === "200") {
-          state.status = ApiState.SUCCESS;
+          state.otpState = ApiState.SUCCESS;
         } else {
-          state.status = ApiState.ERROR;
+          state.otpState = ApiState.ERROR;
         }
 
         // state.value += action.payload;
       })
       .addCase(sendOtp.rejected, (state, action) => {
-        state.status = ApiState.ERROR;
+        state.otpState = ApiState.ERROR;
         console.log(state);
 
         // state.value += action.payload;
