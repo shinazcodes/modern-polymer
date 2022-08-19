@@ -27,7 +27,8 @@ const Home: NextPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/auth/login");
+    console.log(router.asPath);
+    if (router.asPath === "/") router.replace("/auth/login");
   });
   return <div className={styles.container}></div>;
 };
