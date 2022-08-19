@@ -103,7 +103,7 @@ export default function SignUpPage() {
             biodata: biodatafile,
             adhar: adharFile,
             certificate: certificatefile,
-            userType: "admin",
+            userType: "technician",
           })
         )
         .unwrap();
