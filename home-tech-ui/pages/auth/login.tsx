@@ -22,6 +22,7 @@ import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
 import { ApiState, login } from "../../api/Auth/authSlice";
 import { persistor, RootState, store } from "../../api/store";
+import { showErrorAlert } from "../../util/util";
 import { EmailVerifyItems } from "./signup";
 import verifyEmail from "./verify-email";
 declare var navigator: any;
@@ -106,8 +107,14 @@ export default function Example() {
         ```
       */}
       {showPrompt && (
-        <div className="absolute w-11 h-9 top-16 border-2 border-solid bg-slate-200">
-          <button onClick={clicked}>Add to home screen</button>
+        <div
+          className="absolute w-full flex flex-row flex-wrap justify-center
+        transition ease-in-out delay-1000 duration-1000 top-16 border-2 border-solid bg-slate-200 p-4 h-auto
+      "
+        >
+          <button className="rounded-2xl bg-blue-300 p-4 " onClick={clicked}>
+            Download App/Add to Home Screen
+          </button>
         </div>
       )}
       <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -153,6 +160,7 @@ export default function Example() {
                 setHasSubmitted(true);
               } catch (err: any) {
                 setHasSubmitted(false);
+                showErrorAlert(err?.message ?? undefined);
                 console.log(err);
                 resetForm();
               }
