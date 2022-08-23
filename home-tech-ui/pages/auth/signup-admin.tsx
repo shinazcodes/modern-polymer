@@ -116,11 +116,7 @@ export default function SignUpAdmin() {
     }
   };
   useEffect(() => {
-    if (
-      state.auth.status === ApiState.SUCCESS &&
-      hasSubmitted &&
-      hasSubmittedOtp
-    ) {
+    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
       router.replace("/auth/verify-email");
     }
   }, [state, hasSubmitted, hasSubmittedOtp]);
