@@ -1,6 +1,7 @@
 var passport = require('passport');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
+var crypto = require('crypto');
 
 var sendJSONresponse = function(res, status, content) {
   res.status(status);
@@ -33,13 +34,20 @@ module.exports.register = function(req, res) {
       } else {
       user.setPassword(req.body.password);
       user.isVerified = true;
-      // user.emailToken = '';
       user.email = user.email;
-      // user.name = user.name;
-      emailToken = user.generateJwt();
-
+        user.save(function(err) {
+          if(err) {
+          res.status(403);
+          res.json({
+              "response": null,
+              "message": "something went wrong while adding user! please try again later"
+          });
+        }
+          });
       User.findOneAndUpdate({emailToken: req.body.emailToken}, {...user}, {new: true}, (err, user) =>{
         console.log("err" + err);
+      console.log("user2" + user);
+
         if(err) {
           console.log("err register:", err)
           res.status(401).json({

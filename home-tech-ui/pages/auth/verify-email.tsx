@@ -102,6 +102,8 @@ export default function VerifyEmailPage() {
                 }
               } catch (err) {
                 resetForm();
+                setHasSubmitted(false);
+
                 console.log(err);
                 showErrorAlert();
               }

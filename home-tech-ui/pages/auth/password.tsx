@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ApiState, login, register } from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
+import { showErrorAlert } from "../../util/util";
 
 export default function PasswordPage() {
   const router = useRouter();
@@ -32,9 +33,16 @@ export default function PasswordPage() {
   const [hasSubmittedLogin, setHasSubmittedLogin] = useState(false);
 
   async function callLogin() {
-    await store
-      .dispatch(login({ password, email: state.auth.data.email ?? "" }))
-      .unwrap();
+    setTimeout(async () => {
+      try {
+        await store
+          .dispatch(login({ password, email: state.auth.data.email ?? "" }))
+          .unwrap();
+      } catch (err) {
+        setHasSubmittedLogin(false);
+        router.replace("/auth/login");
+      }
+    }, 1500);
   }
   useEffect(() => {
     if (
@@ -98,7 +106,9 @@ export default function PasswordPage() {
                   setHasSubmitted(true);
                   setPassword(values.password);
                   console.log(res);
-                } catch (err) {
+                } catch (err: any) {
+                  setHasSubmitted(false);
+                  showErrorAlert(err.message);
                   console.log(err);
                 }
             }}

@@ -28,7 +28,6 @@ module.exports.verifyOtp = function(req, res) {
           "response": "error", "message": "somthing went wrong"
         });
       } else {
-      user.isVerified = true;
       user.emailToken = crypto.randomBytes(64).toString('hex');  
       user.otp = '';
       user.email = user.email;
