@@ -30,37 +30,12 @@ export default function PasswordPage() {
   const state = useSelector<RootState, RootState>((state) => state);
   const [password, setPassword] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [hasSubmittedLogin, setHasSubmittedLogin] = useState(false);
 
-  async function callLogin() {
-    setTimeout(async () => {
-      try {
-        await store
-          .dispatch(login({ password, email: state.auth.data.email ?? "" }))
-          .unwrap();
-      } catch (err) {
-        setHasSubmittedLogin(false);
-        router.replace("/auth/login");
-      }
-    }, 1500);
-  }
   useEffect(() => {
-    if (
-      state.auth.status === ApiState.SUCCESS &&
-      hasSubmitted &&
-      !hasSubmittedLogin
-    ) {
-      callLogin();
-      setHasSubmittedLogin(true);
+    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+      router.replace("/auth/login");
     }
-    if (state.auth.status === ApiState.SUCCESS && hasSubmittedLogin) {
-      if (localStorage.getItem("userType") === "admin") {
-        router.push("/admin/create-job");
-      } else {
-        router.replace("/home");
-      }
-    }
-  }, [state, hasSubmitted, hasSubmittedLogin]);
+  }, [state, hasSubmitted]);
   return (
     <>
       <div className="mt-16">
