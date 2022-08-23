@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGOLAB_URI;
 }
 
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(dbURI, { useNewUrlParser: true, useCreateIndex: true , useUnifiedTopology: true });
 
 // CONNECTION EVENTS
 mongoose.connection.on('connected', function () {
@@ -44,3 +44,4 @@ process.on('SIGTERM', function () {
     process.exit(0);
   });
 });
+mongoose.set('useFindAndModify', false);
