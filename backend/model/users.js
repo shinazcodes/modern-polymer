@@ -1,12 +1,19 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var jwt = require('jsonwebtoken');
-
+  
+var passportLocalMongoose = require('passport-local-mongoose');
+  
 var userSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
     required: true
+  },
+  username: {
+    type: String,
+    unique: true,
+    required: false
   },
   firstName: {
     type: String,
@@ -93,8 +100,7 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  hash: String,
-  salt: String
+
 });
 
 userSchema.methods.setPassword = function (password) {
@@ -119,5 +125,7 @@ userSchema.methods.generateJwt = function () {
     exp: parseInt(expiry.getTime() / 1000),
   }, "ALVIN"); // DO NOT KEEP YOUR SECRET IN THE CODE!
 };
+// plugin for passport-local-mongoose
+userSchema.plugin(passportLocalMongoose);
 
 mongoose.model('User', userSchema);

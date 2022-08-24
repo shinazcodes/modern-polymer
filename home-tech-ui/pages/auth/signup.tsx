@@ -122,7 +122,7 @@ export default function SignUpPage() {
   }, [state, hasSubmitted, hasSubmittedOtp]);
 
   useEffect(() => {
-    if (state.auth.otpState === ApiState.SUCCESS && hasSubmittedOtp) {
+    if (hasSubmittedOtp) {
       setHasSubmittedOtp(false);
 
       api();
@@ -180,9 +180,9 @@ export default function SignUpPage() {
               { setSubmitting, setFieldValue, resetForm }
             ) => {
               try {
-                const otpRes = await store
-                  .dispatch(sendOtp("91" + values.phoneNumber ?? ""))
-                  .unwrap();
+                // const otpRes = await store
+                //   .dispatch(sendOtp("91" + values.phoneNumber ?? ""))
+                //   .unwrap();
                 setValues(values);
 
                 setHasSubmittedOtp(true);
@@ -209,7 +209,7 @@ export default function SignUpPage() {
               isSubmitting,
               /* and other goodies */
             }) => (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} autoComplete="off">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6">
                     <div className="mb-4">

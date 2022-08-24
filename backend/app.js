@@ -137,7 +137,7 @@ server.on('listening', onListening);
 
 // [SH] Initialise Passport before using the route middleware
 app.use(passport.initialize());
-
+app.use(passport.session());
 // [SH] Use the API routes when path starts with /api
 app.use('/api', routesApi);
 

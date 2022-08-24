@@ -168,7 +168,7 @@ export const register = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (data: { email: string; password: string }) => {
+  async (data: { username: string; password: string }) => {
     console.log(data);
     const response = await PostApi(buildPath("login"), data);
     console.log(response);

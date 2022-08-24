@@ -131,7 +131,7 @@ export default function Example() {
           </div>
           <Formik
             initialValues={{
-              email: "",
+              username: "",
               password: "",
             }}
             validate={(values) => {
@@ -187,12 +187,12 @@ export default function Example() {
                       Email address
                     </label>
                     <input
-                      id="email"
-                      name="email"
+                      id="username"
+                      name="username"
                       type="text"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      value={values.email}
+                      value={values.username}
                       autoComplete="email"
                       required
                       className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
