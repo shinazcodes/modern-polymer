@@ -67,7 +67,7 @@ var transporter = nodemailer.createTransport({
         console.log(""+err);
         console.log(""+doc);
         if(!doc) {
-            user.emailToken = crypto.randomBytes(64).toString('hex');  
+            user.emailToken = Math.floor(100000 + Math.random() * 900000);  
             user.otp = Math.floor(100000 + Math.random() * 900000);
             console.log(user.otp); 
             var mailOptions = {

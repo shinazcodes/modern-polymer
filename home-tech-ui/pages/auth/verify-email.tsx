@@ -18,7 +18,12 @@ import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { ApiState, otpVerification, verifyOtp } from "../../api/Auth/authSlice";
+import {
+  ApiState,
+  otpVerification,
+  sendOtp,
+  verifyOtp,
+} from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
 import { showErrorAlert } from "../../util/util";
 
@@ -31,6 +36,8 @@ export default function VerifyEmailPage() {
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [hasSubmittedOtp, setHasSubmittedOtp] = useState(false);
+  const [count, setCount] = useState(0);
+
   useEffect(() => {
     if (state.auth.status === ApiState.SUCCESS && hasSubmittedOtp) {
       router.replace("/auth/password");
@@ -75,11 +82,14 @@ export default function VerifyEmailPage() {
           </div> */}
         <div className="mt-5 md:mt-0 md:col-span-2 justify-centers">
           <Formik
-            initialValues={{ otp: "" }}
+            initialValues={{ otp: "", agree: undefined }}
             validate={(values) => {
-              const errors = {} as { otp: string };
+              const errors = {} as { otp: string; agree: string };
               if (!values.otp) {
                 errors.otp = "Required";
+              }
+              if (!values.agree) {
+                errors.agree = "Required";
               }
               return errors;
             }}
@@ -141,9 +151,89 @@ export default function VerifyEmailPage() {
                           value={values.otp}
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
+                        {errors.otp ? (
+                          <p className="text-red-600">please enter otp</p>
+                        ) : (
+                          <></>
+                        )}
                       </div>
                     </div>
+                    <div className="text-xs text-right">
+                      <p>didn't receive an otp? </p>
+                      <span
+                        className="text-blue-600 underline"
+                        onClick={async () => {
+                          if (count < 5) {
+                            const otpRes = await store
+                              .dispatch(
+                                sendOtp("91" + state.auth.data.phoneNumber)
+                              )
+                              .unwrap();
+                            setCount(count + 1);
+                          } else {
+                            showErrorAlert("Maximum otp retries reached!");
+                          }
+                        }}
+                      >
+                        click here to resend
+                      </span>
+                      {count > 0 ? <>"retries left:" + {5 - count}</> : <></>}
+                    </div>
                   </div>
+                  <h1 className="font-bold text-lg px-4">
+                    Please read and agree to the terms and conditions below
+                    before continuing
+                  </h1>
+                  <div className="m-4 p-4 rounded-md border flex flex-row flex-wrap relative">
+                    <h1 className="font-bold text-2xl underline pb-1 ">
+                      Terms And Conditions
+                    </h1>
+                    <p>
+                      This is to acknowledge that I , Mr ,{" "}
+                      {state.auth.data.firstName +
+                        " " +
+                        state.auth.data.lastName}{" "}
+                      ( Service Partner ) is a part of Home Tech World Home
+                      Appliance Service Center All Kerala , which services home
+                      appliances . I work as a service partner for home
+                      appliances repair and services . I hereby acknowledge that
+                      the home appliances provided to me by the company will be
+                      completed with full responsibility and will assure to give
+                      the company .50 % of the profit margin on completion of
+                      each work without any interruption . I also agree to a
+                      30day warranty on repairing machines and I will bear full
+                      responsibility for it . If I have to leave the company for
+                      any reason , I agree that I will work for a 30day notice
+                      period after giving a written resignation letter to the
+                      company before 30 days in advance . I assure that I will
+                      clear the pending works the pending amount during this
+                      period . I hereby agree that the Company can charge me
+                      against any loss of the company from my side . I assure
+                      that I will use full potential and will work hard for the
+                      success of the HOME TECH WORLD company
+                    </p>
+                    <div className="flex flex-row flex-wrap place-content-end w-full">
+                      <div className="p-4 right-0 relative  ">
+                        <input
+                          type="checkbox"
+                          name="agree"
+                          id="agree"
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.agree}
+                        />
+                        &ensp; <label htmlFor="account-option">I AGREE</label>
+                      </div>
+                      {errors.agree ? (
+                        <p className="text-red-600">
+                          please agree to the terms and conditions
+                        </p>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
                     <button
                       type="button"
@@ -153,7 +243,7 @@ export default function VerifyEmailPage() {
                         handleSubmit(undefined);
                       }}
                     >
-                      verify
+                      Verify
                     </button>
                   </div>
                 </div>

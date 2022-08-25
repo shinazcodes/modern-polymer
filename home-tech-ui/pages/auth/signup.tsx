@@ -119,7 +119,7 @@ export default function SignUpPage() {
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
       router.replace("/auth/verify-email");
     }
-  }, [state, hasSubmitted]);
+  }, [state, hasSubmitted, hasSubmittedOtp]);
 
   useEffect(() => {
     if (state.auth.otpState === ApiState.SUCCESS && hasSubmittedOtp) {

@@ -32,7 +32,6 @@ module.exports.jobDetails = function(req, res) {
         });
       } else {
       user.isVerified = true;
-      user.emailToken = crypto.randomBytes(64).toString('hex');  
       user.otp = '';
       user.email = user.email;
       user.name = user.name;

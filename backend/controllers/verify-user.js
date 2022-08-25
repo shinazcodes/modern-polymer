@@ -31,7 +31,6 @@ module.exports.otpVerification = function(req, res) {
         });
       } else {
       user.isVerified = req.body.otpVerified;
-      user.emailToken = crypto.randomBytes(64).toString('hex');  
       user.otp = '';
       user.phoneNumber = user.phoneNumber;
       user.name = user.name;
