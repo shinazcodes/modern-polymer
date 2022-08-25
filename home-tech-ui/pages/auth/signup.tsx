@@ -103,9 +103,7 @@ export default function SignUpPage() {
         setHasSubmittedOtp(true);
 
         setTimeout(() => {
-          const otpRes = store
-            .dispatch(sendOtp("91" + phoneNumber ?? ""))
-            .unwrap();
+          const otpRes = store.dispatch(sendOtp(phoneNumber ?? "")).unwrap();
         }, 200);
       }
     }
