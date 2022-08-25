@@ -119,10 +119,10 @@ export default function SignUpPage() {
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
       router.replace("/auth/verify-email");
     }
-  }, [state, hasSubmitted, hasSubmittedOtp]);
+  }, [state, hasSubmitted]);
 
   useEffect(() => {
-    if (hasSubmittedOtp) {
+    if (state.auth.otpState === ApiState.SUCCESS && hasSubmittedOtp) {
       setHasSubmittedOtp(false);
 
       api();
@@ -180,9 +180,9 @@ export default function SignUpPage() {
               { setSubmitting, setFieldValue, resetForm }
             ) => {
               try {
-                // const otpRes = await store
-                //   .dispatch(sendOtp("91" + values.phoneNumber ?? ""))
-                //   .unwrap();
+                const otpRes = await store
+                  .dispatch(sendOtp("91" + values.phoneNumber ?? ""))
+                  .unwrap();
                 setValues(values);
 
                 setHasSubmittedOtp(true);
