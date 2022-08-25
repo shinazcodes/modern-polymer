@@ -98,8 +98,6 @@ export default function SignUpPage() {
       !hasSubmittedOtp
     ) {
       if (!hasSubmittedOtp) {
-        console.log("fuxxccckkk");
-
         setHasSubmittedOtp(true);
 
         setTimeout(() => {

@@ -63,9 +63,9 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     // todo change this
-    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+    if (state.auth.otpState === ApiState.SUCCESS && hasSubmitted) {
       otpverified();
-    } else if (state.auth.status === ApiState.ERROR && hasSubmitted) {
+    } else if (state.auth.otpState === ApiState.ERROR && hasSubmitted) {
       setHasSubmitted(false);
       showErrorAlert();
     }
