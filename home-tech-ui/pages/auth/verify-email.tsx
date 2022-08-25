@@ -159,7 +159,7 @@ export default function VerifyEmailPage() {
                       </div>
                     </div>
                     <div className="text-xs text-right">
-                      <p>didn't receive an otp? </p>
+                      <p>didn&apos;t receive an otp? </p>
                       <span
                         className="text-blue-600 underline"
                         onClick={async () => {
@@ -177,7 +177,7 @@ export default function VerifyEmailPage() {
                       >
                         click here to resend
                       </span>
-                      {count > 0 ? <>"retries left:" + {5 - count}</> : <></>}
+                      {count > 0 ? <>retries left: + {5 - count}</> : <></>}
                     </div>
                   </div>
                   <h1 className="font-bold text-lg px-4">
