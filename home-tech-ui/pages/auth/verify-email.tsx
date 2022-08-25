@@ -166,7 +166,7 @@ export default function VerifyEmailPage() {
                           if (count < 5) {
                             const otpRes = await store
                               .dispatch(
-                                sendOtp("91" + state.auth.data.phoneNumber)
+                                sendOtp(state.auth.data.phoneNumber ?? "")
                               )
                               .unwrap();
                             setCount(count + 1);
