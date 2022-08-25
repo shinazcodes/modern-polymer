@@ -1,7 +1,6 @@
 var passport = require('passport');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
-var crypto = require('crypto');
 
 var sendJSONresponse = function(res, status, content) {
   res.status(status);
@@ -47,7 +46,8 @@ module.exports.register = function(req, res) {
           });
           User.register(user, req.body.password, function(err, user) {
             if (err) {
-              res.json({"response": "error", message:"Your account could  not be saved. Error: ", err}) 
+              res.status(403)
+              .json({"response": "error", message:"Your account could  not be saved. Error: ", err}) 
             }else{
               User.findOneAndUpdate({emailToken: req.body.emailToken}, {...user}, {new: true}, (err, user) =>{
                 console.log("err" + err);

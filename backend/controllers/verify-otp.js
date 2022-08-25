@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var crypto = require('crypto');
 var User = mongoose.model('User');
 
 var sendJSONresponse = function(res, status, content) {

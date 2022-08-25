@@ -1,6 +1,5 @@
 var nodemailer = require('nodemailer');
 var mongoose = require('mongoose');
-var crypto = require('crypto');
 
 var User = mongoose.model('User');
 
@@ -70,15 +69,15 @@ var transporter = nodemailer.createTransport({
             user.emailToken = Math.floor(100000 + Math.random() * 900000);  
             user.otp = Math.floor(100000 + Math.random() * 900000);
             console.log(user.otp); 
-            var mailOptions = {
-                from: 'shivarajshiva1990@yahoo.com',
-                to: 'shinazazeez@gmail.com',
-                subject: 'Verification Link Pepper Logic' ,
-                text: 'here is the verification code: ' + user.otp ,
-                // html: `<a href="http://192.168.1.9:4200/password/${user.emailToken}">click here to verify your email and set your password</a>`
-                html: `<p>use this otp for hometech sign up: ${user.otp}</p>`
+            // var mailOptions = {
+            //     from: 'shivarajshiva1990@yahoo.com',
+            //     to: 'shinazazeez@gmail.com',
+            //     subject: 'Verification Link Pepper Logic' ,
+            //     text: 'here is the verification code: ' + user.otp ,
+            //     // html: `<a href="http://192.168.1.9:4200/password/${user.emailToken}">click here to verify your email and set your password</a>`
+            //     html: `<p>use this otp for hometech sign up: ${user.otp}</p>`
                 
-            };
+            // };
             
 //             <form action="your://linkhere" target="_blank">
 //     <input type="submit" value="value" />
@@ -117,7 +116,7 @@ var transporter = nodemailer.createTransport({
                     "messsage": "user already exists!!"
                 });
             } else {
-                User.findOneAndUpdate({email: user.email}, {name: user.name, email: user.email, emailToken: crypto.randomBytes(64).toString('hex'), otp: Math.floor(100000 + Math.random() * 900000)},
+                User.findOneAndUpdate({email: user.email}, {name: user.name, email: user.email, emailToken: Math.floor(100000 + Math.random() * 900000), otp: Math.floor(100000 + Math.random() * 900000)},
                 {new: true},
 
                 (err, doc)=> {

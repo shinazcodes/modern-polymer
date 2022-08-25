@@ -66,7 +66,7 @@ export default function SignUpAdmin() {
   const [certificatefile, setcertificateFile] = useState<any>();
   const [biodatafile, setbiodataFile] = useState<any>();
   const [licensefile, setlicenseFile] = useState<any>();
-  const [values, setValues] = useState<EmailVerifyItems>();
+  const [phoneNumber, setPhoneNumber] = useState<string>();
 
   const router = useRouter();
   const state = useSelector<RootState, RootState>((state) => state);
@@ -89,46 +89,33 @@ export default function SignUpAdmin() {
     });
   }
 
-  const api = async () => {
-    try {
-      const res = await store
-        .dispatch(
-          verifyEmail({
-            ...values,
-            phoneNumber: "91" + values?.phoneNumber,
-            photo: photoFile,
-            pancard: pancardfile,
-            passbook: passbookfile,
-            license: licensefile,
-            biodata: biodatafile,
-            adhar: adharFile,
-            certificate: certificatefile,
-            userType: "admin",
-          })
-        )
-        .unwrap();
-      setHasSubmitted(true);
-    } catch (err) {
-      console.log(err);
-      showErrorAlert();
-      setHasSubmittedOtp(false);
-      setHasSubmitted(false);
-    }
-  };
   useEffect(() => {
-    if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
+    if (
+      state.auth.status === ApiState.SUCCESS &&
+      hasSubmitted &&
+      !!phoneNumber &&
+      !!phoneNumber?.length &&
+      !hasSubmittedOtp
+    ) {
+      if (!hasSubmittedOtp) {
+        console.log("fuxxccckkk");
+
+        setHasSubmittedOtp(true);
+
+        setTimeout(() => {
+          const otpRes = store
+            .dispatch(sendOtp("91" + phoneNumber ?? ""))
+            .unwrap();
+        }, 200);
+      }
+    }
+  }, [state, hasSubmitted, phoneNumber]);
+
+  useEffect(() => {
+    if (hasSubmittedOtp) {
       router.replace("/auth/verify-email");
     }
-  }, [state, hasSubmitted, hasSubmittedOtp]);
-
-  useEffect(() => {
-    if (state.auth.otpState === ApiState.SUCCESS && hasSubmittedOtp) {
-      setHasSubmittedOtp(false);
-
-      api();
-    }
-  }, [state, hasSubmittedOtp, values]);
-
+  }, [hasSubmittedOtp]);
   return (
     <>
       <div className="mt-16">
@@ -180,19 +167,32 @@ export default function SignUpAdmin() {
               { setSubmitting, setFieldValue, resetForm }
             ) => {
               try {
-                const otpRes = await store
-                  .dispatch(sendOtp("91" + values.phoneNumber ?? ""))
+                const res = await store
+                  .dispatch(
+                    verifyEmail({
+                      ...values,
+                      phoneNumber: "91" + values?.phoneNumber,
+                      photo: photoFile,
+                      pancard: pancardfile,
+                      passbook: passbookfile,
+                      license: licensefile,
+                      biodata: biodatafile,
+                      adhar: adharFile,
+                      certificate: certificatefile,
+                      userType: "admin",
+                    })
+                  )
                   .unwrap();
-                setValues(values);
-
-                setHasSubmittedOtp(true);
+                setPhoneNumber("91" + values?.phoneNumber);
+                setHasSubmitted(true);
               } catch (err) {
                 console.log(err);
                 showErrorAlert();
-                setHasSubmittedOtp(false);
-
+                setPhoneNumber("");
+                setHasSubmitted(false);
                 resetForm();
               }
+
               //   setTimeout(() => {
               //     alert(JSON.stringify({ ...values, id: file }, null, 2));
               //     setSubmitting(false);
@@ -209,7 +209,7 @@ export default function SignUpAdmin() {
               isSubmitting,
               /* and other goodies */
             }) => (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} autoComplete="off">
                 <div className="shadow overflow-hidden sm:rounded-md">
                   <div className="px-4 py-5 bg-white sm:p-6">
                     <div className="mb-4">
@@ -276,7 +276,6 @@ export default function SignUpAdmin() {
                               if (file)
                                 getBase64(file).then((data) => {
                                   setPhotoFile(data);
-                                  console.log(data);
                                 });
                             }
                           }}
@@ -442,7 +441,6 @@ export default function SignUpAdmin() {
                               if (file)
                                 getBase64(file).then((data) => {
                                   setpancardFile(data);
-                                  console.log(data);
                                 });
                             }
                           }}
@@ -474,7 +472,6 @@ export default function SignUpAdmin() {
                               if (file)
                                 getBase64(file).then((data) => {
                                   setpassbookFile(data);
-                                  console.log(data);
                                 });
                             }
                           }}
@@ -506,7 +503,6 @@ export default function SignUpAdmin() {
                               if (file)
                                 getBase64(file).then((data) => {
                                   setcertificateFile(data);
-                                  console.log(data);
                                 });
                             }
                           }}
@@ -538,7 +534,6 @@ export default function SignUpAdmin() {
                               if (file)
                                 getBase64(file).then((data) => {
                                   setlicenseFile(data);
-                                  console.log(data);
                                 });
                             }
                           }}
@@ -570,7 +565,6 @@ export default function SignUpAdmin() {
                               if (file)
                                 getBase64(file).then((data) => {
                                   setbiodataFile(data);
-                                  console.log(data);
                                 });
                             }
                           }}
@@ -620,7 +614,6 @@ export default function SignUpAdmin() {
                                 if (file)
                                   getBase64(file).then((data) => {
                                     setAdharFile(data);
-                                    console.log(data);
                                   });
                               }
                             } else {
