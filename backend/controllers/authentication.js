@@ -46,9 +46,10 @@ module.exports.register = function(req, res) {
           });
           User.register(user, req.body.password, function(err, user) {
             if (err) {
+              console.log(err)
               res.status(403)
-              .json({"response": "error", message:"Your account could  not be saved. Error: ", err}) 
-            }else{
+              .json({"response": "error", message: err.message ?? "Your account could not be saved."}) 
+            } else {
               User.findOneAndUpdate({emailToken: req.body.emailToken}, {...user}, {new: true}, (err, user) =>{
                 console.log("err" + err);
               console.log("user2" + user);

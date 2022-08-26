@@ -46,6 +46,7 @@ export default function VerifyEmailPage() {
 
   const otpverified = async () => {
     try {
+      setHasSubmitted(false);
       const res = await store
         .dispatch(
           otpVerification({
@@ -56,6 +57,8 @@ export default function VerifyEmailPage() {
         .unwrap();
       setHasSubmittedOtp(true);
     } catch (err) {
+      setHasSubmitted(false);
+
       showErrorAlert();
       setHasSubmittedOtp(false);
     }
@@ -69,7 +72,7 @@ export default function VerifyEmailPage() {
       setHasSubmitted(false);
       showErrorAlert();
     }
-  }, [state, hasSubmitted]);
+  }, [state.auth.otpState, hasSubmitted]);
 
   return (
     <>
