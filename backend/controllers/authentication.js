@@ -35,15 +35,15 @@ module.exports.register = function(req, res) {
       user.isVerified = true;
       user.email = user.email;
       user.username = user.email;
-        user.save(function(err) {
-          if(err) {
-          res.status(403);
-          res.json({
-              "response": null,
-              "message": "something went wrong while adding user! please try again later"
-          });
-        }
-          });
+        // user.save(function(err) {
+        //   if(err) {
+        //   res.status(403);
+        //   res.json({
+        //       "response": null,
+        //       "message": "something went wrong while adding user! please try again later"
+        //   });
+        // }
+        //   });
           User.register(user, req.body.password, function(err, user) {
             if (err) {
               console.log(err)
