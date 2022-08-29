@@ -17,6 +17,7 @@ import jwt_decode from "jwt-decode";
 import { sendSms } from "../../api/Auth/authSlice";
 import { getSMS, SMS } from "../../api/model";
 import { showErrorAlert } from "../../util/util";
+import { confirmAlert } from "react-confirm-alert";
 
 export default function CarouselComponent({
   customers,
@@ -87,6 +88,16 @@ export default function CarouselComponent({
             }),
           })
         );
+        confirmAlert({
+          title: "Success",
+          message: "job unassigned!",
+          buttons: [
+            {
+              label: "ok",
+              onClick: () => {},
+            },
+          ],
+        });
         setIsJobRemoved(false);
       }
       setHasAssignedJob(false);
@@ -138,34 +149,50 @@ export default function CarouselComponent({
                                   type="button"
                                   className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                   onClick={async (e: React.MouseEvent) => {
-                                    console.log(selectedTechnician);
-                                    const assignedTechnician =
-                                      customer.assignedTo;
-                                    console.log(!!assignedTechnician);
-                                    if (!!assignedTechnician) {
-                                      setSelectedCustomer(customer);
-                                      try {
-                                        await store
-                                          .dispatch(
-                                            assignJob({
-                                              technicianEmail:
-                                                technicians.filter(
-                                                  (tech) =>
-                                                    tech.email ===
-                                                    customer.assignedTo
-                                                )[0]?.email ?? "",
-                                              customer: customer,
-                                              remove: true,
-                                            })
-                                          )
-                                          .unwrap();
-                                        setIsJobRemoved(true);
-                                        setHasAssignedJob(true);
-                                      } catch (err) {
-                                        setHasAssignedJob(false);
-                                        showErrorAlert();
-                                      }
-                                    }
+                                    confirmAlert({
+                                      title: "please confirm cancellation",
+                                      message:
+                                        "are you sure you want to unassign this job?",
+                                      buttons: [
+                                        {
+                                          label: "yes",
+                                          onClick: async () => {
+                                            console.log(selectedTechnician);
+                                            const assignedTechnician =
+                                              customer.assignedTo;
+                                            console.log(!!assignedTechnician);
+                                            if (!!assignedTechnician) {
+                                              setSelectedCustomer(customer);
+                                              try {
+                                                await store
+                                                  .dispatch(
+                                                    assignJob({
+                                                      technicianEmail:
+                                                        technicians.filter(
+                                                          (tech) =>
+                                                            tech.email ===
+                                                            customer.assignedTo
+                                                        )[0]?.email ?? "",
+                                                      customer: customer,
+                                                      remove: true,
+                                                    })
+                                                  )
+                                                  .unwrap();
+                                                setIsJobRemoved(true);
+                                                setHasAssignedJob(true);
+                                              } catch (err) {
+                                                setHasAssignedJob(false);
+                                                showErrorAlert();
+                                              }
+                                            }
+                                          },
+                                        },
+                                        {
+                                          label: "no",
+                                          onClick: () => {},
+                                        },
+                                      ],
+                                    });
 
                                     e.preventDefault();
                                   }}
@@ -251,25 +278,45 @@ export default function CarouselComponent({
                             type="button"
                             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             onClick={(e: React.MouseEvent) => {
-                              console.log(customer);
-                              var decoded: {
-                                name: string;
-                                email: string;
-                              } = jwt_decode(state.auth.accessToken ?? "");
-                              console.log(decoded);
-                              try {
-                                store.dispatch(
-                                  assignJob({
-                                    technicianEmail: decoded.email ?? "",
-                                    customer: customer,
-                                    remove: true,
-                                  })
-                                );
-                                setIsJobRemoved(true);
-                                setHasAssignedJob(true);
-                              } catch (err) {
-                                setHasAssignedJob(false);
-                              }
+                              confirmAlert({
+                                title: "please confirm cancellation",
+                                message:
+                                  "are you sure you want to unassign this job?",
+                                buttons: [
+                                  {
+                                    label: "yes",
+                                    onClick: async () => {
+                                      console.log(customer);
+                                      var decoded: {
+                                        name: string;
+                                        email: string;
+                                      } = jwt_decode(
+                                        state.auth.accessToken ?? ""
+                                      );
+                                      console.log(decoded);
+                                      try {
+                                        await store.dispatch(
+                                          assignJob({
+                                            technicianEmail:
+                                              decoded.email ?? "",
+                                            customer: customer,
+                                            remove: true,
+                                          })
+                                        );
+                                        setIsJobRemoved(true);
+                                        setHasAssignedJob(true);
+                                      } catch (err) {
+                                        setHasAssignedJob(false);
+                                      }
+                                    },
+                                  },
+                                  {
+                                    label: "no",
+                                    onClick: () => {},
+                                  },
+                                ],
+                              });
+
                               e.preventDefault();
                             }}
                           >

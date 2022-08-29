@@ -42,6 +42,8 @@ module.exports.assignJob = async function(req, res) {
             Customer
             .findOne({_customerId: req.body.customer._customerId})
             .exec(function(err, customer1) {
+            if(!!customer1.assignedTo) {
+
               User
               .findOne({email: customer1.assignedTo})
               .exec(function(err, tech) {
@@ -52,6 +54,7 @@ module.exports.assignJob = async function(req, res) {
     
               }});    
             });
+          }
             });
             try {
      
@@ -84,11 +87,34 @@ module.exports.assignJob = async function(req, res) {
      
       
     } else {
-      User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: user.assignedTasks.filter((cust)=> cust._customerId !== req.body.customer._customerId)}}, {new: true}, (err, doc) => {
+
+      User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: user.assignedTasks.filter((cust)=> cust._customerId !== req.body.customer._customerId &&  cust.status !== "completed")}}, {new: true}, (err, doc) => {
         if (err) {
             console.log("Something wrong when updating data!");
         }
+ 
+            try {
      
+              Customer
+              .findOne({_customerId: req.body.customer._customerId})
+              .exec(function(err, user) {
+          
+                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
+                status: req.body.remove ? "unassigned" : "pending"}}, {new: true}, (err, doc) => {
+                  if (err) {
+                    res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
+
+                  }
+                  res.status(200).json({
+                    "response": "job unassigned"
+                      });
+              });
+              });
+             
+              } catch {
+              res.status(403).json({"response": "error", "message": "something went wrong"});
+          
+              }
     
     });
    

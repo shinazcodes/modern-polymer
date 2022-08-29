@@ -32,10 +32,10 @@ export default function Example() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
   useEffect(() => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userType");
-    sessionStorage.removeItem("userType");
-    sessionStorage.removeItem("accessToken");
+    // localStorage.removeItem("accessToken");
+    // localStorage.removeItem("userType");
+    // sessionStorage.removeItem("userType");
+    // sessionStorage.removeItem("accessToken");
     persistor.purge();
   }, []);
   useEffect(() => {
@@ -196,7 +196,7 @@ export default function Example() {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.username}
-                      autoComplete="email"
+                      autoComplete="off"
                       required
                       className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                       placeholder="Email address"
@@ -213,7 +213,7 @@ export default function Example() {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
-                      autoComplete="current-password"
+                      autoComplete="off"
                       required
                       className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                       placeholder="Password"

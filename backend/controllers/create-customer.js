@@ -53,6 +53,7 @@ module.exports.createCustomer = async function(req, res) {
         //   // }
         // });
         console.log(req.body.assignedTo)
+        if(!!req.body.assignedTo){
         User
           .findOne({email: req.body.assignedTo})
           .exec(function(err, user) {
@@ -72,6 +73,7 @@ module.exports.createCustomer = async function(req, res) {
               // console.log(doc.email);
           });
           });
+        }
             res.status(200).json({
               "response": "job created successfully!"
                 });
