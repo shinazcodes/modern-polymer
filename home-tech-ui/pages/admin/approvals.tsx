@@ -43,7 +43,7 @@ export interface CreateJobItems {
   brand: string;
 }
 
-export const Machines = ["Washing Machine", "Fridge", "AC"];
+export const Machines = ["Washing Machine", "Fridge", "AC", "TV", "Heater"];
 export default function CustomerList() {
   //   const { state } = useSelector<RootState, string>((state) =>
   //     state.counter.value.toString()
@@ -83,7 +83,12 @@ export default function CustomerList() {
         (customer) => !customer.invoiceDetails?.approved
       ),
       approved: state.customer.customerList?.filter(
-        (customer) => customer.invoiceDetails?.approved
+        (customer) =>
+          customer.invoiceDetails?.approved && customer.status !== "completed"
+      ),
+      completed: state.customer.customerList?.filter(
+        (customer) =>
+          customer.invoiceDetails?.approved && customer.status === "completed"
       ),
     };
   }, [state]);

@@ -57,7 +57,6 @@ module.exports.createCustomer = async function(req, res) {
           .findOne({email: req.body.assignedTo})
           .exec(function(err, user) {
           
-            console.log("user:" + user._id);
             User.findOneAndUpdate({email: req.body.assignedTo}, {$set:{assignedTasks: [...user.assignedTasks, customer]}}, {new: true}, (err, doc) => {
               if (err) {
                   console.log("Something wrong when updating data!");

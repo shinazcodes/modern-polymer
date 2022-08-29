@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Customer = mongoose.model('Customer');
 var Services = mongoose.model('Services');
 var Invoice = mongoose.model('Invoice');
+var User = mongoose.model('User');
 
 var sendJSONresponse = function(res, status, content) {
   res.status(status);
@@ -55,7 +56,7 @@ module.exports.generateInvoice = async function(req, res) {
         // services.quantity = req.body.invoiceDetails.services.quantity;
         // services.price = req.body.invoiceDetails.services.price;
         console.log("serviuces", invoice)
-        invoice.save(function(err) {
+        inv.save(function(err) {
          
           console.log("sdfgsfggferrr", err)
           console.log("sfgsggfs", invoice)
@@ -76,7 +77,7 @@ module.exports.generateInvoice = async function(req, res) {
     } catch(err) {
       console.log("err", err);
       res.status(403).json({      "response": "error", 
-      "message" : "something ggg went wrong"
+      "message" : "something went wrong"
       });
 
     }
@@ -166,6 +167,76 @@ module.exports.approveInvoice = async function(req, res) {
           Customer.findOneAndUpdate({_customerId: req.body._customerId}, {$set:{ invoiceDetails: invoiceDetails}}, {new: true}, (err, doc) => {
             if (err) {
                 console.log("Something wrong when updating data!");
+            }
+          console.log("sfgsggfs", doc)
+            
+            res.status(200).json({
+              "response": "invoice approved!"
+                });
+              });
+            });
+  } catch {
+      res.status(403).json({      "response": "error", 
+      "message" : "something went wrong"
+      });
+
+    }
+   
+  }
+};
+
+
+
+module.exports.completeTask = async function(req, res) {
+  console.log(req.body);
+
+  if(!req.body || !req.body._customerId || !req.body.technicianEmail) {
+    sendJSONresponse(res, 400, {
+      "message": "All fields required",
+      "response": "error",
+
+    });
+    return;
+  }
+  if (!req.payload._id) {
+    res.status(401).json({
+      "response": "error", "message" : "UnauthorizedError: private profile"
+    });
+  } else {
+    try {
+      Customer
+      .findOne({_customerId: req.body._customerId})
+      .exec(function(err, customer) {
+          if(err || !customer){
+              res.status(403).json({
+                  "response": "error", 
+                  "message": "sometihng went wrong"
+              })
+          } 
+          console.log(customer)
+
+          Customer.findOneAndUpdate({_customerId: req.body._customerId}, {$set:{ status: "completed"}}, {new: true}, (err, doc) => {
+            if (err) {
+                console.log("Something wrong when updating data!");
+            } else {
+
+
+                User
+                .findOne({email: req.body.technicianEmail})
+                .exec(function(err, user) {
+                  var found = false;
+                  otherTasks = user.assignedTasks.filter((item)=> item._customerId !== req.body._customerId);
+                  taskToUpdate = user.assignedTasks.filter((item)=> item._customerId === req.body._customerId);
+                  taskToUpdate[0].status = "completed";
+                  User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...taskToUpdate, ...otherTasks]}}, {new: true}, (err, doc) => {
+                    if (err) {
+                        console.log("Something wrong when updating data!");
+                    } else {
+          
+                    }});   
+                  });       
+
+
             }
           console.log("sfgsggfs", doc)
             

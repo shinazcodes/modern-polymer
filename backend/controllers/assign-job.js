@@ -30,7 +30,7 @@ module.exports.assignJob = async function(req, res) {
       .exec(function(err, user) {
         var found = false;
         found = user.assignedTasks.filter((item)=> item._customerId === req.body.customer._customerId).length > 0;
-        if(found && !req.body.remove){
+        if(found && !req.body.remove) {
           res.status(403).json({"response": "error", 
           "message": "this job is already assigned to this user"});
         } else{
@@ -38,8 +38,50 @@ module.exports.assignJob = async function(req, res) {
         User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, status: "pending"}]}}, {new: true}, (err, doc) => {
           if (err) {
               console.log("Something wrong when updating data!");
+          } else {
+            Customer
+            .findOne({_customerId: req.body.customer._customerId})
+            .exec(function(err, customer1) {
+              User
+              .findOne({email: customer1.assignedTo})
+              .exec(function(err, tech) {
+            User.findOneAndUpdate({email: customer1.assignedTo}, {$set:{ assignedTasks: tech.assignedTasks.filter((item) => item._customerId !== req.body.customer._customerId)}}, {new: true}, (err, doc) => {
+              if (err) {
+                  console.log("Something wrong when updating data!");
+              } else {
+    
+              }});    
+            });
+            });
+            try {
+     
+              Customer
+              .findOne({_customerId: req.body.customer._customerId})
+              .exec(function(err, user) {
+          
+                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
+                status: req.body.remove ? "unassigned" : "pending"}}, {new: true}, (err, doc) => {
+                  if (err) {
+                    res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
+
+                  }
+          
+                  res.status(200).json({
+                    "response": "job assigned successfully!"
+                      });
+              });
+              });
+             
+              } catch {
+              res.status(403).json({"response": "error", "message": "something went wrong"});
+          
+              }
+
+
           }
+
       });
+     
       
     } else {
       User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: user.assignedTasks.filter((cust)=> cust._customerId !== req.body.customer._customerId)}}, {new: true}, (err, doc) => {
@@ -52,31 +94,7 @@ module.exports.assignJob = async function(req, res) {
    
     }
  
-    try {
-     
-    Customer
-    .findOne({_customerId: req.body.customer._customerId})
-    .exec(function(err, user) {
 
-      console.log("user foundxxxxxxxx:" + user);
-      Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
-      status: req.body.remove ? "unassigned" : "pending"}}, {new: true}, (err, doc) => {
-        if (err) {
-            console.log("Something wrong when updating data!");
-        }
-      console.log("user foundyyyyyyyy:" + user);
-      console.log("user techniiiiiii:" + req.body.technicianEmail);
-
-        res.status(200).json({
-          "response": "job assigned successfully!"
-            });
-    });
-    });
-   
-    } catch {
-    res.status(401).json({"response": "error", "message": "something went wrong"});
-
-    }
   }
 });
      

@@ -132,68 +132,70 @@ export default function CarouselComponent({
                               customer={customer}
                               technicians={technicians}
                             />
-                            {!!customer.assignedTo && (
-                              <button
-                                type="button"
-                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                onClick={async (e: React.MouseEvent) => {
-                                  console.log(selectedTechnician);
-                                  const assignedTechnician =
-                                    customer.assignedTo;
-                                  console.log(!!assignedTechnician);
-                                  if (!!assignedTechnician) {
-                                    setSelectedCustomer(customer);
-                                    try {
-                                      await store
-                                        .dispatch(
-                                          assignJob({
-                                            technicianEmail:
-                                              technicians.filter(
-                                                (tech) =>
-                                                  tech.email ===
-                                                  customer.assignedTo
-                                              )[0]?.email ?? "",
-                                            customer: customer,
-                                            remove: true,
-                                          })
-                                        )
-                                        .unwrap();
-                                      setIsJobRemoved(true);
-                                      setHasAssignedJob(true);
-                                    } catch (err) {
-                                      setHasAssignedJob(false);
-                                      showErrorAlert();
+                            {!!customer.assignedTo &&
+                              customer.status !== "completed" && (
+                                <button
+                                  type="button"
+                                  className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                  onClick={async (e: React.MouseEvent) => {
+                                    console.log(selectedTechnician);
+                                    const assignedTechnician =
+                                      customer.assignedTo;
+                                    console.log(!!assignedTechnician);
+                                    if (!!assignedTechnician) {
+                                      setSelectedCustomer(customer);
+                                      try {
+                                        await store
+                                          .dispatch(
+                                            assignJob({
+                                              technicianEmail:
+                                                technicians.filter(
+                                                  (tech) =>
+                                                    tech.email ===
+                                                    customer.assignedTo
+                                                )[0]?.email ?? "",
+                                              customer: customer,
+                                              remove: true,
+                                            })
+                                          )
+                                          .unwrap();
+                                        setIsJobRemoved(true);
+                                        setHasAssignedJob(true);
+                                      } catch (err) {
+                                        setHasAssignedJob(false);
+                                        showErrorAlert();
+                                      }
                                     }
-                                  }
 
-                                  e.preventDefault();
-                                }}
-                              >
-                                cancel
-                              </button>
-                            )}
-                            {!!customer.assignedTo && (
-                              <button
-                                type="button"
-                                disabled={!!!customer.assignedTo}
-                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
-                                onClick={async (e: React.MouseEvent) => {
-                                  const assignedTechnician =
-                                    customer.assignedTo;
-                                  console.log(!!assignedTechnician);
-                                  if (!!assignedTechnician)
-                                    await store.dispatch(
-                                      customerSlice.actions.custInvoice({
-                                        customer: customer,
-                                      })
-                                    );
-                                  router.push("/admin/invoice");
-                                  e.preventDefault();
-                                }}
-                              >
-                                generate invoice
-                              </button>
-                            )}
+                                    e.preventDefault();
+                                  }}
+                                >
+                                  cancel
+                                </button>
+                              )}
+                            {!!customer.assignedTo &&
+                              customer.status !== "completed" && (
+                                <button
+                                  type="button"
+                                  disabled={!!!customer.assignedTo}
+                                  className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                                  onClick={async (e: React.MouseEvent) => {
+                                    const assignedTechnician =
+                                      customer.assignedTo;
+                                    console.log(!!assignedTechnician);
+                                    if (!!assignedTechnician)
+                                      await store.dispatch(
+                                        customerSlice.actions.custInvoice({
+                                          customer: customer,
+                                        })
+                                      );
+                                    router.push("/admin/invoice");
+                                    e.preventDefault();
+                                  }}
+                                >
+                                  generate invoice
+                                </button>
+                              )}
                           </>
                         </p>
                       )}
@@ -214,11 +216,12 @@ export default function CarouselComponent({
                             <button
                               type="button"
                               className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                              onClick={(e: React.MouseEvent) => {
+                              onClick={async (e: React.MouseEvent) => {
                                 console.log(selectedTechnician);
+                                setSelectedCustomer(customer);
                                 setAssignedTechnician(selectedTechnician);
                                 try {
-                                  store
+                                  await store
                                     .dispatch(
                                       assignJob({
                                         technicianEmail:
@@ -229,9 +232,9 @@ export default function CarouselComponent({
                                     )
                                     .unwrap();
                                   setHasAssignedJob(true);
-                                } catch (err) {
+                                } catch (err: any) {
                                   setHasAssignedJob(false);
-                                  showErrorAlert();
+                                  showErrorAlert(err?.message);
                                 }
                                 e.preventDefault();
                               }}
@@ -242,7 +245,7 @@ export default function CarouselComponent({
                         </div>
                       )}
 
-                      {!!!technicians && (
+                      {!!!technicians && customer.status !== "completed" && (
                         <div className="mt-6">
                           <button
                             type="button"
@@ -289,7 +292,7 @@ export default function CarouselComponent({
                               e.preventDefault();
                             }}
                           >
-                            generate invoice
+                            generate invoices
                           </button>
                         </div>
                       )}
@@ -301,6 +304,7 @@ export default function CarouselComponent({
           })}
         </div>
       </div>
+      {customers.length < 1 && <>no records</>}
     </div>
   );
 }

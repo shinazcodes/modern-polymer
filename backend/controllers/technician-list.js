@@ -26,7 +26,8 @@ module.exports.techniciansList = function(req, res) {
                         return {
                             "firstName": user.firstName,
                             "lastName": user.lastName,
-                            "email": user.email
+                            "email": user.email,
+                            "phoneNumber": user.phoneNumber
                         } 
                     })
                 

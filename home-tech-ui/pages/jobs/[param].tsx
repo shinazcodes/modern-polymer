@@ -20,7 +20,7 @@ export default function Jobs() {
     (state) => state.auth.accessToken
   );
   const customers = useSelector<RootState, Customer[] | undefined>(
-    (state) => state.auth.jobs
+    (state) => state.technician.showTechnician?.assignedTasks
   );
   const router = useRouter();
   const { param } = router.query;

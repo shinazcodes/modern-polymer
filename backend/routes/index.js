@@ -34,6 +34,7 @@ router.post('/verifyEmail', ctrlEmailVerify.verifyEmail);
 router.post('/purchaseHistory', auth, ctrlPurchaseHistory.purchaseHistory);
 router.post('/generateInvoice', auth, ctrlgenerateInvoice.generateInvoice);
 router.post('/approveInvoice', auth, ctrlgenerateInvoice.approveInvoice);
+router.post('/completeTask', auth, ctrlgenerateInvoice.completeTask);
 router.post('/getInvoice', auth, ctrlgenerateInvoice.getInvoice);
 router.post('/verifyOtp', ctrlOtp.verifyOtp);
 router.post('/otpVerification', ctrlOtpVerification.otpVerification);

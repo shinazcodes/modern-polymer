@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { ApiState, login } from "../../api/Auth/authSlice";
 import { generateInvoice, Service } from "../../api/Auth/customerSlice";
 import { RootState, store } from "../../api/store";
+import { showErrorAlert } from "../../util/util";
 
 export interface Services {
   name: string;
@@ -196,25 +197,29 @@ export default function Invoice() {
                   values?.custAddress &&
                   values?.name
                 ) {
-                  const res = await store
-                    .dispatch(
-                      generateInvoice({
-                        _customerId: customer?._customerId,
-                        mobileNumber: values.mobileNumber,
-                        assignedTo: customer?.assignedTo,
-                        services: service,
-                        email: values.custEmail,
-                        fullAddress: values?.custAddress,
-                        name: values.name,
-                        gst: values.gst,
-                        invoiceDate: values.invoiceDate,
-                      })
-                    )
-                    .unwrap();
+                  try {
+                    const res = await store
+                      .dispatch(
+                        generateInvoice({
+                          _customerId: customer?._customerId,
+                          mobileNumber: values.mobileNumber,
+                          assignedTo: customer?.assignedTo,
+                          services: service,
+                          email: values.custEmail,
+                          fullAddress: values?.custAddress,
+                          name: values.name,
+                          gst: values.gst,
+                          invoiceDate: values.invoiceDate,
+                        })
+                      )
+                      .unwrap();
 
-                  console.log(res);
-                  if (res) {
-                    setHasSubmitted(true);
+                    console.log(res);
+                    if (res) {
+                      setHasSubmitted(true);
+                    }
+                  } catch (err: any) {
+                    showErrorAlert(err?.message);
                   }
                 }
               } catch (err) {

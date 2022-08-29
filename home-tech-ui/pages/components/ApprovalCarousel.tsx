@@ -4,7 +4,9 @@ import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
+  ApiState,
   approveInvoice,
+  completeTask,
   Customer,
   customerSlice,
   Service,
@@ -12,6 +14,10 @@ import {
 import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "../auth/signup";
 import { StyleSheet } from "@react-pdf/renderer";
+import { showErrorAlert } from "../../util/util";
+import { confirmAlert } from "react-confirm-alert";
+import { sendSms } from "../../api/Auth/authSlice";
+import { getSMS, SMS } from "../../api/model";
 var converter = require("number-to-words");
 
 const styles = StyleSheet.create({
@@ -83,15 +89,20 @@ const styles = StyleSheet.create({
 export default function ApprovalCarousel({
   customers,
   technicians,
+  approved,
   refresh,
+  completed,
 }: {
   customers: Customer[];
   technicians?: EmailVerifyItems[];
   refresh: () => void;
+  approved: boolean;
+  completed: boolean;
 }) {
   const [selectedTechnician, setSelectedTechnician] = useState(
     {} as EmailVerifyItems
   );
+  const [selectedCustomer, setSelectedCustomer] = useState({} as Customer);
   const state = useSelector<RootState, RootState>((state) => state);
   const router = useRouter();
   useEffect(() => {}, [state]);
@@ -136,6 +147,111 @@ export default function ApprovalCarousel({
     let gstA = (total * (customer?.invoiceDetails?.gst ?? 0.0)) / 100;
     return total + gstA;
   }
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [hasSubmittedComplete, setHasSubmittedComplete] = useState(false);
+
+  async function handleApproved(assignedTechnician: any, customer: any) {
+    try {
+      if (!!assignedTechnician)
+        await store
+          .dispatch(
+            approveInvoice({
+              _customerId: customer._customerId ?? "",
+            })
+          )
+          .unwrap();
+
+      setHasSubmitted(true);
+    } catch (err: any) {
+      setHasSubmitted(false);
+
+      showErrorAlert(err?.message);
+    }
+  }
+
+  async function handleCompleted(assignedTechnician: string, customer: any) {
+    try {
+      if (!!assignedTechnician)
+        await store
+          .dispatch(
+            completeTask({
+              _customerId: customer._customerId ?? "",
+              technicianEmail: assignedTechnician,
+            })
+          )
+          .unwrap();
+
+      setHasSubmittedComplete(true);
+    } catch (err: any) {
+      setHasSubmittedComplete(false);
+
+      showErrorAlert(err?.message);
+    }
+  }
+
+  useEffect(() => {
+    if (hasSubmitted && state.customer.status === ApiState.SUCCESS) {
+      setHasSubmitted(false);
+
+      confirmAlert({
+        title: "invoice has been approved!",
+        buttons: [
+          {
+            label: "ok",
+            onClick: () => {},
+          },
+        ],
+      });
+    }
+  }, [hasSubmitted, state.customer.status]);
+
+  async function sms() {
+    await store.dispatch(
+      sendSms({
+        mobileNumber: selectedCustomer.mobileNumber,
+        sms: getSMS(SMS.WORK_COMPLETED, {
+          billAmount: getTotalnum(selectedCustomer).toString(),
+          technicianMob: selectedTechnician.phoneNumber,
+          technicianName:
+            selectedTechnician.firstName + " " + selectedTechnician.lastName,
+          downloadLink:
+            "https://www.hometechworld.co.in/external/" +
+            selectedCustomer._customerId,
+        }),
+      })
+    );
+    await store.dispatch(
+      sendSms({
+        mobileNumber: selectedTechnician.phoneNumber ?? "",
+        sms: getSMS(SMS.WORK_COMPLETED, {
+          billAmount: getTotalnum(selectedCustomer).toString(),
+          technicianMob: selectedTechnician.phoneNumber,
+          technicianName:
+            selectedTechnician.firstName + " " + selectedTechnician.lastName,
+          downloadLink:
+            "https://www.hometechworld.co.in/external/" +
+            selectedCustomer._customerId,
+        }),
+      })
+    );
+  }
+
+  useEffect(() => {
+    if (hasSubmittedComplete && state.customer.status === ApiState.SUCCESS) {
+      setHasSubmittedComplete(false);
+      sms();
+      confirmAlert({
+        title: "the job is completed!",
+        buttons: [
+          {
+            label: "ok",
+            onClick: () => {},
+          },
+        ],
+      });
+    }
+  }, [hasSubmittedComplete, state.customer.status]);
+
   return (
     <div className="w-full">
       <div className="mx-0 w-full rounded-2xl bg-white p-2">
@@ -383,49 +499,60 @@ export default function ApprovalCarousel({
                             </div>
                           </div>
                         </div>
-                        <div className="mt-8">
-                          <button
-                            type="button"
-                            disabled={!!!customer.assignedTo}
-                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
-                            onClick={async (e: React.MouseEvent) => {
-                              const assignedTechnician = customer.assignedTo;
-                              console.log(!!assignedTechnician);
-                              if (!!assignedTechnician)
-                                await store.dispatch(
-                                  approveInvoice({
-                                    _customerId: customer._customerId ?? "",
-                                  })
-                                );
+                        {!completed && (
+                          <div className="mt-8">
+                            <button
+                              type="button"
+                              disabled={!!!customer.assignedTo}
+                              className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                              onClick={async (e: React.MouseEvent) => {
+                                const assignedTechnician = customer.assignedTo;
+                                console.log(!!assignedTechnician);
+                                if (customer.status == "pending" && !approved) {
+                                  handleApproved(assignedTechnician, customer);
+                                } else {
+                                  setSelectedTechnician(
+                                    state.technician.data.filter(
+                                      (tch) => tch.email === customer.assignedTo
+                                    )[0]
+                                  );
+                                  setSelectedCustomer(customer);
+                                  handleCompleted(assignedTechnician, customer);
+                                }
 
-                              e.preventDefault();
-                            }}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            type="button"
-                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
-                            onClick={async (e: React.MouseEvent) => {
-                              const assignedTechnician = customer.assignedTo;
-                              console.log(!!assignedTechnician);
-                              console.log(customer);
-                              try {
-                                store.dispatch(
-                                  customerSlice.actions.custInvoice({
-                                    customer: customer,
-                                  })
-                                );
-                                router.push("/admin/invoice");
-                              } catch (err) {
-                                console.log(err);
-                              }
-                              e.preventDefault();
-                            }}
-                          >
-                            Edit
-                          </button>
-                        </div>
+                                e.preventDefault();
+                              }}
+                            >
+                              {customer.status == "pending" && !approved ? (
+                                <>Approve</>
+                              ) : (
+                                <>Complete Task</>
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                              onClick={async (e: React.MouseEvent) => {
+                                const assignedTechnician = customer.assignedTo;
+                                console.log(!!assignedTechnician);
+                                console.log(customer);
+                                try {
+                                  store.dispatch(
+                                    customerSlice.actions.custInvoice({
+                                      customer: customer,
+                                    })
+                                  );
+                                  router.push("/admin/invoice");
+                                } catch (err) {
+                                  console.log(err);
+                                }
+                                e.preventDefault();
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        )}
                       </Disclosure.Panel>
                     </>
                   )}

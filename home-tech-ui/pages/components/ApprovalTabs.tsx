@@ -17,6 +17,7 @@ export default function ApprovalTabs({
   customers: {
     pending?: Customer[];
     approved?: Customer[];
+    completed?: Customer[];
   };
   technicians: EmailVerifyItems[];
   refresh: () => void;
@@ -24,6 +25,7 @@ export default function ApprovalTabs({
   let [categories] = useState({
     Pending: [],
     Approved: [],
+    Completed: [],
   });
 
   useEffect(() => {
@@ -63,6 +65,8 @@ export default function ApprovalTabs({
             >
               <ApprovalCarousel
                 customers={customer}
+                approved={idx === 1}
+                completed={idx === 2}
                 technicians={technicians}
                 refresh={refresh}
               />

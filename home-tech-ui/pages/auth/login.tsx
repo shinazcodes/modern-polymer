@@ -33,6 +33,9 @@ export default function Example() {
   const state = useSelector<RootState, RootState>((state) => state);
   useEffect(() => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userType");
+    sessionStorage.removeItem("userType");
+    sessionStorage.removeItem("accessToken");
     persistor.purge();
   }, []);
   useEffect(() => {

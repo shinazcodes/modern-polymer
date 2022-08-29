@@ -137,7 +137,7 @@ export default function CreateJobPage() {
         title: "something went wrong",
       });
     }
-  }, [state, hasSubmitted]);
+  }, [state.customer.status, hasSubmitted]);
 
   return (
     <>
