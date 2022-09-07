@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     margin: "0.25%",
-    minWidth: "19.35%",
+    minWidth: "16.1%",
     height: 40,
     lineHeight: "100%",
     marginVertical: "auto",
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     margin: "0.25%",
-    minWidth: "59.1%",
+    minWidth: "66 %",
     textAlign: "center",
     minHeight: 40,
 
@@ -223,6 +223,15 @@ export default function InvoicesCarousel({
                                   margin: "auto",
                                 }}
                               >
+                                GST%
+                              </p>
+                            </div>
+                            <div style={styles.columns}>
+                              <p
+                                style={{
+                                  margin: "auto",
+                                }}
+                              >
                                 Total
                               </p>
                             </div>
@@ -271,8 +280,21 @@ export default function InvoicesCarousel({
                                     margin: "auto",
                                   }}
                                 >
+                                  {service.gst ?? 0}%
+                                </p>
+                              </div>
+                              <div style={styles.columns}>
+                                <p
+                                  style={{
+                                    margin: "auto",
+                                  }}
+                                >
                                   {Number(service.price) *
-                                    Number(service.quantity)}
+                                    Number(service.quantity) +
+                                    (Number(service.price) *
+                                      Number(service.quantity) *
+                                      (service.gst ?? 0)) /
+                                      100}
                                 </p>
                               </div>
                             </div>
@@ -307,37 +329,17 @@ export default function InvoicesCarousel({
                               </p>
                             </div>
                           </div>
-                          <div style={styles.rows}>
-                            <div style={styles.bigColumns}></div>
-                            <div style={styles.columns}>
-                              <p
-                                style={{
-                                  margin: "auto",
-                                }}
-                              >
-                                GST @{customer?.gst}%
-                              </p>
-                            </div>
-                            <div style={styles.columns}>
-                              <p
-                                style={{
-                                  margin: "auto",
-                                }}
-                              >
-                                {getGst(customer)}
-                              </p>
-                            </div>
-                          </div>
+
                           <div style={styles.rows}>
                             <div
                               style={{
                                 borderWidth: 1,
                                 borderColor: "black",
                                 margin: "0.25%",
-                                minWidth: "59.1%",
+                                minWidth: "66%",
                                 textAlign: "center",
                                 minHeight: 20,
-                                maxWidth: "59.1%",
+                                maxWidth: "66%",
                                 backgroundColor: "lightgrey",
                               }}
                             >

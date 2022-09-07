@@ -44,6 +44,10 @@ var customerSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  cancelReason:{
+    type: String,
+    required: false
+  },
   invoiceDetails: {
     type:{
       name: {

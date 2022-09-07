@@ -153,9 +153,8 @@ app.use(function (req, res, next) {
 // [SH] Catch unauthorised errors
 app.use(function (err, req, res, next) {
   if(req)
-  console.log('request on ' + JSON.stringify(req));
   res.status(401);
-  res.json({ "response": "error", "message": ""+req +"" + ": " + err.message });
+  res.json({ "response": "error", "message": err.message });
   if (err.name === 'UnauthorizedError') {
     res.status(401);
     res.json({ "response": "error", "message": err.name + ": " + err.message });
@@ -177,7 +176,6 @@ app.use(function (err, req, res, next) {
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
-  console.log('requested on ', req);
 
   res.status(err.status || 500);
   res.json({

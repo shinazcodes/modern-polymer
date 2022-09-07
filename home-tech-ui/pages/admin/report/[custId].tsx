@@ -20,7 +20,6 @@ export default function ReportPdf() {
   );
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [gstAmount, setGstAmount] = useState(0.0);
   const [total, setTotal] = useState(0.0);
 
   async function getInvoiceData() {
@@ -34,15 +33,18 @@ export default function ReportPdf() {
       let total: number = 0.0;
       state?.selectedForInvoiceGeneration?.invoiceDetails?.services.map(
         (item) => {
-          total += Number(item.price) * Number(item.quantity);
+          total +=
+            (Number(item.price) * Number(item.quantity) * (item.gst ?? 0)) /
+              100 +
+            Number(item.price) * Number(item.quantity);
         }
       );
-      let gstA =
-        (total *
-          (state.selectedForInvoiceGeneration?.invoiceDetails?.gst ?? 0.0)) /
-        100;
-      setGstAmount(gstA);
-      setTotal(total + gstA);
+      // let gstA =
+      //   (total *
+      //     (state.selectedForInvoiceGeneration?.invoiceDetails?.gst ?? 0.0)) /
+      //   100;
+      // setGstAmount(gstA);
+      setTotal(total);
     }
   }, [hasSubmitted, state]);
 
@@ -61,7 +63,6 @@ export default function ReportPdf() {
         <PDFViewer className="h-full w-full">
           <PdfDocument
             data={state?.selectedForInvoiceGeneration}
-            gstAmount={gstAmount}
             total={total}
           />
         </PDFViewer>

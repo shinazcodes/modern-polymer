@@ -20,8 +20,11 @@ var ctrlPurchaseHistory = require('../controllers/purchase-history');
 var ctrlgenerateInvoice = require('../controllers/generateInvoice');
 var ctrlGetTechnician = require('../controllers/technician');
 var ctrlGetInvoices = require('../controllers/invoices');
+var ctrlBlockUnblockUser = require('../controllers/blockUnblockTechnician');
 
 // profile
+router.post('/blockUnblockUser', auth, ctrlBlockUnblockUser.blockUnblockUser);
+router.post('/startJob', auth, ctrlAssignJob.startJob);
 router.get('/jobDetails', auth, ctrlJobDetails.jobDetails);
 router.get('/techniciansList', auth, ctrlTechniciansList.techniciansList);
 router.post('/getTechnician', auth, ctrlGetTechnician.getTechnician);

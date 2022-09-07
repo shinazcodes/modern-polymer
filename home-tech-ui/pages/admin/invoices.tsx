@@ -21,7 +21,7 @@
 import { Listbox } from "@headlessui/react";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
 import { createCustomer, getCustomers } from "../../api/Auth/customerSlice";
@@ -56,6 +56,7 @@ export default function CustomerList() {
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [gotTechnicians, setgotTechnicians] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     getCust();
@@ -80,15 +81,29 @@ export default function CustomerList() {
       console.log(err);
     }
   };
+  const filteredInvoice = useMemo(() => {
+    return query === ""
+      ? state.technician.invoiceDetails
+      : state.technician.invoiceDetails?.filter(
+          (invoice) =>
+            invoice?.email
+              ?.toLowerCase()
+              .replace(/\s+/g, "")
+              .includes(query.toLowerCase().replace(/\s+/g, "")) ||
+            invoice?.name
+              ?.toLowerCase()
+              .replace(/\s+/g, "")
+              .includes(query.toLowerCase().replace(/\s+/g, "")) ||
+            invoice?.mobileNumber
+              .toString()
+              .includes(query.toLowerCase().replace(/\s+/g, ""))
+        );
+  }, [query]);
 
   const getCustomerSorted = useCallback(() => {
     return {
-      pending: state.technician?.invoiceDetails?.filter(
-        (customer) => !customer?.approved
-      ),
-      approved: state.technician?.invoiceDetails?.filter(
-        (customer) => customer?.approved
-      ),
+      pending: filteredInvoice?.filter((customer) => !customer?.approved),
+      approved: filteredInvoice?.filter((customer) => customer?.approved),
     };
   }, [state]);
 
@@ -106,6 +121,7 @@ export default function CustomerList() {
       //   router.replace("/auth/verify-email");
     }
   }, [state, hasSubmitted]);
+
   useEffect(() => {
     if (state.auth.status === ApiState.SUCCESS && hasSubmitted) {
       //   router.replace("/auth/verify-email");
@@ -171,18 +187,25 @@ export default function CustomerList() {
                   <div className="px-4 py-5 bg-white overflow-scroll h-screen sm:p-6">
                     <div className="max-w-full bg-white shadow mx-auto py-6 px-4 h-auto sm:px-6 lg:px-8">
                       <h1 className="text-3xl font-bold text-gray-900">
-                        Jobs List
+                        Invoice List
                       </h1>
-                      {state.technician?.invoiceDetails &&
-                        state.technician?.invoiceDetails?.length > 0 && (
-                          <InvoicesTab
-                            customers={getCustomerSorted()}
-                            refresh={() => {
-                              setHasSubmitted(false);
-                              setgotTechnicians(false);
-                            }}
-                          />
-                        )}
+                      <input
+                        className="  py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 w-1/2 border
+          rounded-md"
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder="search by email, name or mobile number"
+                      />
+                      {filteredInvoice && filteredInvoice.length > 0 ? (
+                        <InvoicesTab
+                          customers={getCustomerSorted()}
+                          refresh={() => {
+                            setHasSubmitted(false);
+                            setgotTechnicians(false);
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full mt-10">no invoices found!</div>
+                      )}
                     </div>
                   </div>
                 </div>

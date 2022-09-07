@@ -50,6 +50,7 @@ export interface EmailVerifyItems {
   pancard?: string | number | string[] | undefined;
   userType?: string;
   adharNumber?: string;
+  isBlocked?: boolean;
   _id?: string;
   assignedTasks?: Customer[];
 }

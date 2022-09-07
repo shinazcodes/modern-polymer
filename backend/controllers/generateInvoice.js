@@ -3,14 +3,16 @@ var Customer = mongoose.model('Customer');
 var Services = mongoose.model('Services');
 var Invoice = mongoose.model('Invoice');
 var User = mongoose.model('User');
+const { checkAccess } = require('../util/util');
 
 var sendJSONresponse = function(res, status, content) {
   res.status(status);
   res.json(content);
 };
 module.exports.generateInvoice = async function(req, res) {
-  console.log(req.body);
-
+  const check = await checkAccess(req,res)
+  if(!check)
+  return;
   if(!req.body || !req.body.invoiceDetails.name || !req.body.invoiceDetails.fullAddress) {
     sendJSONresponse(res, 400, {
       "message": "All fields required",
@@ -88,6 +90,9 @@ module.exports.generateInvoice = async function(req, res) {
 
 module.exports.getInvoice = async function(req, res) {
   console.log(req.body);
+    const check = await checkAccess(req,res)
+  if(!check)
+  return;
 
   if(!req.body || !req.body._customerId ) {
     sendJSONresponse(res, 400, {
@@ -137,6 +142,9 @@ module.exports.getInvoice = async function(req, res) {
 
 module.exports.approveInvoice = async function(req, res) {
   console.log(req.body);
+    const check = await checkAccess(req,res)
+  if(!check)
+  return;
 
   if(!req.body || !req.body._customerId ) {
     sendJSONresponse(res, 400, {
@@ -188,7 +196,9 @@ module.exports.approveInvoice = async function(req, res) {
 
 
 module.exports.completeTask = async function(req, res) {
-  console.log(req.body);
+    const check = await checkAccess(req,res)
+  if(!check)
+  return;
 
   if(!req.body || !req.body._customerId || !req.body.technicianEmail) {
     sendJSONresponse(res, 400, {

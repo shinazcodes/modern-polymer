@@ -47,6 +47,7 @@ export enum JobStatus {
   UNASSIGNED = "unassigned",
   PENDING = "pending",
   COMPLETED = "completed",
+  ASSIGNED = "assigned",
 }
 export const Machines = ["Washing Machine", "Fridge", "AC"];
 export default function CreateJobPage() {
@@ -102,7 +103,7 @@ export default function CreateJobPage() {
 
       if (
         !!selectedCustomer.assignedTo ||
-        selectedCustomer.status === "pending"
+        selectedCustomer.status === "assigned"
       ) {
         store.dispatch(
           sendSms({
@@ -188,7 +189,7 @@ export default function CreateJobPage() {
                       ...values,
                       mobileNumber: "91" + values.mobileNumber,
                       altMobileNumber: "91" + values.altMobileNumber,
-                      status: selectedTechnician ? "pending" : "unassigned",
+                      status: selectedTechnician ? "assigned" : "unassigned",
                       assignedTo: selectedTechnician?.email ?? "",
                     })
                   )
@@ -198,7 +199,7 @@ export default function CreateJobPage() {
                   ...values,
                   mobileNumber: "91" + values.mobileNumber,
                   altMobileNumber: "91" + values.altMobileNumber,
-                  status: selectedTechnician ? "pending" : "unassigned",
+                  status: selectedTechnician ? "assigned" : "unassigned",
                   assignedTo: selectedTechnician?.email ?? "",
                 });
                 setHasSubmitted(true);

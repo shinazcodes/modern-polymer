@@ -7,7 +7,9 @@ var sendJSONresponse = function(res, status, content) {
 };
 
 module.exports.jobDetails = function(req, res) {
-
+  const check = await checkAccess(req,res)
+  if(!check)
+  return;
   if(!req.body || !req.body.otp || !req.body.email) {
     sendJSONresponse(res, 400, {
       "response": "error",

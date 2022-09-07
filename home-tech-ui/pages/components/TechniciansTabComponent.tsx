@@ -3,34 +3,25 @@ import { Tab } from "@headlessui/react";
 import CarouselComponent from "./CarouselComponent";
 import { Customer } from "../../api/Auth/customerSlice";
 import { EmailVerifyItems } from "../auth/signup";
-import ApprovalCarousel from "./ApprovalCarousel";
 
-export function classNames(...classes: string[]) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function ApprovalTabs({
+export default function TechnicianTabComponent({
   customers,
-  technicians,
   refresh,
 }: {
-  customers: {
-    pending?: Customer[];
-    approved?: Customer[];
-    completed?: Customer[];
-  };
-  technicians: EmailVerifyItems[];
+  customers?: Customer[];
   refresh: () => void;
 }) {
   let [categories] = useState({
+    Jobs: [],
     Pending: [],
-    Approved: [],
     Completed: [],
   });
-
   useEffect(() => {
     console.log(customers);
-    console.log("technicians", technicians);
   }, []);
 
   return (
@@ -55,7 +46,7 @@ export default function ApprovalTabs({
           ))}
         </Tab.List>
         <Tab.Panels className="mt-2">
-          {Object.values(customers).flatMap((customer, idx) => (
+          {customers?.flatMap((customer, idx) => (
             <Tab.Panel
               key={idx}
               className={classNames(
@@ -63,12 +54,21 @@ export default function ApprovalTabs({
                 "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2"
               )}
             >
-              <ApprovalCarousel
-                customers={customer}
-                approved={idx === 1}
-                completed={idx === 2}
-                technicians={technicians}
-                refresh={refresh}
+              <CarouselComponent
+                customers={
+                  customer.status === "assigned"
+                    ? customers?.filter(
+                        (customer) => customer.status === "assigned"
+                      )
+                    : customer.status === "completed"
+                    ? customers?.filter(
+                        (customer) => customer.status === "completed"
+                      )
+                    : customers?.filter(
+                        (customer) => customer.status === "completed"
+                      )
+                }
+                refresh={() => {}}
               />
             </Tab.Panel>
           ))}

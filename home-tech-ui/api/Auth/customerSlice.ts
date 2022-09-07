@@ -22,6 +22,7 @@ export interface Customer {
   name: string;
   fullAddress: string;
   brand: string;
+  cancelReason?: string;
   email: string;
   mobileNumber: string;
   altMobileNumber: string;
@@ -34,6 +35,7 @@ export interface Customer {
 export interface Service {
   name: string;
   quantity: string;
+  gst?: number;
   price: string;
 }
 
@@ -55,6 +57,7 @@ export interface AssignJobRequest {
   technicianEmail: string | null;
   customer: Customer;
   remove: boolean;
+  cancelReason?: string;
 }
 
 export interface GenerateInvoiceRequest {
@@ -111,6 +114,16 @@ export const assignJob = createAsyncThunk(
   "customer/assignJob",
   async (data: AssignJobRequest) => {
     const response = await PostApi(buildPath("assign-job"), data);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
+  }
+);
+
+export const startJob = createAsyncThunk(
+  "customer/startJob",
+  async (data: AssignJobRequest) => {
+    const response = await PostApi(buildPath("startJob"), data);
 
     // The value we return becomes the `fulfilled` action payload
     return response.data as ApiResponse<any>;
@@ -310,17 +323,21 @@ export const customerSlice = createSlice({
       })
       .addCase(completeTask.fulfilled, (state, action) => {
         state.status = ApiState.SUCCESS;
-        // state.selectedForInvoiceGeneration = action.payload.response.customer;
-        // console.log(current(state).data);
-        // console.log(action.payload);
-
-        // state.value += action.payload;
       })
       .addCase(completeTask.rejected, (state, action) => {
         state.status = ApiState.ERROR;
-        // console.log(state);
+      });
 
-        // state.value += action.payload;
+    builder
+      .addCase(startJob.pending, (state) => {
+        state.status = ApiState.LOADING;
+        // console.log(state);
+      })
+      .addCase(startJob.fulfilled, (state, action) => {
+        state.status = ApiState.SUCCESS;
+      })
+      .addCase(startJob.rejected, (state, action) => {
+        state.status = ApiState.ERROR;
       });
   },
 });

@@ -8,6 +8,7 @@ import {
   assignJob,
   Customer,
   customerSlice,
+  startJob,
 } from "../../api/Auth/customerSlice";
 import { RootState, store } from "../../api/store";
 import { EmailVerifyItems } from "../auth/signup";
@@ -34,6 +35,7 @@ export default function CarouselComponent({
   const [selectedCustomer, setSelectedCustomer] = useState<Customer>(
     {} as Customer
   );
+  const [cancelReason, setcancelReason] = useState("");
   const [isJobRemoved, setIsJobRemoved] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState(
     {} as EmailVerifyItems
@@ -134,6 +136,13 @@ export default function CarouselComponent({
                       <p className="font-bold">machine: {customer.machine}</p>
                       <p className="font-bold">status: {customer.status}</p>
                       <p className="font-bold">brand: {customer.brand}</p>
+                      {customer.cancelReason ? (
+                        <p className="font-bold text-red-700">
+                          cancelled: {customer.cancelReason}
+                        </p>
+                      ) : (
+                        <></>
+                      )}
 
                       {technicians && (
                         <p className="font-bold">
@@ -150,48 +159,99 @@ export default function CarouselComponent({
                                   className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                   onClick={async (e: React.MouseEvent) => {
                                     confirmAlert({
-                                      title: "please confirm cancellation",
-                                      message:
-                                        "are you sure you want to unassign this job?",
-                                      buttons: [
-                                        {
-                                          label: "yes",
-                                          onClick: async () => {
-                                            console.log(selectedTechnician);
-                                            const assignedTechnician =
-                                              customer.assignedTo;
-                                            console.log(!!assignedTechnician);
-                                            if (!!assignedTechnician) {
-                                              setSelectedCustomer(customer);
-                                              try {
-                                                await store
-                                                  .dispatch(
-                                                    assignJob({
-                                                      technicianEmail:
-                                                        technicians.filter(
-                                                          (tech) =>
-                                                            tech.email ===
-                                                            customer.assignedTo
-                                                        )[0]?.email ?? "",
-                                                      customer: customer,
-                                                      remove: true,
-                                                    })
-                                                  )
-                                                  .unwrap();
-                                                setIsJobRemoved(true);
-                                                setHasAssignedJob(true);
-                                              } catch (err) {
-                                                setHasAssignedJob(false);
-                                                showErrorAlert();
+                                      customUI: ({
+                                        title,
+                                        message,
+                                        onClose,
+                                      }) => (
+                                        <>
+                                          <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
+                                            <h1 className="m-6 mb-0">
+                                              please confirm cancellation
+                                            </h1>
+                                            <p>
+                                              Are you sure you want to unassign
+                                              this job? Please provide a reason
+                                              to proceed with the cancellation.
+                                              Click on NO to abort cancellation.
+                                            </p>
+                                            <div className="p-6">
+                                              <label htmlFor="serviceName">
+                                                Cancellation Reason
+                                              </label>
+                                              <input
+                                                id="cancelReason"
+                                                name="cancelReason"
+                                                required
+                                                onChange={(e: any) => {
+                                                  e.preventDefault();
+                                                  setcancelReason(
+                                                    e.target.value
+                                                  );
+                                                }}
+                                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                                placeholder="reason for cancellation"
+                                              />
+                                            </div>
+
+                                            <button
+                                              type="submit"
+                                              disabled={
+                                                cancelReason?.length < 1
                                               }
-                                            }
-                                          },
-                                        },
-                                        {
-                                          label: "no",
-                                          onClick: () => {},
-                                        },
-                                      ],
+                                              className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                              onClick={async () => {
+                                                console.log(selectedTechnician);
+                                                const assignedTechnician =
+                                                  customer.assignedTo;
+                                                console.log(
+                                                  !!assignedTechnician
+                                                );
+                                                if (
+                                                  !!assignedTechnician &&
+                                                  cancelReason?.length > 1
+                                                ) {
+                                                  setSelectedCustomer(customer);
+                                                  try {
+                                                    await store
+                                                      .dispatch(
+                                                        assignJob({
+                                                          technicianEmail:
+                                                            technicians.filter(
+                                                              (tech) =>
+                                                                tech.email ===
+                                                                customer.assignedTo
+                                                            )[0]?.email ?? "",
+                                                          customer: customer,
+                                                          remove: true,
+                                                          cancelReason,
+                                                        })
+                                                      )
+                                                      .unwrap();
+                                                    setIsJobRemoved(true);
+                                                    setHasAssignedJob(true);
+                                                  } catch (err) {
+                                                    setHasAssignedJob(false);
+                                                    showErrorAlert();
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              YES
+                                            </button>
+                                            <button
+                                              type="submit"
+                                              className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                              onClick={() => {
+                                                setcancelReason("");
+                                                onClose();
+                                              }}
+                                            >
+                                              NO
+                                            </button>
+                                          </div>
+                                        </>
+                                      ),
                                     });
 
                                     e.preventDefault();
@@ -276,45 +336,86 @@ export default function CarouselComponent({
                         <div className="mt-6">
                           <button
                             type="button"
-                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            onClick={(e: React.MouseEvent) => {
+                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                            onClick={async (e: React.MouseEvent) => {
                               confirmAlert({
-                                title: "please confirm cancellation",
-                                message:
-                                  "are you sure you want to unassign this job?",
-                                buttons: [
-                                  {
-                                    label: "yes",
-                                    onClick: async () => {
-                                      console.log(customer);
-                                      var decoded: {
-                                        name: string;
-                                        email: string;
-                                      } = jwt_decode(
-                                        state.auth.accessToken ?? ""
-                                      );
-                                      console.log(decoded);
-                                      try {
-                                        await store.dispatch(
-                                          assignJob({
-                                            technicianEmail:
-                                              decoded.email ?? "",
-                                            customer: customer,
-                                            remove: true,
-                                          })
-                                        );
-                                        setIsJobRemoved(true);
-                                        setHasAssignedJob(true);
-                                      } catch (err) {
-                                        setHasAssignedJob(false);
-                                      }
-                                    },
-                                  },
-                                  {
-                                    label: "no",
-                                    onClick: () => {},
-                                  },
-                                ],
+                                customUI: ({ title, message, onClose }) => (
+                                  <>
+                                    <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
+                                      <h1 className="m-6 mb-0">
+                                        please confirm cancellation
+                                      </h1>
+                                      <p>
+                                        Are you sure you want to unassign this
+                                        job? Please provide a reason to proceed
+                                        with the cancellation. Click on NO to
+                                        abort cancellation.
+                                      </p>
+                                      <div className="p-6">
+                                        <label htmlFor="serviceName">
+                                          Cancellation Reason
+                                        </label>
+                                        <input
+                                          id="cancelReason"
+                                          name="cancelReason"
+                                          required
+                                          onChange={(e: any) => {
+                                            e.preventDefault();
+                                            setcancelReason(e.target.value);
+                                          }}
+                                          className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                          placeholder="reason for cancellation"
+                                        />
+                                      </div>
+
+                                      <button
+                                        type="submit"
+                                        disabled={cancelReason?.length < 1}
+                                        className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        onClick={async () => {
+                                          console.log(customer);
+                                          var decoded: {
+                                            name: string;
+                                            email: string;
+                                          } = jwt_decode(
+                                            state.auth.accessToken ?? ""
+                                          );
+                                          if (cancelReason?.length > 1) {
+                                            console.log(decoded);
+                                            try {
+                                              await store.dispatch(
+                                                assignJob({
+                                                  technicianEmail:
+                                                    decoded.email ?? "",
+                                                  customer: customer,
+                                                  remove: true,
+                                                  cancelReason,
+                                                })
+                                              );
+                                              setIsJobRemoved(true);
+                                              setHasAssignedJob(true);
+                                            } catch (err: any) {
+                                              setHasAssignedJob(false);
+                                              showErrorAlert(err?.message);
+                                            }
+                                          }
+                                        }}
+                                      >
+                                        YES
+                                      </button>
+                                      <button
+                                        type="submit"
+                                        className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        onClick={() => {
+                                          setcancelReason("");
+                                          onClose();
+                                        }}
+                                      >
+                                        NO
+                                      </button>
+                                    </div>
+                                  </>
+                                ),
                               });
 
                               e.preventDefault();
@@ -322,25 +423,55 @@ export default function CarouselComponent({
                           >
                             cancel
                           </button>
-                          <button
-                            type="button"
-                            disabled={!!!customer.assignedTo}
-                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
-                            onClick={async (e: React.MouseEvent) => {
-                              const assignedTechnician = customer.assignedTo;
-                              console.log(!!assignedTechnician);
-                              if (!!assignedTechnician)
-                                await store.dispatch(
-                                  customerSlice.actions.custInvoice({
-                                    customer: customer,
-                                  })
-                                );
-                              router.push("/invoice");
-                              e.preventDefault();
-                            }}
-                          >
-                            generate invoices
-                          </button>
+                          {customer.status === "assigned" && (
+                            <button
+                              type="button"
+                              className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                              onClick={async (e: React.MouseEvent) => {
+                                var decoded: {
+                                  name: string;
+                                  email: string;
+                                } = jwt_decode(state.auth.accessToken ?? "");
+                                console.log(decoded);
+                                try {
+                                  await store.dispatch(
+                                    startJob({
+                                      technicianEmail: decoded.email ?? "",
+                                      customer: customer,
+                                      remove: false,
+                                    })
+                                  );
+                                  setHasAssignedJob(true);
+                                } catch (err: any) {
+                                  setHasAssignedJob(false);
+                                  showErrorAlert(err?.message);
+                                }
+                              }}
+                            >
+                              start job
+                            </button>
+                          )}
+                          {customer.status !== "assigned" && (
+                            <button
+                              type="button"
+                              disabled={!!!customer.assignedTo}
+                              className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                              onClick={async (e: React.MouseEvent) => {
+                                const assignedTechnician = customer.assignedTo;
+                                console.log(!!assignedTechnician);
+                                if (!!assignedTechnician)
+                                  await store.dispatch(
+                                    customerSlice.actions.custInvoice({
+                                      customer: customer,
+                                    })
+                                  );
+                                router.push("/invoice");
+                                e.preventDefault();
+                              }}
+                            >
+                              generate invoice
+                            </button>
+                          )}
                         </div>
                       )}
                     </Disclosure.Panel>

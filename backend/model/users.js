@@ -9,6 +9,11 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  isBlocked: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
   username: {
     type: String,
     required: false
@@ -113,14 +118,14 @@ userSchema.methods.validPassword = function (password) {
 
 userSchema.methods.generateJwt = function () {
   var expiry = new Date();
-  expiry.setDate(expiry.getDate() + 7);
+  expiry.setDate(expiry.getDate());
 
   return jwt.sign({
     _id: this._id,
     email: this.email,
     name: this.firstName + " " +this.lastName,
     userType: this.userType ? this.userType : "technician" ,
-    exp: parseInt(expiry.getTime() / 1000),
+    exp: parseInt(expiry.getTime()),
   }, "ALVIN"); // DO NOT KEEP YOUR SECRET IN THE CODE!
 };
 // plugin for passport-local-mongoose

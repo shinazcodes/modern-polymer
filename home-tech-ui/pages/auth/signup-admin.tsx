@@ -51,6 +51,7 @@ export interface EmailVerifyItems {
   userType?: string;
   adharNumber?: string;
   _id?: string;
+  isBlocked?: boolean;
   assignedTasks?: Customer[];
 }
 export default function SignUpAdmin() {

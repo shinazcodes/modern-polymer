@@ -55,7 +55,7 @@ export default function Jobs() {
         customers={
           customers
             ? param === "all"
-              ? customers
+              ? customers?.filter((customer) => customer.status === "assigned")
               : param === "pending"
               ? customers?.filter((customer) => customer.status === "pending")
               : customers?.filter((customer) => customer.status === "completed")

@@ -64,10 +64,14 @@ export default function Example() {
     console.log(jobs);
 
     if (!!jobs?.length) {
-      tempFeatures[0].total = jobs?.length;
+      tempFeatures[0].total = jobs.filter(
+        (job) => job.status && job.status === "assigned"
+      ).length;
+
       tempFeatures[1].total = jobs.filter(
         (job) => job.status && job.status === "pending"
       ).length;
+
       tempFeatures[2].total = jobs.filter(
         (job) => job.status && job.status === "completed"
       ).length;

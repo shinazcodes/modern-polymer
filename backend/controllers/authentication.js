@@ -1,5 +1,6 @@
 var passport = require('passport');
 var mongoose = require('mongoose');
+const {  checkLoginAccess } = require('../util/util');
 var User = mongoose.model('User');
 
 var sendJSONresponse = function(res, status, content) {
@@ -76,7 +77,7 @@ module.exports.register = function(req, res) {
 });
 };
 
-module.exports.login = function(req, res) {
+module.exports.login = async function(req, res) {
 
   if(!req.body || !req.body.username || !req.body.password) {
     sendJSONresponse(res, 400, {
@@ -87,9 +88,13 @@ module.exports.login = function(req, res) {
     });
     return;
   }
-
+ 
+  const check = await checkLoginAccess(req.body.username,res);
+  if(!check)
+  return;
 
   passport.authenticate('local', function (err, user, info) { 
+    
     if(err){
       res.status(403).json({"message": "incorrect credentials",
       "response": "error",})

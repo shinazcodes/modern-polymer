@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     margin: "0.25%",
-    minWidth: "19.4%",
+    minWidth: "16.1%",
     height: 40,
     fontSize: 12,
     lineHeight: "100%",
@@ -57,13 +57,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignSelf: "center",
     minHeight: 20,
-    maxWidth: "19.4%",
+    maxWidth: "16.1%",
   },
   bigColumns: {
     borderWidth: 1,
     borderColor: "black",
     margin: "0.25%",
-    minWidth: "59.15%",
+    minWidth: "65.5%",
     textAlign: "center",
     minHeight: 40,
     fontSize: 12,
@@ -83,11 +83,9 @@ const styles = StyleSheet.create({
 // Create Document Component
 const PdfDocument = ({
   data,
-  gstAmount,
   total,
 }: {
   data: Customer | undefined;
-  gstAmount: number;
   total: number;
 }) => (
   <Document>
@@ -239,6 +237,17 @@ const PdfDocument = ({
                 width: "100%",
               }}
             >
+              GST%
+            </Text>
+          </View>
+          <View style={styles.columns}>
+            <Text
+              style={{
+                margin: "auto",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
               Total
             </Text>
           </View>
@@ -297,7 +306,22 @@ const PdfDocument = ({
                   width: "100%",
                 }}
               >
-                {Number(service.price) * Number(service.quantity)}
+                {service.gst ?? 0}%
+              </Text>
+            </View>
+            <View style={styles.columns}>
+              <Text
+                style={{
+                  margin: "auto",
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                {Number(service.price) * Number(service.quantity) +
+                  (Number(service.price) *
+                    Number(service.quantity) *
+                    (service.gst ?? 0)) /
+                    100}
               </Text>
             </View>
           </View>
@@ -338,7 +362,7 @@ const PdfDocument = ({
             </Text>
           </View>
         </View>
-        <View style={styles.rows}>
+        {/* <View style={styles.rows}>
           <View style={styles.bigColumns}></View>
           <View style={styles.columns}>
             <Text
@@ -362,17 +386,17 @@ const PdfDocument = ({
               {gstAmount}
             </Text>
           </View>
-        </View>
+        </View> */}
         <View style={styles.rows}>
           <View
             style={{
               borderWidth: 1,
               borderColor: "black",
               margin: "0.25%",
-              minWidth: "59.1%",
+              minWidth: "65.5%",
               textAlign: "center",
               minHeight: 20,
-              maxWidth: "59.1%",
+              maxWidth: "65.5%",
               backgroundColor: "lightgrey",
             }}
           >

@@ -60,6 +60,20 @@ export const removeTechnician = createAsyncThunk(
   }
 );
 
+export const blockUnblockUser = createAsyncThunk(
+  "technician/blockUnblockUser",
+  async ({ email, block }: { email: string; block: boolean }) => {
+    const response = await PostApi(buildPath("blockUnblockUser"), {
+      email,
+      block,
+    });
+    // console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
+  }
+);
+
 export const getInvoices = createAsyncThunk(
   "technician/getInvoices",
   async () => {

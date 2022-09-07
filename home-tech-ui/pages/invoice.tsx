@@ -11,6 +11,7 @@ export interface Services {
   name: string;
   quantity: number | string;
   price: number | string;
+  gst: number;
 }
 export default function Invoice() {
   const router = useRouter();
@@ -21,12 +22,46 @@ export default function Invoice() {
   const [serviceName, setServiceName] = useState<any>("");
   const [serviceQuanity, setServiceQuantity] = useState<any>("");
   const [servicePrice, setServicePrice] = useState<any>("");
+  const [gst, setGst] = useState<any>(0);
   const [hasCreatedService, setHasCreatedService] = useState<any>(false);
 
   useEffect(() => {});
 
   useEffect(() => {
     if (hasSubmitted && state.customer.status === ApiState.SUCCESS) {
+      confirmAlert({
+        customUI: ({ title, message, onClose }) => (
+          <>
+            <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
+              <h1 className="m-6 mb-0">
+                invoice generated successfully! please wait for approval from
+                admin.
+              </h1>
+              <a
+                onClick={() => {
+                  router.push(
+                    "/external/" +
+                      state.customer.selectedForInvoice?._customerId
+                  );
+                }}
+              >
+                click here to view/download the invoice
+              </a>
+              <button
+                type="submit"
+                className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={() => {
+                  router.push("/home");
+                  onClose();
+                }}
+              >
+                Okay
+              </button>
+            </div>
+          </>
+        ),
+      });
+
       confirmAlert({
         title:
           "invoice generated successfully! please wait for approval from admin.",
@@ -51,6 +86,7 @@ export default function Invoice() {
           name: serviceName,
           quantity: serviceQuanity,
           price: servicePrice,
+          gst: gst,
         },
       ]);
       setHasCreatedService(false);
@@ -108,6 +144,22 @@ export default function Invoice() {
                 placeholder="price"
               />
             </div>
+            <div className="p-6">
+              <label htmlFor="price">GST%</label>
+              <input
+                id="price"
+                name="price"
+                required
+                onChange={(e: any) => {
+                  e.preventDefault();
+
+                  console.log(e.target.value);
+                  setGst(e.target.value);
+                }}
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="price"
+              />
+            </div>
             <button
               type="submit"
               className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -136,7 +188,6 @@ export default function Invoice() {
               custAddress: state.customer.selectedForInvoice?.fullAddress,
               custEmail: state.customer.selectedForInvoice?.email,
               invoiceDate: new Date().toISOString().slice(0, 10),
-              gst: 0,
             }}
             validate={(values) => {
               const errors = {};
@@ -177,7 +228,6 @@ export default function Invoice() {
                         email: values.custEmail,
                         fullAddress: values?.custAddress,
                         name: values.name,
-                        gst: values.gst,
                         invoiceDate: values.invoiceDate,
                       })
                     )
@@ -282,19 +332,7 @@ export default function Invoice() {
                       placeholder="customer address"
                     />
                   </div>
-                  <div className="pb-6 ">
-                    <label htmlFor="gst">GST%</label>
-                    <input
-                      id="gst"
-                      name="gst"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.gst}
-                      required
-                      className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                      placeholder="gst %"
-                    />
-                  </div>
+
                   <div className="pb-6">
                     <label htmlFor="invoiceDate">Date</label>
                     <input
@@ -337,20 +375,23 @@ export default function Invoice() {
             )}
           </Formik>
           {!!service?.length && (
-            <div className="flex flex-col w-1/2 m-auto mt-10">
+            <div className="flex flex-col w-full m-auto mt-10 pt-10">
               <div className="flex flex-row flex-wrap w-full m-auto align-middle justify-around">
-                <h1 className="w-1/3 text-center">Name</h1>
-                <h1 className="w-1/3 text-center">Quantity</h1>
-                <h1 className="w-1/3 text-center">Price</h1>
+                <h1 className="w-1/4 text-center">Name</h1>
+                <h1 className="w-1/4 text-center">Quantity</h1>
+                <h1 className="w-1/4 text-center">GST</h1>
+                <h1 className="w-1/4 text-center">Price</h1>
               </div>
               {service.map((item, index) => (
                 <div
                   key={index}
                   className="flex flex-row flex-wrap  w-full m-auto align-middle justify-around"
                 >
-                  <h1 className="w-1/3 text-center">{item.name}</h1>
-                  <h1 className="w-1/3 text-center">{item.quantity}</h1>
-                  <h1 className="w-1/3 text-center">Rs.{item.price}</h1>
+                  <h1 className="w-1/4 text-center">{item.name}</h1>
+                  <h1 className="w-1/4 text-center">{item.quantity}</h1>
+                  <h1 className="w-1/4 text-center">{item.gst}%</h1>
+
+                  <h1 className="w-1/4 text-center">Rs.{item.price}</h1>
                 </div>
               ))}
             </div>

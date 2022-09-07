@@ -1,7 +1,11 @@
 var mongoose = require('mongoose');
+const { checkAccess } = require('../util/util');
 var Customers = mongoose.model('Customer');
 
-module.exports.getCustomers = function(req, res) {
+module.exports.getCustomers = async function(req, res) {
+    const check = await checkAccess(req,res)
+  if(!check)
+  return;
 
   if (!req.payload._id) {
     res.status(401).json({

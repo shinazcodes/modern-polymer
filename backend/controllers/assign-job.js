@@ -35,7 +35,7 @@ module.exports.assignJob = async function(req, res) {
           "message": "this job is already assigned to this user"});
         } else{
         if(!req.body.remove) {
-        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, status: "pending"}]}}, {new: true}, (err, doc) => {
+        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, status: "assigned"}]}}, {new: true}, (err, doc) => {
           if (err) {
               console.log("Something wrong when updating data!");
           } else {
@@ -63,7 +63,7 @@ module.exports.assignJob = async function(req, res) {
               .exec(function(err, user) {
           
                 Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
-                status: req.body.remove ? "unassigned" : "pending"}}, {new: true}, (err, doc) => {
+                status: req.body.remove ? "unassigned" : "assigned", cancelReason: req.body.cancelReason ? req.body.cancelReason : undefined}}, {new: true}, (err, doc) => {
                   if (err) {
                     res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
 
@@ -100,7 +100,7 @@ module.exports.assignJob = async function(req, res) {
               .exec(function(err, user) {
           
                 Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
-                status: req.body.remove ? "unassigned" : "pending"}}, {new: true}, (err, doc) => {
+                status: req.body.remove ? "unassigned" : "assigned", cancelReason: req.body.cancelReason ? req.body.cancelReason : undefined}}, {new: true}, (err, doc) => {
                   if (err) {
                     res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
 
@@ -119,6 +119,84 @@ module.exports.assignJob = async function(req, res) {
     });
    
     }
+ 
+
+  }
+});
+     
+    } catch (error){
+      console.log("technician update error", error);
+      res.status(403).json({eror: "something went wrong"});
+
+    }
+   
+  }
+  
+};
+
+
+module.exports.startJob = async function(req, res) {
+  console.log("here 1");
+
+  if(!req.body || !req.body.technicianEmail || req.body.customer === undefined ) {
+    sendJSONresponse(res, 400, {
+      "message": "All fields required",
+      "response": "error"
+    });
+    return;
+  }
+  if (!req.payload._id) {
+    res.status(401).json({
+      "message" : "UnauthorizedError: private profile",
+      "response": "error"
+
+    });
+  } else {
+    try {
+      User
+      .findOne({email: req.body.technicianEmail})
+      .exec(function(err, user) {
+        var found = false;
+        found = user.assignedTasks.filter((item)=> item._customerId === req.body.customer._customerId && item.status === "pending" ).length > 0;
+        if(found && !req.body.remove) {
+          res.status(403).json({"response": "error", 
+          "message": "this job is already started by" + user.firstName +" " + user.lastName + "(" + user.email +")"});
+        } else{
+        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, status: "pending"}]}}, {new: true}, (err, doc) => {
+          if (err) {
+              console.log("Something wrong when updating data!");
+          } else {
+          
+            try {
+     
+              Customer
+              .findOne({_customerId: req.body.customer._customerId})
+              .exec(function(err, user) {
+          
+                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
+                status: req.body.remove ? "unassigned" : "pending", cancelReason: req.body.cancelReason ? req.body.cancelReason : undefined}}, {new: true}, (err, doc) => {
+                  if (err) {
+                    res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
+
+                  }
+          
+                  res.status(200).json({
+                    "response": "job started successfully!"
+                      });
+              });
+              });
+             
+              } catch {
+              res.status(403).json({"response": "error", "message": "something went wrong"});
+          
+              }
+
+
+          }
+
+      });
+     
+      
  
 
   }
