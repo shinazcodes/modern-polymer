@@ -133,6 +133,7 @@ export default function Technicians() {
           {filteredtechnicians.map((technician) => (
             <li
               className="hover:bg-blue-200  cursor-pointer p-2 rounded-lg"
+              key={technician._id}
               onClick={() => {
                 setSelectedTechnician(technician);
               }}
