@@ -22,6 +22,10 @@ export interface Customer {
   name: string;
   fullAddress: string;
   brand: string;
+  dateCreated?: string;
+  dateAssigned?: string;
+  dateCompleted?: string;
+  dateStarted?: string;
   cancelReason?: string;
   email: string;
   mobileNumber: string;

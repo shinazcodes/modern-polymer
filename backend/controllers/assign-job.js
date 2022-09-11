@@ -35,7 +35,7 @@ module.exports.assignJob = async function(req, res) {
           "message": "this job is already assigned to this user"});
         } else{
         if(!req.body.remove) {
-        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, status: "assigned"}]}}, {new: true}, (err, doc) => {
+        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, dateAssigned: req.body.remove ? undefined : Date.now(),  status: "assigned"}]}}, {new: true}, (err, doc) => {
           if (err) {
               console.log("Something wrong when updating data!");
           } else {
@@ -47,7 +47,7 @@ module.exports.assignJob = async function(req, res) {
               User
               .findOne({email: customer1.assignedTo})
               .exec(function(err, tech) {
-            User.findOneAndUpdate({email: customer1.assignedTo}, {$set:{ assignedTasks: tech.assignedTasks.filter((item) => item._customerId !== req.body.customer._customerId)}}, {new: true}, (err, doc) => {
+            User.findOneAndUpdate({email: customer1.assignedTo}, {$set:{  assignedTasks: tech.assignedTasks.filter((item) => item._customerId !== req.body.customer._customerId)}}, {new: true}, (err, doc) => {
               if (err) {
                   console.log("Something wrong when updating data!");
               } else {
@@ -62,7 +62,7 @@ module.exports.assignJob = async function(req, res) {
               .findOne({_customerId: req.body.customer._customerId})
               .exec(function(err, user) {
           
-                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
+                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{  dateAssigned: req.body.remove ? undefined : Date.now(),  assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
                 status: req.body.remove ? "unassigned" : "assigned", cancelReason: req.body.cancelReason ? req.body.cancelReason : undefined}}, {new: true}, (err, doc) => {
                   if (err) {
                     res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
@@ -99,7 +99,7 @@ module.exports.assignJob = async function(req, res) {
               .findOne({_customerId: req.body.customer._customerId})
               .exec(function(err, user) {
           
-                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
+                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ dateAssigned: req.body.remove ? undefined : Date.now(), assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
                 status: req.body.remove ? "unassigned" : "assigned", cancelReason: req.body.cancelReason ? req.body.cancelReason : undefined}}, {new: true}, (err, doc) => {
                   if (err) {
                     res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
@@ -162,18 +162,16 @@ module.exports.startJob = async function(req, res) {
           res.status(403).json({"response": "error", 
           "message": "this job is already started by" + user.firstName +" " + user.lastName + "(" + user.email +")"});
         } else{
-        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, status: "pending"}]}}, {new: true}, (err, doc) => {
+        
+        User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...user.assignedTasks, {...req.body.customer, dateStarted: req.body.remove ? undefined : Date.now(), status: "pending"}]}}, {new: true}, (err, doc) => {
           if (err) {
               console.log("Something wrong when updating data!");
           } else {
           
             try {
      
-              Customer
-              .findOne({_customerId: req.body.customer._customerId})
-              .exec(function(err, user) {
-          
-                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
+            
+                Customer.findOneAndUpdate({_customerId: req.body.customer._customerId}, {$set:{ dateStarted: req.body.remove ? undefined : Date.now(), assignedTo: req.body.remove ? undefined : req.body.technicianEmail,
                 status: req.body.remove ? "unassigned" : "pending", cancelReason: req.body.cancelReason ? req.body.cancelReason : undefined}}, {new: true}, (err, doc) => {
                   if (err) {
                     res.status(403).json({"response": "error", "message": "something went wrong", code: 1234});
@@ -183,7 +181,6 @@ module.exports.startJob = async function(req, res) {
                   res.status(200).json({
                     "response": "job started successfully!"
                       });
-              });
               });
              
               } catch {

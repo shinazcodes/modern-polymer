@@ -7,6 +7,22 @@ var customerSchema = new mongoose.Schema({
     required: true,
     unique:true
   },
+  dateCreated: {
+    type: Date,
+    required: false,
+  },
+  dateAssigned: {
+    type: Date,
+    required: false,
+  },
+  dateStarted: {
+    type: Date,
+    required: false,
+  },
+  dateCompleted: {
+    type: Date,
+    required: false,
+  },
     name: {
     type: String,
     required: true,
@@ -126,6 +142,7 @@ customerSchema.methods.setCustomer = function (id, data) {
   this.altMobileNumber = data.altMobileNumber;
   this.assignedTo = data.assignedTo;
   this.status = data.status;
+  this.dateCreated = Date.now();
 };
 
 mongoose.model('Customer', customerSchema);

@@ -6,7 +6,7 @@ var sendJSONresponse = function(res, status, content) {
   res.json(content);
 };
 
-module.exports.jobDetails = function(req, res) {
+module.exports.jobDetails = async function(req, res) {
   const check = await checkAccess(req,res)
   if(!check)
   return;

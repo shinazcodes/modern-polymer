@@ -136,6 +136,18 @@ export default function CarouselComponent({
                       <p className="font-bold">machine: {customer.machine}</p>
                       <p className="font-bold">status: {customer.status}</p>
                       <p className="font-bold">brand: {customer.brand}</p>
+                      <p className="font-bold">
+                        created date: {customer.dateCreated}
+                      </p>
+                      <p className="font-bold">
+                        assigned date: {customer.dateAssigned}
+                      </p>
+                      <p className="font-bold">
+                        started date: {customer.dateStarted}
+                      </p>
+                      <p className="font-bold">
+                        completion date: {customer.dateCompleted}
+                      </p>
                       {customer.cancelReason ? (
                         <p className="font-bold text-red-700">
                           cancelled: {customer.cancelReason}

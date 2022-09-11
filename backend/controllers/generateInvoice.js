@@ -225,7 +225,7 @@ module.exports.completeTask = async function(req, res) {
           } 
           console.log(customer)
 
-          Customer.findOneAndUpdate({_customerId: req.body._customerId}, {$set:{ status: "completed"}}, {new: true}, (err, doc) => {
+          Customer.findOneAndUpdate({_customerId: req.body._customerId}, {$set:{ dateCompleted: Date.now(), status: "completed"}}, {new: true}, (err, doc) => {
             if (err) {
                 console.log("Something wrong when updating data!");
             } else {
@@ -238,6 +238,7 @@ module.exports.completeTask = async function(req, res) {
                   otherTasks = user.assignedTasks.filter((item)=> item._customerId !== req.body._customerId);
                   taskToUpdate = user.assignedTasks.filter((item)=> item._customerId === req.body._customerId);
                   taskToUpdate[0].status = "completed";
+                  taskToUpdate[0].dateCompleted = Date.now(),
                   User.findOneAndUpdate({email: req.body.technicianEmail}, {$set:{ assignedTasks: [...taskToUpdate, ...otherTasks]}}, {new: true}, (err, doc) => {
                     if (err) {
                         console.log("Something wrong when updating data!");
