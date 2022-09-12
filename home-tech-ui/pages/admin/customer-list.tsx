@@ -21,7 +21,7 @@
 import { Listbox } from "@headlessui/react";
 import { Formik } from "formik";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import authSlice, { ApiState, verifyEmail } from "../../api/Auth/authSlice";
 import { createCustomer, getCustomers } from "../../api/Auth/customerSlice";
@@ -51,6 +51,7 @@ export default function CustomerList() {
   const state = useSelector<RootState, RootState>((state) => state);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [gotTechnicians, setgotTechnicians] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     getCust();
@@ -76,22 +77,41 @@ export default function CustomerList() {
     }
   };
 
+  const filterCustomers = useMemo(() => {
+    return query === ""
+      ? state.customer.customerList
+      : state.customer.customerList?.filter(
+          (invoice) =>
+            invoice?.email
+              ?.toLowerCase()
+              .replace(/\s+/g, "")
+              .includes(query.toLowerCase().replace(/\s+/g, "")) ||
+            invoice?.name
+              ?.toLowerCase()
+              .replace(/\s+/g, "")
+              .includes(query.toLowerCase().replace(/\s+/g, "")) ||
+            invoice?.mobileNumber
+              .toString()
+              .includes(query.toLowerCase().replace(/\s+/g, ""))
+        );
+  }, [query, state]);
+
   const getCustomerSorted = useCallback(() => {
     return {
-      all: state.customer.customerList,
+      all: filterCustomers,
 
-      unAssigned: state.customer.customerList?.filter(
+      unAssigned: filterCustomers?.filter(
         (customer) =>
           !customer.status || customer.status === JobStatus.UNASSIGNED
       ),
-      pending: state.customer.customerList?.filter(
+      pending: filterCustomers?.filter(
         (customer) => customer.status === JobStatus.PENDING
       ),
-      completed: state.customer.customerList?.filter(
+      completed: filterCustomers?.filter(
         (customer) => customer.status === JobStatus.COMPLETED
       ),
     };
-  }, [state]);
+  }, [state, filterCustomers]);
 
   useEffect(() => {
     if (!gotTechnicians) {
@@ -112,6 +132,7 @@ export default function CustomerList() {
       //   router.replace("/auth/verify-email");
     }
   }, [state, hasSubmitted]);
+
   return (
     <>
       <div className="mt-16">
@@ -174,6 +195,12 @@ export default function CustomerList() {
                       <h1 className="text-3xl font-bold text-gray-900">
                         Jobs List
                       </h1>
+                      <input
+                        className="  py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 w-1/2 border
+          rounded-md"
+                        onChange={(event) => setQuery(event.target.value)}
+                        placeholder="search by email, name or mobile number"
+                      />
                       {state.customer.customerList && (
                         <TabComponent
                           customers={getCustomerSorted()}

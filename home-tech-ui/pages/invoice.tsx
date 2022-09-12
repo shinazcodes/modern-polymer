@@ -106,8 +106,6 @@ export default function Invoice() {
                 name="serviceName"
                 required
                 onChange={(e: any) => {
-                  e.preventDefault();
-
                   setServiceName(e.target.value);
                 }}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -121,7 +119,6 @@ export default function Invoice() {
                 name="quantity"
                 required
                 onChange={(e: any) => {
-                  e.preventDefault();
                   setServiceQuantity(e.target.value);
                 }}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -135,8 +132,6 @@ export default function Invoice() {
                 name="price"
                 required
                 onChange={(e: any) => {
-                  e.preventDefault();
-
                   console.log(e.target.value);
                   setServicePrice(e.target.value);
                 }}
@@ -151,8 +146,6 @@ export default function Invoice() {
                 name="price"
                 required
                 onChange={(e: any) => {
-                  e.preventDefault();
-
                   console.log(e.target.value);
                   setGst(e.target.value);
                 }}

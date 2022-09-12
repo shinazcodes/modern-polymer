@@ -19,6 +19,7 @@ import { sendSms } from "../../api/Auth/authSlice";
 import { getSMS, SMS } from "../../api/model";
 import { showErrorAlert } from "../../util/util";
 import { confirmAlert } from "react-confirm-alert";
+import { Formik } from "formik";
 
 export default function CarouselComponent({
   customers,
@@ -41,6 +42,7 @@ export default function CarouselComponent({
     {} as EmailVerifyItems
   );
   const [assignedJob, setHasAssignedJob] = useState(false);
+  const [startedJob, setJobStarted] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
 
   useEffect(() => {
@@ -105,6 +107,11 @@ export default function CarouselComponent({
       setHasAssignedJob(false);
     }
   }, [state, assignedJob, isJobRemoved]);
+
+  async function clickedyes(
+    technicians: EmailVerifyItems[],
+    customer: Customer
+  ) {}
 
   return (
     <div className="w-full">
@@ -177,96 +184,146 @@ export default function CarouselComponent({
                                         onClose,
                                       }) => (
                                         <>
-                                          <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
-                                            <h1 className="m-6 mb-0">
-                                              please confirm cancellation
-                                            </h1>
-                                            <p>
-                                              Are you sure you want to unassign
-                                              this job? Please provide a reason
-                                              to proceed with the cancellation.
-                                              Click on NO to abort cancellation.
-                                            </p>
-                                            <div className="p-6">
-                                              <label htmlFor="serviceName">
-                                                Cancellation Reason
-                                              </label>
-                                              <input
-                                                id="cancelReason"
-                                                name="cancelReason"
-                                                required
-                                                onChange={(e: any) => {
-                                                  e.preventDefault();
-                                                  setcancelReason(
-                                                    e.target.value
-                                                  );
-                                                }}
-                                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                                placeholder="reason for cancellation"
-                                              />
-                                            </div>
-
-                                            <button
-                                              type="submit"
-                                              disabled={
-                                                cancelReason?.length < 1
+                                          <Formik
+                                            initialValues={{
+                                              cancelReason: "",
+                                            }}
+                                            validate={(values) => {
+                                              const errors = {};
+                                              return errors;
+                                            }}
+                                            onSubmit={async (
+                                              values,
+                                              {
+                                                setSubmitting,
+                                                setFieldValue,
+                                                resetForm,
                                               }
-                                              className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                              onClick={async () => {
-                                                console.log(selectedTechnician);
-                                                const assignedTechnician =
-                                                  customer.assignedTo;
-                                                console.log(
-                                                  !!assignedTechnician
-                                                );
-                                                if (
-                                                  !!assignedTechnician &&
-                                                  cancelReason?.length > 1
-                                                ) {
-                                                  setSelectedCustomer(customer);
-                                                  try {
-                                                    await store
-                                                      .dispatch(
-                                                        assignJob({
-                                                          technicianEmail:
-                                                            technicians.filter(
-                                                              (tech) =>
-                                                                tech.email ===
-                                                                customer.assignedTo
-                                                            )[0]?.email ?? "",
-                                                          customer: customer,
-                                                          remove: true,
-                                                          cancelReason,
-                                                        })
-                                                      )
-                                                      .unwrap();
-                                                    setIsJobRemoved(true);
-                                                    setHasAssignedJob(true);
-                                                  } catch (err) {
-                                                    setHasAssignedJob(false);
-                                                    showErrorAlert();
-                                                  }
-                                                }
-                                              }}
-                                            >
-                                              YES
-                                            </button>
-                                            <button
-                                              type="submit"
-                                              className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                              onClick={() => {
-                                                setcancelReason("");
-                                                onClose();
-                                              }}
-                                            >
-                                              NO
-                                            </button>
-                                          </div>
+                                            ) => {}}
+                                          >
+                                            {({
+                                              values,
+                                              errors,
+                                              touched,
+                                              handleChange,
+                                              handleBlur,
+                                              handleSubmit,
+                                              isSubmitting,
+                                              /* and other goodies */
+                                            }) => (
+                                              <form
+                                                onSubmit={handleSubmit}
+                                                className="mt-8 space-y-6 flex flex-row flex-wrap align-middle justify-center m-auto w-full"
+                                              >
+                                                <div className="rounded-md bg-white w-96 py-6  shadow-lg ">
+                                                  <h1 className="px-4 mb-0 font-bold">
+                                                    Please Confirm Cancellation
+                                                  </h1>
+                                                  <p className="px-4 pb-4">
+                                                    Are you sure you want to
+                                                    unassign this job? Please
+                                                    provide a reason to proceed
+                                                    with the cancellation. Click
+                                                    on NO to abort cancellation.
+                                                  </p>
+                                                  <div className="p-6">
+                                                    <label htmlFor="serviceName">
+                                                      Cancellation Reason
+                                                    </label>
+                                                    <input
+                                                      id="cancelReason"
+                                                      name="cancelReason"
+                                                      required
+                                                      onChange={handleChange}
+                                                      onBlur={handleBlur}
+                                                      className="appearance-none rounded-none relative block 
+                                                w-full px-3 py-2 border border-gray-300 placeholder-gray-500
+                                                 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500
+                                                  focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                                      placeholder="reason for cancellation"
+                                                    />
+                                                  </div>
+
+                                                  <button
+                                                    type="button"
+                                                    disabled={
+                                                      values.cancelReason
+                                                        ?.length < 1
+                                                    }
+                                                    className="group  disabled:bg-gray-200
+                                               relative mx-auto flex justify-center py-2 px-4 border
+                                                border-transparent text-sm font-medium rounded-md
+                                                 text-white bg-indigo-600 hover:bg-indigo-700 
+                                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                    onClick={async () => {
+                                                      const assignedTechnician =
+                                                        customer.assignedTo;
+                                                      console.log(
+                                                        values.cancelReason
+                                                      );
+                                                      if (
+                                                        !!assignedTechnician &&
+                                                        values.cancelReason
+                                                          ?.length > 1
+                                                      ) {
+                                                        setSelectedCustomer(
+                                                          customer
+                                                        );
+                                                        try {
+                                                          await store
+                                                            .dispatch(
+                                                              assignJob({
+                                                                technicianEmail:
+                                                                  technicians.filter(
+                                                                    (tech) =>
+                                                                      tech.email ===
+                                                                      customer.assignedTo
+                                                                  )[0]?.email ??
+                                                                  "",
+                                                                customer:
+                                                                  customer,
+                                                                remove: true,
+                                                                cancelReason:
+                                                                  values.cancelReason,
+                                                              })
+                                                            )
+                                                            .unwrap();
+                                                          setIsJobRemoved(true);
+                                                          setHasAssignedJob(
+                                                            true
+                                                          );
+                                                        } catch (err) {
+                                                          setHasAssignedJob(
+                                                            false
+                                                          );
+                                                          showErrorAlert();
+                                                        }
+                                                      }
+                                                    }}
+                                                  >
+                                                    YES
+                                                  </button>
+
+                                                  <button
+                                                    type="button"
+                                                    className=" mt-4 relative mx-auto flex 
+                                              justify-center py-2 px-4 border border-transparent 
+                                              text-sm font-medium rounded-md text-white bg-indigo-600
+                                               hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                    onClick={() => {
+                                                      setcancelReason("");
+                                                      onClose();
+                                                    }}
+                                                  >
+                                                    NO
+                                                  </button>
+                                                </div>
+                                              </form>
+                                            )}
+                                          </Formik>
                                         </>
                                       ),
                                     });
-
-                                    e.preventDefault();
                                   }}
                                 >
                                   cancel
@@ -353,79 +410,126 @@ export default function CarouselComponent({
                               confirmAlert({
                                 customUI: ({ title, message, onClose }) => (
                                   <>
-                                    <div className="rounded-md bg-white w-96 py-6  shadow-lg -space-y-px">
-                                      <h1 className="m-6 mb-0">
-                                        please confirm cancellation
-                                      </h1>
-                                      <p>
-                                        Are you sure you want to unassign this
-                                        job? Please provide a reason to proceed
-                                        with the cancellation. Click on NO to
-                                        abort cancellation.
-                                      </p>
-                                      <div className="p-6">
-                                        <label htmlFor="serviceName">
-                                          Cancellation Reason
-                                        </label>
-                                        <input
-                                          id="cancelReason"
-                                          name="cancelReason"
-                                          required
-                                          onChange={(e: any) => {
-                                            e.preventDefault();
-                                            setcancelReason(e.target.value);
-                                          }}
-                                          className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                          placeholder="reason for cancellation"
-                                        />
-                                      </div>
+                                    <Formik
+                                      initialValues={{
+                                        cancelReason: "",
+                                      }}
+                                      validate={(values) => {
+                                        const errors = {};
+                                        return errors;
+                                      }}
+                                      onSubmit={async (
+                                        values,
+                                        {
+                                          setSubmitting,
+                                          setFieldValue,
+                                          resetForm,
+                                        }
+                                      ) => {}}
+                                    >
+                                      {({
+                                        values,
+                                        errors,
+                                        touched,
+                                        handleChange,
+                                        handleBlur,
+                                        handleSubmit,
+                                        isSubmitting,
+                                        /* and other goodies */
+                                      }) => (
+                                        <form
+                                          onSubmit={handleSubmit}
+                                          className="mt-8 space-y-6 flex flex-row flex-wrap align-middle justify-center m-auto w-full"
+                                        >
+                                          <div className="rounded-md bg-white w-96 py-6  shadow-lg">
+                                            <h1 className="m-6 mb-0">
+                                              please confirm cancellation
+                                            </h1>
+                                            <p>
+                                              Are you sure you want to unassign
+                                              this job? Please provide a reason
+                                              to proceed with the cancellation.
+                                              Click on NO to abort cancellation.
+                                            </p>
+                                            <div className="p-6">
+                                              <label htmlFor="serviceName">
+                                                Cancellation Reason
+                                              </label>
+                                              <input
+                                                id="cancelReason"
+                                                name="cancelReason"
+                                                required
+                                                onChange={(e: any) => {
+                                                  setcancelReason(
+                                                    e.target.value
+                                                  );
+                                                  console.log(cancelReason);
+                                                }}
+                                                className="group m-6 disabled:bg-gray-200 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                placeholder="reason for cancellation"
+                                              />
+                                            </div>
 
-                                      <button
-                                        type="submit"
-                                        disabled={cancelReason?.length < 1}
-                                        className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={async () => {
-                                          console.log(customer);
-                                          var decoded: {
-                                            name: string;
-                                            email: string;
-                                          } = jwt_decode(
-                                            state.auth.accessToken ?? ""
-                                          );
-                                          if (cancelReason?.length > 1) {
-                                            console.log(decoded);
-                                            try {
-                                              await store.dispatch(
-                                                assignJob({
-                                                  technicianEmail:
-                                                    decoded.email ?? "",
-                                                  customer: customer,
-                                                  remove: true,
-                                                  cancelReason,
-                                                })
-                                              );
-                                              setIsJobRemoved(true);
-                                              setHasAssignedJob(true);
-                                            } catch (err: any) {
-                                              setHasAssignedJob(false);
-                                              showErrorAlert(err?.message);
-                                            }
-                                          }
-                                        }}
-                                      >
-                                        YES
-                                      </button>
-                                      <button
-                                        type="submit"
-                                        className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={() => {
-                                          setcancelReason("");
-                                          onClose();
-                                        }}
-                                      >
-                                        NO
-                                      </button>
-                                    </div>
+                                            <button
+                                              type="submit"
+                                              className="group m-6 relative mx-auto 
+                                        flex justify-center py-2 px-4 border border-transparent 
+                                        text-sm font-medium rounded-md text-white bg-indigo-600
+                                         hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                              onClick={async () => {
+                                                console.log(customer);
+                                                var decoded: {
+                                                  name: string;
+                                                  email: string;
+                                                } = jwt_decode(
+                                                  state.auth.accessToken ?? ""
+                                                );
+                                                if (
+                                                  values.cancelReason?.length >
+                                                  1
+                                                ) {
+                                                  console.log(decoded);
+                                                  try {
+                                                    await store.dispatch(
+                                                      assignJob({
+                                                        technicianEmail:
+                                                          decoded.email ?? "",
+                                                        customer: customer,
+                                                        remove: true,
+                                                        cancelReason:
+                                                          values.cancelReason,
+                                                      })
+                                                    );
+                                                    setIsJobRemoved(true);
+                                                    setHasAssignedJob(true);
+                                                  } catch (err: any) {
+                                                    setHasAssignedJob(false);
+                                                    showErrorAlert(
+                                                      err?.message
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              YES
+                                            </button>
+                                            <button
+                                              type="submit"
+                                              className="group mt-4 relative mx-auto flex justify-center 
+                                        py-2 px-4 border border-transparent text-sm font-medium r
+                                        ounded-md text-white bg-indigo-600 hover:bg-indigo-700 
+                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                              onClick={() => {
+                                                setcancelReason("");
+                                                onClose();
+                                              }}
+                                            >
+                                              NO
+                                            </button>
+                                          </div>
+                                        </form>
+                                      )}
+                                    </Formik>
                                   </>
                                 ),
                               });
@@ -453,9 +557,9 @@ export default function CarouselComponent({
                                       remove: false,
                                     })
                                   );
-                                  setHasAssignedJob(true);
+                                  setJobStarted(true);
                                 } catch (err: any) {
-                                  setHasAssignedJob(false);
+                                  setJobStarted(false);
                                   showErrorAlert(err?.message);
                                 }
                               }}
