@@ -4,21 +4,19 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
-import { ApiState, generateInvoice } from "../../api/Auth/customerSlice";
+import {
+  ApiState,
+  generateInvoice,
+  Service,
+} from "../../api/Auth/customerSlice";
 import { RootState, store } from "../../api/store";
 
-export interface Services {
-  name: string;
-  quantity: number | string;
-  price: number | string;
-  gst: number | string;
-}
 export default function Invoice() {
   const router = useRouter();
   const [showPrompt, setShowPrompt] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
-  const [service, setService] = useState<Services[]>([] as Services[]);
+  const [service, setService] = useState<Service[]>([] as Service[]);
   const [serviceName, setServiceName] = useState<any>("");
   const [serviceQuanity, setServiceQuantity] = useState<any>("");
   const [servicePrice, setServicePrice] = useState<any>("");
@@ -168,7 +166,7 @@ export default function Invoice() {
     index: number,
     value: string
   ) => {
-    let serv: Services[] = [] as Services[];
+    let serv: Service[] = [] as Service[];
     service.forEach((item, i) => {
       serv.push({ ...item });
     });
