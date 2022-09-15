@@ -321,7 +321,7 @@ const PdfDocument = ({
                 {Number(service.price) * Number(service.quantity) +
                   (Number(service.price) *
                     Number(service.quantity) *
-                    (service.gst ?? 0)) /
+                    (Number(service.gst) ?? 0)) /
                     100}
               </Text>
             </View>

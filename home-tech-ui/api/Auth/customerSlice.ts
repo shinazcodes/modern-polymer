@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
-import { Services } from "../../pages/admin/invoice";
 import { EmailVerifyItems } from "../../pages/auth/signup";
 import { OtpSentResponse, SendOtprequest } from "../model";
 import { ApiResponse, buildPath, GetApi, PostApi, PostSmsApi } from "./Base";
@@ -39,7 +38,7 @@ export interface Customer {
 export interface Service {
   name: string;
   quantity: string;
-  gst?: number;
+  gst?: number | string;
   price: string;
 }
 
@@ -75,7 +74,7 @@ export interface GenerateInvoiceRequest {
   assignedTo: string;
   status?: string;
   _customerId?: string;
-  services: Services[];
+  services: Service[];
   invoiceId?: string;
   invoiceDate?: string;
   gst?: number;
