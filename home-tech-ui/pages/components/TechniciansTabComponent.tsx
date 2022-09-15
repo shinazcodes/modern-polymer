@@ -16,12 +16,12 @@ export default function TechnicianTabComponent({
   refresh: () => void;
 }) {
   let [categories] = useState({
-    Jobs: [],
+    "Assigned Jobs": [],
     Pending: [],
     Completed: [],
   });
   useEffect(() => {
-    console.log(customers);
+    console.log(customers?.filter((customer) => customer.status === "pending"));
   }, []);
 
   return (
@@ -46,27 +46,27 @@ export default function TechnicianTabComponent({
           ))}
         </Tab.List>
         <Tab.Panels className="mt-2">
-          {customers?.flatMap((customer, idx) => (
+          {Object.keys(categories)?.flatMap((cat, idx) => (
             <Tab.Panel
               key={idx}
               className={classNames(
-                "rounded-xl bg-white p-3",
+                "rounded-xl  p-3",
                 "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2"
               )}
             >
               <CarouselComponent
                 customers={
-                  customer.status === "assigned"
+                  idx === 0
                     ? customers?.filter(
                         (customer) => customer.status === "assigned"
-                      )
-                    : customer.status === "completed"
+                      ) ?? []
+                    : idx === 1
                     ? customers?.filter(
-                        (customer) => customer.status === "completed"
-                      )
+                        (customer) => customer.status === "pending"
+                      ) ?? []
                     : customers?.filter(
                         (customer) => customer.status === "completed"
-                      )
+                      ) ?? []
                 }
                 refresh={() => {}}
               />

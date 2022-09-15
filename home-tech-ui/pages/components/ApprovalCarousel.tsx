@@ -134,10 +134,12 @@ export default function ApprovalCarousel({
   function getTotal(customer: Customer): ReactNode {
     let total: number = 0.0;
     customer?.invoiceDetails?.services.map((item) => {
-      total += Number(item.price) * Number(item.quantity);
+      total +=
+        Number(item.price) * Number(item.quantity) +
+        (Number(item.price) * Number(item.quantity) * Number(item.gst ?? 0)) /
+          100;
     });
-    let gstA = (total * (customer?.invoiceDetails?.gst ?? 0.0)) / 100;
-    return <>{total + gstA}</>;
+    return <>{total}</>;
   }
   function getTotalnum(customer: Customer) {
     let total: number = 0;
@@ -198,7 +200,9 @@ export default function ApprovalCarousel({
         buttons: [
           {
             label: "ok",
-            onClick: () => {},
+            onClick: () => {
+              router.reload();
+            },
           },
         ],
       });
@@ -245,7 +249,9 @@ export default function ApprovalCarousel({
         buttons: [
           {
             label: "ok",
-            onClick: () => {},
+            onClick: () => {
+              router.reload();
+            },
           },
         ],
       });
@@ -254,7 +260,7 @@ export default function ApprovalCarousel({
 
   return (
     <div className="w-full">
-      <div className="mx-0 w-full rounded-2xl bg-white p-2">
+      <div className="mx-0 w-full rounded-2xl  p-2">
         <div>
           {customers.map((customer: Customer, index) => {
             return (
@@ -275,28 +281,61 @@ export default function ApprovalCarousel({
                         />
                       </Disclosure.Button>
                       <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                        <p className="font-bold">name: {customer.name}</p>
                         <p className="font-bold">
-                          phone number: {customer.mobileNumber}
+                          name:{" "}
+                          <span className="font-normal">{customer.name}</span>
+                        </p>
+                        <p className="font-bold ">
+                          phone number:{" "}
+                          <span className="font-normal">
+                            {customer.mobileNumber}
+                          </span>
                         </p>
                         <p className="font-bold">
-                          address: {customer.fullAddress}
-                        </p>
-                        <p className="font-bold">machine: {customer.machine}</p>
-                        <p className="font-bold">status: {customer.status}</p>
-                        <p className="font-bold">brand: {customer.brand}</p>
-                        <p className="font-bold">
-                          created date: {customer.dateCreated}
+                          address:{" "}
+                          <span className="font-normal">
+                            {customer.fullAddress}
+                          </span>
                         </p>
                         <p className="font-bold">
-                          assigned date: {customer.dateAssigned}
+                          machine:{" "}
+                          <span className="font-normal">
+                            {customer.machine}
+                          </span>
                         </p>
                         <p className="font-bold">
-                          started date: {customer.dateStarted}
+                          status:{" "}
+                          <span className="font-normal">{customer.status}</span>
                         </p>
                         <p className="font-bold">
-                          completion date: {customer.dateCompleted}
+                          brand:{" "}
+                          <span className="font-normal">{customer.brand}</span>
                         </p>
+                        <p className="font-bold">
+                          created date:{" "}
+                          <span className="font-normal">
+                            {customer.dateCreated}
+                          </span>
+                        </p>
+                        <p className="font-bold">
+                          assigned date:{" "}
+                          <span className="font-normal">
+                            {customer.dateAssigned}
+                          </span>
+                        </p>
+                        <p className="font-bold">
+                          started date:{" "}
+                          <span className="font-normal">
+                            {customer.dateStarted}
+                          </span>
+                        </p>
+                        <p className="font-bold">
+                          completion date:{" "}
+                          <span className="font-normal">
+                            {customer.dateCompleted}
+                          </span>
+                        </p>
+
                         <div
                           style={{
                             borderBottomWidth: 1,
@@ -343,7 +382,7 @@ export default function ApprovalCarousel({
                                   margin: "auto",
                                 }}
                               >
-                                Quantity
+                                GST%
                               </p>
                             </div>
                             <div style={styles.columns}>
@@ -352,9 +391,10 @@ export default function ApprovalCarousel({
                                   margin: "auto",
                                 }}
                               >
-                                GST%
+                                Quantity
                               </p>
                             </div>
+
                             <div style={styles.columns}>
                               <p
                                 style={{
@@ -431,7 +471,7 @@ export default function ApprovalCarousel({
                             )
                           )}
 
-                          <div style={styles.rows}>
+                          {/* <div style={styles.rows}>
                             <div style={styles.bigColumns}>
                               <p
                                 style={{
@@ -463,7 +503,7 @@ export default function ApprovalCarousel({
                                 )}
                               </p>
                             </div>
-                          </div>
+                          </div> */}
 
                           <div style={styles.rows}>
                             <div
@@ -565,6 +605,23 @@ export default function ApprovalCarousel({
                               Edit
                             </button>
                           </div>
+                        )}
+                        {completed && (
+                          <>
+                            <div className="mt-8">
+                              <button
+                                type="button"
+                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm p-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                                onClick={async (e: React.MouseEvent) => {
+                                  router.push(
+                                    "/admin/report/" + customer._customerId
+                                  );
+                                }}
+                              >
+                                download invoice
+                              </button>
+                            </div>
+                          </>
                         )}
                       </Disclosure.Panel>
                     </>

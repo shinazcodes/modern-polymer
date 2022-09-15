@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
+import { CogIcon } from "@heroicons/react/solid";
 
 const user = {
   name: "Tom Cook",
@@ -36,11 +37,11 @@ export default function NavBar() {
         ```
       */}
       <div className="h-16 fixed z-50 top-0 w-full">
-        <Disclosure as="nav" className="bg-blue-400">
+        <Disclosure as="nav" className="bg-white shadow-xl ">
           {({ open }) => (
             <>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+                <div className="flex items-center justify-between h-16 bg-white ">
                   <div className="flex items-center">
                     {router.pathname !== "/auth/login" && (
                       <div
@@ -81,7 +82,7 @@ export default function NavBar() {
                               className={classNames(
                                 item.current
                                   ? "bg-gray-900 text-white"
-                                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                  : "text-black hover:bg-gray-600 hover:text-white",
                                 "px-3 py-2 rounded-md text-sm font-medium"
                               )}
                               aria-current={item.current ? "page" : undefined}
@@ -93,7 +94,7 @@ export default function NavBar() {
                       </div>
                     )}
                   </div>
-                  <div className="hidden md:block">
+                  <div className=" md:block">
                     <div className="ml-4 flex items-center md:ml-6">
                       {/* Profile dropdown */}
                       <Menu as="div" className="ml-3 relative">
@@ -106,10 +107,7 @@ export default function NavBar() {
                               <span className="sr-only">
                                 View notifications
                               </span>
-                              <BellIcon
-                                className="h-6 w-6"
-                                aria-hidden="true"
-                              />
+                              <CogIcon className="h-6 w-6" aria-hidden="true" />
                             </button>
                           </Menu.Button>
                         </div>

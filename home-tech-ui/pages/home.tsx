@@ -59,27 +59,42 @@ export default function Example() {
   }, [hasSubmitted]);
 
   useEffect(() => {
-    console.log(jobs);
     let tempFeatures = features;
-    console.log(jobs);
-
-    if (!!jobs?.length) {
-      tempFeatures[0].total = jobs.filter(
-        (job) => job.status && job.status === "assigned"
-      ).length;
-
-      tempFeatures[1].total = jobs.filter(
-        (job) => job.status && job.status === "pending"
-      ).length;
-
-      tempFeatures[2].total = jobs.filter(
-        (job) => job.status && job.status === "completed"
-      ).length;
-      console.log(
-        jobs.filter((job) => job.status && job.status === "pending").length
-      );
-    }
-    setFeatures(tempFeatures);
+    setFeatures((prev) => [
+      ...[
+        {
+          ...prev[0],
+          ...{
+            name: "My jobs",
+            total:
+              jobs?.filter((job) => job.status && job.status === "assigned")
+                .length ?? 0,
+            icon: GlobeAltIcon,
+          },
+        },
+        {
+          ...prev[1],
+          ...{
+            name: "Pending jobs",
+            total:
+              jobs?.filter((job) => job.status && job.status === "pending")
+                .length ?? 0,
+            icon: ScaleIcon,
+          },
+        },
+        {
+          ...prev[2],
+          ...{
+            name: "Completed jobs",
+            total:
+              jobs?.filter((job) => job.status && job.status === "completed")
+                .length ?? 0,
+            icon: LightningBoltIcon,
+          },
+        },
+      ],
+    ]);
+    console.log(features);
   }, [jobs]);
 
   useEffect(() => {
@@ -96,7 +111,7 @@ export default function Example() {
   }, [token]);
 
   return (
-    <div className="py-12 bg-white mt-16">
+    <div className="py-12 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center justify-center flex flex-col items-center">
           <div className=" flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
@@ -109,11 +124,29 @@ export default function Example() {
             Registered email : {email}
           </p>
         </div>
-
-        <dl className="flex flex-row flex-wrap content-between justify-around fixed p-4 bottom-0 left-0 w-full">
+        <button
+          type="button"
+          className="group m-6 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          onClick={() => {
+            if (token) {
+              var decoded: {
+                name: string;
+                email: string;
+              } = jwt_decode(token);
+              console.log(decoded);
+              setName(decoded.name);
+              setEmail(decoded.email);
+              // store.dispatch(getTechnicianList)
+              store.dispatch(getTechnician({ email: decoded.email }));
+            }
+          }}
+        >
+          refresh
+        </button>
+        <dl className="flex flex-row flex-wrap content-between justify-around fixed p-4 bottom-0 left-0 w-full shadow-t-xl">
           {features.map((feature, index) => (
             <div
-              key={feature.name}
+              key={feature.name + index}
               onClick={() => {
                 if (index === 0) {
                   router.push("/jobs/all");

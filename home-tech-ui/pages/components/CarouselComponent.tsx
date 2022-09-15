@@ -42,7 +42,7 @@ export default function CarouselComponent({
     {} as EmailVerifyItems
   );
   const [assignedJob, setHasAssignedJob] = useState(false);
-  const [startedJob, setJobStarted] = useState(false);
+  const [jobStarted, setJobStarted] = useState(false);
   const state = useSelector<RootState, RootState>((state) => state);
 
   useEffect(() => {
@@ -98,24 +98,32 @@ export default function CarouselComponent({
           buttons: [
             {
               label: "ok",
-              onClick: () => {},
+              onClick: () => {
+                router.push("/home");
+              },
             },
           ],
         });
+
         setIsJobRemoved(false);
       }
       setHasAssignedJob(false);
     }
   }, [state, assignedJob, isJobRemoved]);
 
-  async function clickedyes(
-    technicians: EmailVerifyItems[],
-    customer: Customer
-  ) {}
+  useEffect(() => {
+    if (jobStarted && state.customer.status === ApiState.SUCCESS) {
+      confirmAlert({
+        title: "Job Started",
+        message: "The job has started successfully...",
+      });
+      router.push("/home");
+    }
+  }, [jobStarted, state]);
 
   return (
     <div className="w-full">
-      <div className="mx-0 w-full rounded-2xl bg-white p-2">
+      <div className="mx-0 w-full rounded-2xl  p-2">
         <div>
           {customers.map((customer: Customer, index) => {
             return (
@@ -132,32 +140,65 @@ export default function CarouselComponent({
                         } h-5 w-5 text-purple-500`}
                       />
                     </Disclosure.Button>
-                    <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                      <p className="font-bold">name: {customer.name}</p>
+                    <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-black">
                       <p className="font-bold">
-                        phone number: {customer.mobileNumber}
+                        name:{" "}
+                        <span className="font-normal">{customer.name}</span>
+                      </p>
+                      <p className="font-bold ">
+                        phone number:{" "}
+                        <span className="font-normal">
+                          {customer.mobileNumber}
+                        </span>
                       </p>
                       <p className="font-bold">
-                        address: {customer.fullAddress}
-                      </p>
-                      <p className="font-bold">machine: {customer.machine}</p>
-                      <p className="font-bold">status: {customer.status}</p>
-                      <p className="font-bold">brand: {customer.brand}</p>
-                      <p className="font-bold">
-                        created date: {customer.dateCreated}
+                        address:{" "}
+                        <span className="font-normal">
+                          {customer.fullAddress}
+                        </span>
                       </p>
                       <p className="font-bold">
-                        assigned date: {customer.dateAssigned}
+                        machine:{" "}
+                        <span className="font-normal">{customer.machine}</span>
                       </p>
                       <p className="font-bold">
-                        started date: {customer.dateStarted}
+                        status:{" "}
+                        <span className="font-normal">{customer.status}</span>
                       </p>
                       <p className="font-bold">
-                        completion date: {customer.dateCompleted}
+                        brand:{" "}
+                        <span className="font-normal">{customer.brand}</span>
+                      </p>
+                      <p className="font-bold">
+                        created date:{" "}
+                        <span className="font-normal">
+                          {customer.dateCreated}
+                        </span>
+                      </p>
+                      <p className="font-bold">
+                        assigned date:{" "}
+                        <span className="font-normal">
+                          {customer.dateAssigned}
+                        </span>
+                      </p>
+                      <p className="font-bold">
+                        started date:{" "}
+                        <span className="font-normal">
+                          {customer.dateStarted}
+                        </span>
+                      </p>
+                      <p className="font-bold">
+                        completion date:{" "}
+                        <span className="font-normal">
+                          {customer.dateCompleted}
+                        </span>
                       </p>
                       {customer.cancelReason ? (
                         <p className="font-bold text-red-700">
-                          cancelled: {customer.cancelReason}
+                          cancelled :
+                          <span className="font-normal">
+                            {customer.cancelReason}
+                          </span>
                         </p>
                       ) : (
                         <></>
@@ -292,11 +333,13 @@ export default function CarouselComponent({
                                                           setHasAssignedJob(
                                                             true
                                                           );
-                                                        } catch (err) {
+                                                        } catch (err: any) {
                                                           setHasAssignedJob(
                                                             false
                                                           );
-                                                          showErrorAlert();
+                                                          showErrorAlert(
+                                                            err?.message
+                                                          );
                                                         }
                                                       }
                                                     }}
@@ -357,6 +400,7 @@ export default function CarouselComponent({
                       )}
 
                       {technicians && (
+                        // if this is admin console
                         <div className="flex mt-6">
                           <div className="min-w-fit m-auto font-bold">
                             {" "}
@@ -382,7 +426,11 @@ export default function CarouselComponent({
                                       assignJob({
                                         technicianEmail:
                                           selectedTechnician.email ?? "",
-                                        customer: customer,
+                                        customer: {
+                                          ...customer,
+                                          assignedTo:
+                                            selectedTechnician.email ?? "",
+                                        },
                                         remove: false,
                                       })
                                     )
@@ -401,6 +449,26 @@ export default function CarouselComponent({
                         </div>
                       )}
 
+                      {technicians && (
+                        <>
+                          {customer.status === "completed" && (
+                            <div className="mt-8">
+                              <button
+                                type="button"
+                                disabled={!!!customer.assignedTo}
+                                className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                                onClick={async (e: React.MouseEvent) => {
+                                  router.push(
+                                    "/admin/report/" + customer._customerId
+                                  );
+                                }}
+                              >
+                                donwload invoice
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      )}
                       {!!!technicians && customer.status !== "completed" && (
                         <div className="mt-6">
                           <button
@@ -441,11 +509,11 @@ export default function CarouselComponent({
                                           onSubmit={handleSubmit}
                                           className="mt-8 space-y-6 flex flex-row flex-wrap align-middle justify-center m-auto w-full"
                                         >
-                                          <div className="rounded-md bg-white w-96 py-6  shadow-lg">
-                                            <h1 className="m-6 mb-0">
-                                              please confirm cancellation
+                                          <div className="rounded-md bg-white w-96 py-6  shadow-lg ">
+                                            <h1 className="px-4 mb-0 font-bold">
+                                              Please Confirm Cancellation
                                             </h1>
-                                            <p>
+                                            <p className="px-4 pb-4">
                                               Are you sure you want to unassign
                                               this job? Please provide a reason
                                               to proceed with the cancellation.
@@ -459,47 +527,45 @@ export default function CarouselComponent({
                                                 id="cancelReason"
                                                 name="cancelReason"
                                                 required
-                                                onChange={(e: any) => {
-                                                  setcancelReason(
-                                                    e.target.value
-                                                  );
-                                                  console.log(cancelReason);
-                                                }}
-                                                className="group m-6 disabled:bg-gray-200 relative mx-auto flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className="appearance-none rounded-none relative block 
+                                                w-full px-3 py-2 border border-gray-300 placeholder-gray-500
+                                                 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500
+                                                  focus:border-indigo-500 focus:z-10 sm:text-sm"
                                                 placeholder="reason for cancellation"
                                               />
                                             </div>
 
                                             <button
-                                              type="submit"
-                                              className="group m-6 relative mx-auto 
-                                        flex justify-center py-2 px-4 border border-transparent 
-                                        text-sm font-medium rounded-md text-white bg-indigo-600
-                                         hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                              type="button"
+                                              disabled={
+                                                values.cancelReason?.length < 1
+                                              }
+                                              className="group  disabled:bg-gray-200
+                                               relative mx-auto flex justify-center py-2 px-4 border
+                                                border-transparent text-sm font-medium rounded-md
+                                                 text-white bg-indigo-600 hover:bg-indigo-700 
+                                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                               onClick={async () => {
-                                                console.log(customer);
-                                                var decoded: {
-                                                  name: string;
-                                                  email: string;
-                                                } = jwt_decode(
-                                                  state.auth.accessToken ?? ""
-                                                );
                                                 if (
                                                   values.cancelReason?.length >
                                                   1
                                                 ) {
-                                                  console.log(decoded);
                                                   try {
-                                                    await store.dispatch(
-                                                      assignJob({
-                                                        technicianEmail:
-                                                          decoded.email ?? "",
-                                                        customer: customer,
-                                                        remove: true,
-                                                        cancelReason:
-                                                          values.cancelReason,
-                                                      })
-                                                    );
+                                                    await store
+                                                      .dispatch(
+                                                        assignJob({
+                                                          technicianEmail:
+                                                            customer.assignedTo ??
+                                                            "",
+                                                          customer: customer,
+                                                          remove: true,
+                                                          cancelReason:
+                                                            values.cancelReason,
+                                                        })
+                                                      )
+                                                      .unwrap();
                                                     setIsJobRemoved(true);
                                                     setHasAssignedJob(true);
                                                   } catch (err: any) {
@@ -544,19 +610,17 @@ export default function CarouselComponent({
                               type="button"
                               className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                               onClick={async (e: React.MouseEvent) => {
-                                var decoded: {
-                                  name: string;
-                                  email: string;
-                                } = jwt_decode(state.auth.accessToken ?? "");
-                                console.log(decoded);
+                                console.log(customer);
                                 try {
-                                  await store.dispatch(
-                                    startJob({
-                                      technicianEmail: decoded.email ?? "",
-                                      customer: customer,
-                                      remove: false,
-                                    })
-                                  );
+                                  await store
+                                    .dispatch(
+                                      startJob({
+                                        technicianEmail: customer.assignedTo,
+                                        customer: customer,
+                                        remove: false,
+                                      })
+                                    )
+                                    .unwrap();
                                   setJobStarted(true);
                                 } catch (err: any) {
                                   setJobStarted(false);
@@ -588,6 +652,20 @@ export default function CarouselComponent({
                               generate invoice
                             </button>
                           )}
+                        </div>
+                      )}
+                      {!!!technicians && customer.status === "completed" && (
+                        <div className="pt-8">
+                          <button
+                            type="button"
+                            disabled={!!!customer.assignedTo}
+                            className="inline-flex ml-10 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                            onClick={async (e: React.MouseEvent) => {
+                              router.push("/external/" + customer._customerId);
+                            }}
+                          >
+                            donwload invoice
+                          </button>
                         </div>
                       )}
                     </Disclosure.Panel>

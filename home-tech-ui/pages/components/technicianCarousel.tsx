@@ -49,7 +49,7 @@ export default function TechnicianCarouselComponent({
   }, [hasSubmitted]);
 
   return (
-    <div className="mx-0 w-full rounded-2xl bg-white p-2">
+    <div className="mx-0 w-full rounded-2xl p-2">
       <div>
         {technicians && (
           <div className="flex flex-row flex-wrap m-10 mt-6">

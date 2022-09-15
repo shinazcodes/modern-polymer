@@ -218,6 +218,7 @@ const PdfDocument = ({
               Rate
             </Text>
           </View>
+
           <View style={styles.columns}>
             <Text
               style={{
@@ -327,30 +328,8 @@ const PdfDocument = ({
           </View>
         ))}
 
-        <View style={styles.rows}>
+        {/* <View style={styles.rows}>
           <View style={styles.bigColumns}>
-            <Text
-              style={{
-                margin: "auto",
-                textAlign: "center",
-                width: "100%",
-              }}
-            >
-              Rate
-            </Text>
-          </View>
-          <View style={styles.columns}>
-            <Text
-              style={{
-                margin: "auto",
-                textAlign: "center",
-                width: "100%",
-              }}
-            >
-              Quantity
-            </Text>
-          </View>
-          <View style={styles.columns}>
             <Text
               style={{
                 margin: "auto",
@@ -361,7 +340,29 @@ const PdfDocument = ({
               Total
             </Text>
           </View>
-        </View>
+          <View style={styles.bigColumns}>
+            <Text
+              style={{
+                margin: "auto",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              
+            </Text>
+          </View>
+          <View style={styles.bigColumns}>
+            <Text
+              style={{
+                margin: "auto",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              Total
+            </Text>
+          </View>
+        </View> */}
         {/* <View style={styles.rows}>
           <View style={styles.bigColumns}></View>
           <View style={styles.columns}>
@@ -393,10 +394,10 @@ const PdfDocument = ({
               borderWidth: 1,
               borderColor: "black",
               margin: "0.25%",
-              minWidth: "65.5%",
+              minWidth: "65.8%",
               textAlign: "center",
               minHeight: 20,
-              maxWidth: "65.5%",
+              maxWidth: "65.8%",
               backgroundColor: "lightgrey",
             }}
           >

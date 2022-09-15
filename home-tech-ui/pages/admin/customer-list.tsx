@@ -104,6 +104,9 @@ export default function CustomerList() {
         (customer) =>
           !customer.status || customer.status === JobStatus.UNASSIGNED
       ),
+      assigned: filterCustomers?.filter(
+        (customer) => !customer.status || customer.status === JobStatus.ASSIGNED
+      ),
       pending: filterCustomers?.filter(
         (customer) => customer.status === JobStatus.PENDING
       ),
@@ -189,14 +192,14 @@ export default function CustomerList() {
               /* and other goodies */
             }) => (
               <form onSubmit={handleSubmit}>
-                <div className="shadow overflow-hidden sm:rounded-md">
-                  <div className="px-4 py-5 bg-white overflow-scroll h-screen sm:p-6">
-                    <div className="max-w-full bg-white shadow mx-auto py-6 px-4 h-auto sm:px-6 lg:px-8">
-                      <h1 className="text-3xl font-bold text-gray-900">
+                <div className="shadow overflow-hidden rounded-2xl">
+                  <div className="px-4 py-5  overflow-scroll h-screen sm:p-6">
+                    <div className="max-w-full bg-white rounded shadow-lg mx-auto py-6 px-4 h-auto sm:px-6 lg:px-8">
+                      <h1 className="text-3xl font-bold text-gray-900 mb-4">
                         Jobs List
                       </h1>
                       <input
-                        className="  py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 w-1/2 border
+                        className="  py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 w-1/2 border mb-4
           rounded-md"
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder="search by email, name or mobile number"

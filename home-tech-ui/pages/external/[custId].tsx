@@ -34,9 +34,11 @@ export default function ReportExternalPdf() {
       state?.selectedForInvoiceGeneration?.invoiceDetails?.services.map(
         (item) => {
           total +=
-            (Number(item.price) * Number(item.quantity) * (item.gst ?? 0)) /
-              100 +
-            Number(item.price) * Number(item.quantity);
+            Number(item.price) * Number(item.quantity) +
+            (Number(item.price) *
+              Number(item.quantity) *
+              Number(item.gst ?? 0)) /
+              100;
         }
       );
       // let gstA =

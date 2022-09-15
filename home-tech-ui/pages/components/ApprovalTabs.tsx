@@ -36,7 +36,7 @@ export default function ApprovalTabs({
   return (
     <div className="w-full px-2 py-2 sm:px-0">
       <Tab.Group>
-        <Tab.List className="flex space-x-1 rounded-xl bg-blue-200 p-1">
+        <Tab.List className="flex space-x-1 rounded-xl bg-[#e3efff] p-1">
           {Object.keys(categories).map((category) => (
             <Tab
               key={category}
@@ -59,7 +59,7 @@ export default function ApprovalTabs({
             <Tab.Panel
               key={idx}
               className={classNames(
-                "rounded-xl bg-white p-3",
+                "rounded-xl  p-3",
                 "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2"
               )}
             >

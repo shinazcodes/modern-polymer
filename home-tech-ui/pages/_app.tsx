@@ -8,6 +8,7 @@ import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import AuthGuard from "../util/AuthGuard";
+import Spinner from "./components/Spinner";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -18,7 +19,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         <PersistGate loading={<>loading</>} persistor={persistor}>
           {!router.pathname.includes("external") && <NavBar />}
           <AuthGuard>
-            <Component {...pageProps} />
+            <>
+              <Spinner />
+              <Component {...pageProps} />
+            </>
           </AuthGuard>
         </PersistGate>
       </Provider>

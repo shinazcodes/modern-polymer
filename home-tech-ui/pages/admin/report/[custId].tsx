@@ -21,7 +21,7 @@ export default function ReportPdf() {
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [total, setTotal] = useState(0.0);
-
+  const [getTotalQuantity, setTotalQuantity] = useState(0);
   async function getInvoiceData() {
     return await store
       .dispatch(getInvoice({ _customerId: custId?.toString() ?? "" }))
@@ -31,12 +31,15 @@ export default function ReportPdf() {
   useEffect(() => {
     if (hasSubmitted && state?.status === ApiState.SUCCESS) {
       let total: number = 0.0;
+      let x = 0;
+
       state?.selectedForInvoiceGeneration?.invoiceDetails?.services.map(
         (item) => {
           total +=
-            (Number(item.price) * Number(item.quantity) * (item.gst ?? 0)) /
-              100 +
-            Number(item.price) * Number(item.quantity);
+            Number(item.price) * Number(item.quantity) +
+            (Number(item.price) * Number(item.quantity) * Number(item.gst)) /
+              100;
+          x += Number(item.quantity);
         }
       );
       // let gstA =
@@ -45,6 +48,7 @@ export default function ReportPdf() {
       //   100;
       // setGstAmount(gstA);
       setTotal(total);
+      setTotalQuantity(x);
     }
   }, [hasSubmitted, state]);
 

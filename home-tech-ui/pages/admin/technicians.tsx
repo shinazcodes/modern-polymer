@@ -94,6 +94,9 @@ export default function Technicians() {
         );
   }, [query, state]);
 
+  useEffect(() => {
+    setSelectedTechnician(filteredtechnicians[0]);
+  }, []);
   const router = useRouter();
   useEffect(() => {
     if (selectedTechnician && selectedTechnician.email) {
@@ -121,7 +124,7 @@ export default function Technicians() {
         }}
       /> */}
 
-      <div className="w-1/3 bg-blue-100  px-4 rounded-md">
+      <div className="w-1/3 px-4 rounded-md">
         <h1 className="font-bold text-lg p-4">Technicians</h1>
         <input
           className=" border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 
@@ -194,7 +197,7 @@ export default function Technicians() {
             {state.technician?.showTechnician &&
             state.technician?.showTechnician?.assignedTasks &&
             state.technician?.showTechnician?.assignedTasks?.length > 0 ? (
-              <div className="w-full p-4 rounded shadow-lg m-4">
+              <div className="w-full p-4 rounded bg-white shadow-lg m-4">
                 <h1 className="text-lg font-bold ">Jobs Assigned</h1>
                 <TechnicianTabComponent
                   customers={state.technician.showTechnician.assignedTasks}
@@ -210,7 +213,7 @@ export default function Technicians() {
               </>
             )}
 
-            <div className="w-full m-4  self-center rounded-lg shadow-lg p-10">
+            <div className="w-full m-4 bg-white self-center rounded-lg shadow-lg p-10">
               <h1 className="text-lg font-bold">Technician Details</h1>
 
               <p>first name: {state.technician.showTechnician.firstName}</p>

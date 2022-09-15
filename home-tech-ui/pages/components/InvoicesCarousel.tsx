@@ -123,10 +123,12 @@ export default function InvoicesCarousel({
   function getTotal(customer: InvoiceDetails): ReactNode {
     let total: number = 0.0;
     customer?.services.map((item) => {
-      total += Number(item.price) * Number(item.quantity);
+      total +=
+        Number(item.price) * Number(item.quantity) +
+        (Number(item.price) * Number(item.quantity) * Number(item.gst ?? 0)) /
+          100;
     });
-    let gstA = (total * (customer?.gst ?? 0.0)) / 100;
-    return <>{total + gstA}</>;
+    return <>{total}</>;
   }
 
   function getTotalnum(customer: InvoiceDetails) {
@@ -139,7 +141,7 @@ export default function InvoicesCarousel({
   }
   return (
     <div className="w-full">
-      <div className="mx-0 w-full rounded-2xl bg-white p-2">
+      <div className="mx-0 w-full rounded-2xl  p-2">
         <div>
           {invoices?.map((customer: InvoiceDetails, index) => {
             return (
@@ -300,7 +302,7 @@ export default function InvoicesCarousel({
                             </div>
                           ))}
 
-                          <div style={styles.rows}>
+                          {/* <div style={styles.rows}>
                             <div style={styles.bigColumns}>
                               <p
                                 style={{
@@ -328,7 +330,7 @@ export default function InvoicesCarousel({
                                 {getTotalServiceCost(customer?.services)}
                               </p>
                             </div>
-                          </div>
+                          </div> */}
 
                           <div style={styles.rows}>
                             <div

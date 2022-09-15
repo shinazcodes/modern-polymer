@@ -39,6 +39,7 @@ export interface EmailVerifyItems {
   city?: string;
   state?: string;
   zipCode?: string;
+  alternatePhoneNumber?: string;
   phoneNumber?: string;
   email?: string;
   photo?: string | number | string[] | undefined;
@@ -169,6 +170,7 @@ export default function SignUpAdmin() {
                     verifyEmail({
                       ...values,
                       phoneNumber: "91" + values?.phoneNumber,
+                      alternatePhoneNumber: "91" + values?.alternatePhoneNumber,
                       photo: photoFile,
                       pancard: pancardfile,
                       passbook: passbookfile,
@@ -303,7 +305,26 @@ export default function SignUpAdmin() {
                           />
                         </div>
                       </div>
-
+                      <div className="col-span-3">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Alternate Phone Number
+                        </label>
+                        <div className="input-box">
+                          <span className="prefix">+91</span>
+                          <input
+                            type="text"
+                            name="altphoneNumber"
+                            id="altphoneNumber"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.alternatePhoneNumber}
+                            className="mt-1 block w-full sm:text-sm shadow-none rounded-md"
+                          />
+                        </div>
+                      </div>
                       <div className="col-span-6 sm:col-span-4">
                         <label
                           htmlFor="email"

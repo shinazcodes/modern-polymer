@@ -35,6 +35,8 @@ module.exports.generateInvoice = async function(req, res) {
             name: req.body.invoiceDetails.services[i].name,
             quantity: req.body.invoiceDetails.services[i].quantity,
             price: req.body.invoiceDetails.services[i].price,
+            gst: req.body.invoiceDetails.services[i].gst,
+
           };
           serviceArray.push(services)
         }
@@ -48,7 +50,7 @@ module.exports.generateInvoice = async function(req, res) {
           custId: req.body.invoiceDetails._customerId,
           invoiceId: "#PAY" + Math.floor(100000 + Math.random() * 900000),
           invoiceDate: req.body.invoiceDetails.invoiceDate,
-          gst: req.body.invoiceDetails.gst,
+          approved: false
           
         };
         var inv = new Invoice();
@@ -58,12 +60,26 @@ module.exports.generateInvoice = async function(req, res) {
         // services.quantity = req.body.invoiceDetails.services.quantity;
         // services.price = req.body.invoiceDetails.services.price;
         console.log("serviuces", invoice)
-        inv.save(function(err) {
+        Invoice.findOne({custId: req.body.invoiceDetails._customerId}, (err, invoice)=>{
+          if(err || !!!invoice){
+          inv.save(function(error) {
          
-          console.log("sdfgsfggferrr", err)
-          console.log("sfgsggfs", invoice)
-          
+            console.log("sdfgsfggferrr", error)
+            console.log("invoice created and saved", invoice)
+
+            
+            });
+
+          } else {
+            for (var id in req.body.invoiceDetails ){
+              invoice[id]= req.body.invoiceDetails[id];
+          }
+            invoice.save( function(err){
           });
+          }
+
+        });
+    
      
 
           Customer.findOneAndUpdate({_customerId: req.body.invoiceDetails._customerId}, {$set:{ invoiceDetails: invoice}}, {new: true}, (err, doc) => {

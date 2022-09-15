@@ -91,6 +91,10 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  alternatePhoneNumber: {
+    type: String,
+    required: false
+  },
   adharNumber: {
     type: String,
     required: false

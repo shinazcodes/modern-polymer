@@ -224,8 +224,8 @@ export default function CreateJobPage() {
               /* and other goodies */
             }) => (
               <form onSubmit={handleSubmit}>
-                <div className="shadow  sm:rounded-md">
-                  <div className="px-4 py-5 bg-white sm:p-6">
+                <div className="rounded-lg shadow-2xl mx-4 ">
+                  <div className="px-4 py-5 bg-white rounded-lg   sm:p-6">
                     <div className="mb-4">
                       please enter the customer/job details
                     </div>
@@ -289,40 +289,47 @@ export default function CreateJobPage() {
 
                       <div className="col-span-6 sm:col-span-3">
                         <label
-                          htmlFor="fullAddress"
+                          htmlFor="email"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          mobile Number
+                          Phone Number
                         </label>
-                        <input
-                          type="text"
-                          name="mobileNumber"
-                          id="mobileNumber"
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          value={values.mobileNumber}
-                          autoComplete="given-name"
-                          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        />
+                        <div className="input-box">
+                          <span className="prefix">+91</span>
+
+                          <input
+                            type="text"
+                            name="mobileNumber"
+                            id="mobileNumber"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.mobileNumber}
+                            autoComplete="given-name"
+                            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                          />
+                        </div>
                       </div>
 
                       <div className="col-span-6 sm:col-span-3">
                         <label
-                          htmlFor="fullAddress"
+                          htmlFor="email"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          alternate mobile Number
+                          Altrernate Phone Number
                         </label>
-                        <input
-                          type="text"
-                          name="altMobileNumber"
-                          id="altMobileNumber"
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          value={values.altMobileNumber}
-                          autoComplete="given-name"
-                          className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        />
+                        <div className="input-box">
+                          <span className="prefix">+91</span>
+                          <input
+                            type="text"
+                            name="altMobileNumber"
+                            id="altMobileNumber"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.altMobileNumber}
+                            autoComplete="given-name"
+                            className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                          />
+                        </div>
                       </div>
 
                       <div className="col-span-6 sm:col-span-3">

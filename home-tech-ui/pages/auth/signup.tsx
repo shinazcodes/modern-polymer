@@ -40,6 +40,7 @@ export interface EmailVerifyItems {
   state?: string;
   zipCode?: string;
   phoneNumber?: string;
+  alternatePhoneNumber?: string;
   email?: string;
   photo?: string | number | string[] | undefined;
   adhar?: string | number | string[] | undefined;
@@ -131,6 +132,7 @@ export default function SignUpPage() {
                 streetAddress: "",
                 city: "",
                 phoneNumber: "",
+                alternatePhoneNumber: "",
                 state: "",
                 zipCode: "",
                 email: "",
@@ -169,6 +171,7 @@ export default function SignUpPage() {
                     verifyEmail({
                       ...values,
                       phoneNumber: "91" + values?.phoneNumber,
+                      alternatePhoneNumber: "91" + values?.alternatePhoneNumber,
                       photo: photoFile,
                       pancard: pancardfile,
                       passbook: passbookfile,
@@ -251,7 +254,7 @@ export default function SignUpPage() {
                           className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                         />
                       </div>
-                      <div className="col-span-6 sm:col-span-3 lg:col-span-2">
+                      <div className="col-span-6">
                         <label
                           htmlFor="id"
                           className="block text-sm font-medium text-gray-700"
@@ -283,7 +286,7 @@ export default function SignUpPage() {
                         />
                       </div>
 
-                      <div className="col-span-6 sm:col-span-4">
+                      <div className="col-span-3">
                         <label
                           htmlFor="email"
                           className="block text-sm font-medium text-gray-700"
@@ -299,6 +302,26 @@ export default function SignUpPage() {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             value={values.phoneNumber}
+                            className="mt-1 block w-full sm:text-sm shadow-none rounded-md"
+                          />
+                        </div>
+                      </div>
+                      <div className="col-span-3">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Alternate Phone Number
+                        </label>
+                        <div className="input-box">
+                          <span className="prefix">+91</span>
+                          <input
+                            type="text"
+                            name="altphoneNumber"
+                            id="altphoneNumber"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            value={values.alternatePhoneNumber}
                             className="mt-1 block w-full sm:text-sm shadow-none rounded-md"
                           />
                         </div>

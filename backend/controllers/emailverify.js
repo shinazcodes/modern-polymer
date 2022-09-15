@@ -55,6 +55,7 @@ var transporter = nodemailer.createTransport({
     user.pancard = req.body.pancard;
     user.biodata = req.body.biodata;
     user.phoneNumber = req.body.phoneNumber;
+    user.alternatePhoneNumber = req.body.alternatePhoneNumber;
     user.photo = req.body.photo;
     user.adharNumber = req.body.adharNumber;
     user.license = req.body.license;
