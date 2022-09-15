@@ -67,7 +67,9 @@ export default function Invoice() {
   }, [hasSubmitted, state]);
 
   useEffect(() => {
-    setService(state.customer.selectedForInvoice?.invoiceDetails?.services);
+    setService(
+      state.customer.selectedForInvoice?.invoiceDetails?.services ?? []
+    );
   }, []);
   useEffect(() => {
     console.log(serviceName);
