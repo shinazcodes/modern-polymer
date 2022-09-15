@@ -51,7 +51,7 @@ export default function InvoicesTab({
           ))}
         </Tab.List>
         <Tab.Panels className="mt-2">
-          {Object.values(customers).flatMap((customer, idx) => (
+          {Object.values(categories).flatMap((cat, idx) => (
             <Tab.Panel
               key={idx}
               className={classNames(
@@ -59,7 +59,10 @@ export default function InvoicesTab({
                 "ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2"
               )}
             >
-              <InvoicesCarousel invoices={customer} refresh={refresh} />
+              <InvoicesCarousel
+                invoices={customers[idx === 0 ? "pending" : "approved"]}
+                refresh={refresh}
+              />
             </Tab.Panel>
           ))}
         </Tab.Panels>

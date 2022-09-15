@@ -99,7 +99,11 @@ export default function CarouselComponent({
             {
               label: "ok",
               onClick: () => {
-                router.push("/home");
+                if (!router.asPath.includes("admin")) {
+                  router.push("/home");
+                } else {
+                  router.reload();
+                }
               },
             },
           ],
@@ -117,7 +121,11 @@ export default function CarouselComponent({
         title: "Job Started",
         message: "The job has started successfully...",
       });
-      router.push("/home");
+      if (!router.asPath.includes("admin")) {
+        router.push("/home");
+      } else {
+        router.reload();
+      }
     }
   }, [jobStarted, state]);
 
@@ -388,6 +396,7 @@ export default function CarouselComponent({
                                           customer: customer,
                                         })
                                       );
+
                                     router.push("/admin/invoice");
                                     e.preventDefault();
                                   }}
@@ -645,7 +654,11 @@ export default function CarouselComponent({
                                       customer: customer,
                                     })
                                   );
-                                router.push("/invoice");
+                                if (!router.asPath.includes("admin")) {
+                                  router.push("/invoice");
+                                } else {
+                                  router.push("/admin/invoice");
+                                }
                                 e.preventDefault();
                               }}
                             >

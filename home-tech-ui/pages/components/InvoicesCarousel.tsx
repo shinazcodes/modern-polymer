@@ -295,7 +295,9 @@ export default function InvoicesCarousel({
                                     Number(service.quantity) +
                                     (Number(service.price) *
                                       Number(service.quantity) *
-                                      (Number(service.gst) ?? 0)) /
+                                      (isNaN(Number(service.gst))
+                                        ? 0
+                                        : Number(service.gst))) /
                                       100}
                                 </p>
                               </div>

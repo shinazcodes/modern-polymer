@@ -82,15 +82,39 @@ module.exports.generateInvoice = async function(req, res) {
     
      
 
-          Customer.findOneAndUpdate({_customerId: req.body.invoiceDetails._customerId}, {$set:{ invoiceDetails: invoice}}, {new: true}, (err, doc) => {
+          Customer.findOneAndUpdate({_customerId: req.body.invoiceDetails._customerId}, {$set:{ invoiceDetails: invoice}}, {new: true}, (err, customer) => {
             if (err) {
                 console.log("Something wrong when updating data!");
-            }
-          console.log("sfgsggfs", doc)
+                res.status(403).json({      "response": "error", 
+                "message" : "something went wrong"
+                });
+            } else {
+          console.log("custtt", customer)
+          User
+          .findOne({email: req.body.invoiceDetails.assignedTo})
+          .exec(function(error1, user) {
+          otherTasks = user.assignedTasks.filter((item)=> item._customerId !== req.body.invoiceDetails._customerId);
+          taskToUpdate = user.assignedTasks.filter((item)=> item._customerId === req.body.invoiceDetails._customerId);
+          taskToUpdate[0].invoiceDetails = invoice;
+          User.findOneAndUpdate({email:req.body.invoiceDetails.assignedTo}, {$set:{ assignedTasks: [...taskToUpdate, ...otherTasks]}}, {new: true}, (error, tech) => {
+             if (error1) {
+                console.log("Something wrong when updating    data!");
+                res.status(403).json({      "response": "error", 
+                "message" : "something went wrong"
+                });
+            } else {
+          console.log("techni", tech)
             
             res.status(200).json({
               "response": "invoice created successfully!"
                 });
+            }
+
+        });
+    });
+
+      }
+           
         });
     } catch(err) {
       console.log("err", err);
@@ -178,25 +202,50 @@ module.exports.approveInvoice = async function(req, res) {
     try {
       Customer
       .findOne({_customerId: req.body._customerId})
-      .exec(function(err, user) {
-          if(err || !user){
+      .exec(function(err, user1) {
+          if(err || !user1){
               res.status(403).json({
                   "response": "error", 
                   "message": "sometihng went wrong"
               })
           } 
-          console.log(user)
-          var invoiceDetails = {...user.invoiceDetails, approved: true}
-
+          console.log(user1)
+          var invoiceDetails = {...user1.invoiceDetails, approved: true}
+        
           Customer.findOneAndUpdate({_customerId: req.body._customerId}, {$set:{ invoiceDetails: invoiceDetails}}, {new: true}, (err, doc) => {
             if (err) {
                 console.log("Something wrong when updating data!");
-            }
-          console.log("sfgsggfs", doc)
+            } else {
+              console.log("sfgsggfs", doc);
             
-            res.status(200).json({
-              "response": "invoice approved!"
-                });
+              User
+                .findOne({email: doc.assignedTo})
+                .exec(function(err, user) {
+                  var found = false;
+                  otherTasks = user.assignedTasks.filter((item)=> item._customerId !== req.body._customerId);
+                  taskToUpdate = user.assignedTasks.filter((item)=> item._customerId === req.body._customerId);
+                  taskToUpdate[0].invoiceDetails.approved = true;
+                  User.findOneAndUpdate({email: doc.assignedTo}, {$set:{ assignedTasks: [...taskToUpdate, ...otherTasks]}}, {new: true}, (err, doc) => {
+                    if (err) {
+                        console.log("Something wrong when updating data!");
+                    } else {
+          
+                    }});   
+                  });       
+
+              Invoice.findOneAndUpdate({custId: req.body._customerId}, {$set:{ approved: true}}, {new: true}, (err, doc1) => {
+                if(doc1){
+                  res.status(200).json({
+                    "response": "invoice approved!"
+                      });
+                } else {
+                  res.status(403).json({      "response": "error", 
+                  "message" : "something went wrong"
+                  });
+                }
+              });
+            }
+        
               });
             });
   } catch {

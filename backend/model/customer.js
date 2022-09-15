@@ -120,7 +120,11 @@ var customerSchema = new mongoose.Schema({
           type: String,
         required: false,
     
-        }
+        },
+        gst:{
+          type: Number,
+          required: false,
+        },
       }],
       required: false
     }

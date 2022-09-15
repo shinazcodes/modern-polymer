@@ -79,7 +79,11 @@ var invoiceDetailsSchema = new mongoose.Schema({
           type: String,
         required: false,
     
-        }
+        },
+        gst:{
+          type: Number,
+          required: false,
+        },
       }],
       required: false
     }
@@ -99,7 +103,6 @@ var invoiceDetailsSchema = new mongoose.Schema({
     this.services = array;
     this.custId = data.custId;
     this.invoiceId = data.invoiceId;
-    this.gst = data.gst;
     this.invoiceDate = data.invoiceDate;
 
   };
