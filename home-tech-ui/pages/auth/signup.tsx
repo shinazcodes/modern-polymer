@@ -317,8 +317,8 @@ export default function SignUpPage() {
                           <span className="prefix">+91</span>
                           <input
                             type="text"
-                            name="altphoneNumber"
-                            id="altphoneNumber"
+                            name="alternatePhoneNumber"
+                            id="alternatePhoneNumber"
                             onChange={handleChange}
                             onBlur={handleBlur}
                             value={values.alternatePhoneNumber}
