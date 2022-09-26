@@ -38,7 +38,15 @@ module.exports.checkLoginAccess = async function (username, res) {
           message: "your account is temporarily disabled",
         });
         resolve(false);
-      } else {
+      }
+      else if (user && !user.approvedByAdmin) {
+        res.status(401).json({
+          response: "error",
+          message: "please wait for verification and approval from admin to start using your account",
+        });
+        resolve(false);
+      } 
+      else {
         resolve(true);
       }
     });

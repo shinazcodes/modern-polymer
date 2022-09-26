@@ -142,12 +142,14 @@ export default function ApprovalCarousel({
     return <>{total}</>;
   }
   function getTotalnum(customer: Customer) {
-    let total: number = 0;
+    let total: number = 0.0;
     customer?.invoiceDetails?.services.map((item) => {
-      total += Number(item.price) * Number(item.quantity);
+      total +=
+        Number(item.price) * Number(item.quantity) +
+        (Number(item.price) * Number(item.quantity) * Number(item.gst ?? 0)) /
+          100;
     });
-    let gstA = (total * (customer?.invoiceDetails?.gst ?? 0.0)) / 100;
-    return total + gstA;
+    return total;
   }
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [hasSubmittedComplete, setHasSubmittedComplete] = useState(false);
@@ -376,15 +378,7 @@ export default function ApprovalCarousel({
                                 Rate
                               </p>
                             </div>
-                            <div style={styles.columns}>
-                              <p
-                                style={{
-                                  margin: "auto",
-                                }}
-                              >
-                                GST%
-                              </p>
-                            </div>
+
                             <div style={styles.columns}>
                               <p
                                 style={{
@@ -394,7 +388,15 @@ export default function ApprovalCarousel({
                                 Quantity
                               </p>
                             </div>
-
+                            <div style={styles.columns}>
+                              <p
+                                style={{
+                                  margin: "auto",
+                                }}
+                              >
+                                GST%
+                              </p>
+                            </div>
                             <div style={styles.columns}>
                               <p
                                 style={{
@@ -526,7 +528,9 @@ export default function ApprovalCarousel({
                               >
                                 INR(
                                 {converter.toWords(
-                                  getTotalnum(customer) ?? 0.0
+                                  isNaN(getTotalnum(customer))
+                                    ? 0.0
+                                    : getTotalnum(customer)
                                 )}
                                 )
                               </p>

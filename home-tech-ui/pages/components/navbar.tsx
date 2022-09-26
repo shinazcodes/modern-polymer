@@ -1,9 +1,11 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { useRouter } from "next/router";
 import { CogIcon } from "@heroicons/react/solid";
+import { useSelector } from "react-redux";
+import { RootState } from "../../api/store";
 
 const user = {
   name: "Tom Cook",
@@ -11,13 +13,7 @@ const user = {
   imageUrl:
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
 };
-const navigation = [
-  { name: "Job List", href: "/admin/customer-list", current: true },
-  { name: "Create Job", href: "/admin/create-job", current: false },
-  { name: "Technicians", href: "/admin/technicians", current: false },
-  { name: "Approvals", href: "/admin/approvals", current: false },
-  { name: "Invoices", href: "/admin/invoices", current: false },
-];
+
 const userNavigation = [{ name: "Sign out", href: "/auth/login" }];
 
 function classNames(...classes: string[]) {
@@ -26,6 +22,19 @@ function classNames(...classes: string[]) {
 
 export default function NavBar() {
   const router = useRouter();
+  const state = useSelector<RootState, RootState>((s) => s);
+  const [navigation, setNavigation] = useState([
+    { name: "Job List", href: "/admin/customer-list", current: true },
+    { name: "Create Job", href: "/admin/create-job", current: false },
+    { name: "Technicians", href: "/admin/technicians", current: false },
+    { name: "Approvals", href: "/admin/approvals", current: false },
+    { name: "Invoices", href: "/admin/invoices", current: false },
+  ]);
+  useEffect(() => {
+    navigation.map((ele, index) => {
+      router.asPath === ele.href ? (ele.current = true) : (ele.current = false);
+    });
+  }, [router.asPath]);
   return (
     <>
       {/*
@@ -83,11 +92,23 @@ export default function NavBar() {
                                 item.current
                                   ? "bg-gray-900 text-white"
                                   : "text-black hover:bg-gray-600 hover:text-white",
-                                "px-3 py-2 rounded-md text-sm font-medium"
+                                "px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
                               )}
                               aria-current={item.current ? "page" : undefined}
                             >
                               {item.name}
+                              {item.name === "Technicians" &&
+                                state.technician.techniciansPendingApproval >
+                                  0 && (
+                                  <>
+                                    (
+                                    {
+                                      state.technician
+                                        .techniciansPendingApproval
+                                    }
+                                    )
+                                  </>
+                                )}
                             </a>
                           ))}
                         </div>

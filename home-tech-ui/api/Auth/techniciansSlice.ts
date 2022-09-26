@@ -15,10 +15,12 @@ export interface InitialTechState {
   showTechnician?: EmailVerifyItems;
   invoiceDetails?: InvoiceDetails[];
   status: ApiState;
+  techniciansPendingApproval: number;
 }
 const initialState: InitialTechState = {
   data: [] as EmailVerifyItems[],
   status: ApiState.IDLE,
+  techniciansPendingApproval: 0,
 };
 
 export const getTechnicianList = createAsyncThunk(
@@ -74,6 +76,19 @@ export const blockUnblockUser = createAsyncThunk(
   }
 );
 
+export const onboardTechnician = createAsyncThunk(
+  "technician/onboardTechnician",
+  async ({ phoneNumber }: { phoneNumber: string }) => {
+    const response = await PostApi(buildPath("onboard-technician"), {
+      phoneNumber,
+    });
+    // console.log(response);
+
+    // The value we return becomes the `fulfilled` action payload
+    return response.data as ApiResponse<any>;
+  }
+);
+
 export const getInvoices = createAsyncThunk(
   "technician/getInvoices",
   async () => {
@@ -118,7 +133,9 @@ export const technicianSlice = createSlice({
         // state.data = { ...action.meta.arg };
         // console.log(current(state).data);
         // console.log(action.payload);
-
+        state.techniciansPendingApproval = (
+          action.payload.response as EmailVerifyItems[]
+        ).filter((item) => item.approvedByAdmin).length;
         state.data = action.payload?.response as EmailVerifyItems[];
         // state.value += action.payload;
       })

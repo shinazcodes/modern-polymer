@@ -21,6 +21,7 @@ var ctrlgenerateInvoice = require('../controllers/generateInvoice');
 var ctrlGetTechnician = require('../controllers/technician');
 var ctrlGetInvoices = require('../controllers/invoices');
 var ctrlBlockUnblockUser = require('../controllers/blockUnblockTechnician');
+var ctrlResetPassword = require('../controllers/reset-password');
 
 // profile
 router.post('/blockUnblockUser', auth, ctrlBlockUnblockUser.blockUnblockUser);
@@ -33,7 +34,10 @@ router.post('/removeTechnician', auth, ctrlGetTechnician.removeTechnician);
 router.post('/createCustomer', auth, ctrlCreateCustomer.createCustomer);
 router.get('/get-customers', auth, ctrlGetCustomers.getCustomers);
 router.post('/assign-job', auth, ctrlAssignJob.assignJob);
+router.post('/onboard-technician', auth, ctrlAuth.onboardTechnician);
 router.post('/verifyEmail', ctrlEmailVerify.verifyEmail);
+
+router.post('/resetPassword', ctrlResetPassword.resetPassword);
 router.post('/purchaseHistory', auth, ctrlPurchaseHistory.purchaseHistory);
 router.post('/generateInvoice', auth, ctrlgenerateInvoice.generateInvoice);
 router.post('/approveInvoice', auth, ctrlgenerateInvoice.approveInvoice);

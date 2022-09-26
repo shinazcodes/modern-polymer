@@ -32,7 +32,8 @@ module.exports.techniciansList = async function(req, res) {
                             "email": user.email,
                             "phoneNumber": user.phoneNumber,
                             "alternatePhoneNumber": user.alternatePhoneNumber,
-                            "isBlocked": user.isBlocked
+                            "isBlocked": user.isBlocked,
+                            "approvedByAdmin": user.approvedByAdmin
                         } 
                     })
                 

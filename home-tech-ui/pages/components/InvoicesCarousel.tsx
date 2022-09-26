@@ -132,12 +132,14 @@ export default function InvoicesCarousel({
   }
 
   function getTotalnum(customer: InvoiceDetails) {
-    let total: number = 0;
+    let total: number = 0.0;
     customer?.services.map((item) => {
-      total += Number(item.price) * Number(item.quantity);
+      total +=
+        Number(item.price) * Number(item.quantity) +
+        (Number(item.price) * Number(item.quantity) * Number(item.gst ?? 0)) /
+          100;
     });
-    let gstA = (total * (customer?.gst ?? 0.0)) / 100;
-    return total + gstA;
+    return total;
   }
   return (
     <div className="w-full">

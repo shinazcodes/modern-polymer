@@ -52,6 +52,7 @@ export interface EmailVerifyItems {
   userType?: string;
   adharNumber?: string;
   isBlocked?: boolean;
+  approvedByAdmin?: boolean;
   _id?: string;
   assignedTasks?: Customer[];
 }

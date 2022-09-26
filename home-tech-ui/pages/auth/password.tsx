@@ -17,6 +17,7 @@
 import { Formik } from "formik";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { confirmAlert } from "react-confirm-alert";
 import { useSelector } from "react-redux";
 import { ApiState, login, register } from "../../api/Auth/authSlice";
 import { RootState, store } from "../../api/store";
@@ -77,7 +78,21 @@ export default function PasswordPage() {
                     .dispatch(
                       register({ password: values.password, emailToken })
                     )
-                    .unwrap();
+                    .unwrap()
+                    .then((res) => {
+                      if (res?.response !== "error") {
+                        confirmAlert({
+                          title: "Success!",
+                          message: res?.response?.toString(),
+                          buttons: [
+                            {
+                              label: "Okay",
+                              onClick: () => {},
+                            },
+                          ],
+                        });
+                      }
+                    });
                   setHasSubmitted(true);
                   setPassword(values.password);
                   console.log(res);

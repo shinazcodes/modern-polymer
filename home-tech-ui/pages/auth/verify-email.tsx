@@ -66,7 +66,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     // todo change this
-    if (state.auth.otpState === ApiState.SUCCESS && hasSubmitted) {
+    if (hasSubmitted) {
       otpverified();
     } else if (state.auth.otpState === ApiState.ERROR && hasSubmitted) {
       setHasSubmitted(false);
@@ -102,17 +102,17 @@ export default function VerifyEmailPage() {
             ) => {
               console.log("otp data sending:", values.otp + " " + phoneNumber);
               try {
-                const res = await store
-                  .dispatch(
-                    verifyOtp({
-                      otp: values.otp,
-                      phoneNumber: phoneNumber ?? "",
-                    })
-                  )
-                  .unwrap();
-                if (res) {
-                  setHasSubmitted(true);
-                }
+                // const res = await store
+                //   .dispatch(
+                //     verifyOtp({
+                //       otp: values.otp,
+                //       phoneNumber: phoneNumber ?? "",
+                //     })
+                //   )
+                //   .unwrap();
+                // if (res) {
+                setHasSubmitted(true);
+                // }
               } catch (err) {
                 resetForm();
                 setHasSubmitted(false);

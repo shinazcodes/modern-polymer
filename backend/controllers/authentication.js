@@ -1,6 +1,6 @@
 var passport = require('passport');
 var mongoose = require('mongoose');
-const {  checkLoginAccess } = require('../util/util');
+const {  checkLoginAccess, checkAccess } = require('../util/util');
 var User = mongoose.model('User');
 
 var sendJSONresponse = function(res, status, content) {
@@ -34,8 +34,11 @@ module.exports.register = function(req, res) {
       } else {
       // user.setPassword(req.body.password);
       user.isVerified = true;
-      user.email = user.email;
+      user.email = user.email;a
       user.username = user.email;
+      if(req.body.userType !== "admin") {
+        user.approvedByAdmin = false;
+      }
         // user.save(function(err) {
         //   if(err) {
         //   res.status(403);
@@ -64,7 +67,7 @@ module.exports.register = function(req, res) {
                 } else {
                 res.status(200);
                 res.json({
-                  "response" : "user created successfully",
+                  "response" : "user created successfully! please wait for approval from admin to start using the app!",
                   "message": "SUCCESS"
                 });
               }
@@ -92,7 +95,7 @@ module.exports.login = async function(req, res) {
   const check = await checkLoginAccess(req.body.username,res);
   if(!check)
   return;
-
+  
   passport.authenticate('local', function (err, user, info) { 
     
     if(err){
@@ -123,6 +126,52 @@ module.exports.login = async function(req, res) {
      }
     }
  })(req, res);
+
+ 
+};
+
+
+module.exports.onboardTechnician = async function(req, res) {
+  const check = await checkAccess(req,res)
+  if(!check)
+  return;
+  if(!req.body || !req.body.phoneNumber) {
+    sendJSONresponse(res, 400, {
+      "message": "All fields required"
+      ,
+      "response": "error",
+
+    });
+    return;
+  }
+ 
+
+
+  User.findOne({ phoneNumber: req.body.phoneNumber }).exec(
+    function (err, tech) {
+      //removing other technicians assigned job if it is assigned and is not the same technician
+        User.findOneAndUpdate(
+          { phoneNumber: req.body.phoneNumber },
+          {
+            $set: {
+              approvedByAdmin: true
+            },
+          },
+          { new: true },
+          (err1, doc) => {
+            if (err1 || !doc) {
+              res.status(403).json({
+                "response": "error",
+              "message": "something went wrong"
+                            });
+            } else if(doc) {
+              res.status(200).json({
+              "response": "the technician has been verified and onboarded to hometech successfully!"});
+            }
+          }
+        );
+      }
+  );
 
  
 };

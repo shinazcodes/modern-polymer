@@ -17,6 +17,7 @@ import {
   blockUnblockUser,
   getTechnician,
   getTechnicianList,
+  onboardTechnician,
   removeTechnician,
 } from "../../api/Auth/techniciansSlice";
 import TechnicianCarouselComponent from "../components/technicianCarousel";
@@ -85,14 +86,22 @@ export default function Technicians() {
   const filteredtechnicians = useMemo(() => {
     console.log(filteredtechnicians);
     return query === ""
-      ? state.technician.data
-      : state.technician.data.filter((technician) =>
-          technician?.email
-            ?.toLowerCase()
-            .replace(/\s+/g, "")
-            .includes(query.toLowerCase().replace(/\s+/g, ""))
+      ? state.technician.data.filter((technician) => technician.approvedByAdmin)
+      : state.technician.data.filter(
+          (technician) =>
+            technician?.email
+              ?.toLowerCase()
+              .replace(/\s+/g, "")
+              .includes(query.toLowerCase().replace(/\s+/g, "")) &&
+            technician.approvedByAdmin
         );
   }, [query, state]);
+
+  const adminApprovalPendingTechnicians = useMemo(() => {
+    return state.technician.data.filter(
+      (technician) => !technician.approvedByAdmin
+    );
+  }, [state]);
 
   useEffect(() => {
     setSelectedTechnician(filteredtechnicians[0]);
@@ -133,6 +142,81 @@ export default function Technicians() {
           placeholder="search by email"
         />
         <ul className="h-full overflow-scroll pt-4">
+          {adminApprovalPendingTechnicians.length > 0 && (
+            <Disclosure key={1}>
+              {({ open }) => (
+                <>
+                  <Disclosure.Button className="flex mt-2 w-full justify-between rounded-lg bg-green-400 px-4 py-2 text-left text-sm font-medium text-green-900 hover:bg-green-500 focus:outline-none focus-visible:ring focus-visible:ring-yellow-500 focus-visible:ring-opacity-75">
+                    <span>
+                      verification pending(
+                      {adminApprovalPendingTechnicians.length})
+                    </span>
+                    <ChevronUpIcon
+                      className={`${
+                        open ? "rotate-180 transform" : ""
+                      } h-5 w-5 text-purple-500`}
+                    />
+                  </Disclosure.Button>
+                  <Disclosure.Panel className="px-4 pt-4 pb-2 text-sm text-black">
+                    {adminApprovalPendingTechnicians.map((technician) => (
+                      <li
+                        className="hover:bg-green-200  cursor-pointer p-2 rounded-lg"
+                        key={technician._id}
+                        onClick={() => {
+                          setSelectedTechnician(technician);
+                        }}
+                      >
+                        <div className="flex flex-row flex-wrap place-content-between">
+                          <span>
+                            {technician.firstName + " " + technician.lastName}(
+                            {technician.email})
+                          </span>
+                          {/* <div className="bg-gray-300 w-full h-px"></div> */}
+                          <button
+                            type="button"
+                            className={classNames(
+                              "inline-flex justify-center mr-4 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2",
+                              technician.isBlocked
+                                ? "bg-blue-600 hover:bg-blue-700  focus:ring-blue-500"
+                                : "bg-green-600 hover:bg-green-700  focus:ring-green-500"
+                            )}
+                            onClick={async (e: React.MouseEvent) => {
+                              try {
+                                if (technician?.phoneNumber) {
+                                  const res = await store
+                                    .dispatch(
+                                      onboardTechnician({
+                                        phoneNumber: technician?.phoneNumber,
+                                      })
+                                    )
+                                    .unwrap();
+                                  if (res.response !== "error") {
+                                    confirmAlert({
+                                      title: "success",
+                                      message: res.message,
+                                    });
+                                    getTechnicians();
+                                  }
+                                }
+                              } catch (error: any) {
+                                confirmAlert({
+                                  title: "error",
+                                  message: error.message,
+                                });
+                              }
+                              e.preventDefault();
+                            }}
+                          >
+                            verify and onboard
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
+          )}
           {filteredtechnicians.map((technician) => (
             <li
               className="hover:bg-blue-200  cursor-pointer p-2 rounded-lg"

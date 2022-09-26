@@ -107,6 +107,11 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  approvedByAdmin:{
+    type: Boolean,
+    required: false, 
+    default: false
+  },
 
 });
 
