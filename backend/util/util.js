@@ -16,6 +16,12 @@ module.exports.checkAccess = async function (req, res) {
           message: "unauthorized",
         });
         resolve(false);
+      }  else if (user && !user.approvedByAdmin) {
+        res.status(401).json({
+          response: "error",
+          message: "please wait for verification and approval from admin to start using your account",
+        });
+        resolve(false);
       } else {
         resolve(true);
       }
